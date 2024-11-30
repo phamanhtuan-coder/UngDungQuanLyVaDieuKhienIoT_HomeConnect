@@ -60,7 +60,6 @@ fun Header() {
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
-                Spacer(modifier = Modifier.height(2.dp))
                 Text(text = "Username", color = Color.Black, fontSize = 16.sp)
 
             }
