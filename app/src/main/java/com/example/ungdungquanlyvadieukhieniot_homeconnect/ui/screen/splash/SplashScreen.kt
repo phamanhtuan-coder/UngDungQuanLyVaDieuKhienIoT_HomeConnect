@@ -19,45 +19,59 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 /**
  * Màn hình Splash hiển thị logo và tên công ty
  * -----------------------------------------
  * Người viết: Nguyễn Thanh Sang
- * Ngày viết: 30/11/2023
- * Lần cập nhật cuối: 30/11/2023
+ * Ngày viết: 30/11/2024
+ * Lần cập nhật cuối: 1/12/2024
  * -----------------------------------------
  * Input: Không có
  *
- * Output: Hiển thị màn hình Splash với logo ở giữa và tên Nhóm ở đáy
+ * Output: Column chứa logo, tên ứng dụng và tên công ty
  *
  * ---------------------------------------
+ * Người cập nhật: Phạm Anh Tuấn
+ * Ngày cập nhật: 1/12/2024
+ *
+ * Nội dung cập nhật:
+ *  - Thêm chú thích
+ *  - Thêm hàm @Preview
+ *  - Thêm text tên App
+ *  - Chuyển Box thành Column
+ *
  */
 
-@Preview
+
+@Preview(showBackground = true)
 @Composable
 fun SplashScreen() {
-    Box(
+   return Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Color.White)
+            .background(color = Color.White),
+       //Căn giữa các thành phần
+        verticalArrangement = Arrangement.Center,
+       horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Hiển thị logo ở giữa màn hình
         Image(
             painter = painterResource(id = R.drawable.logo),
-            contentDescription = "Mô tả hình ảnh",
-            modifier = Modifier.align(Alignment.Center) // Căn giữa
+            contentDescription = "Logo ứng dụng HomeConnect"
         )
-
-        // Hiển thị tên nhóm ở đáy màn hình
+       Spacer(modifier = Modifier.height(8.dp))
+       Text(
+           text = "HomeConnect",
+           fontWeight = FontWeight.ExtraBold,
+           fontSize = 20.sp
+         )
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "CKC F.IT SmartNet Solutions",
             fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .align(Alignment.BottomCenter) // Căn ở đáy và giữa màn hình
-                .padding(bottom = 42.dp) // Cách đáy 42dp
+            fontSize = 16.sp
         )
     }
 
 }
-
