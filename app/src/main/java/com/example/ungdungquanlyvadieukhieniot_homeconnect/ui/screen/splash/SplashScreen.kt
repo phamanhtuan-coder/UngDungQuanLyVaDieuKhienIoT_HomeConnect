@@ -20,15 +20,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-/** Giao diện màn hình Splash (Splash Screen)
+/**
+ * Màn hình Splash hiển thị logo và tên công ty
  * -----------------------------------------
  * Người viết: Nguyễn Thanh Sang
- * Ngày viết: 30/11/2024
- * Lần cập nhật cuối: 30/11/2024
+ * Ngày viết: 30/11/2023
+ * Lần cập nhật cuối: 30/11/2023
  * -----------------------------------------
- * Input:
+ * Input: Không có
  *
- * Output: Box
+ * Output: Hiển thị màn hình Splash với logo ở giữa và tên Nhóm ở đáy
  *
  * ---------------------------------------
  */
@@ -41,20 +42,20 @@ fun SplashScreen() {
             .fillMaxSize()
             .background(color = Color.White)
     ) {
-        // Hình ảnh ở giữa
+        // Hiển thị logo ở giữa màn hình
         Image(
             painter = painterResource(id = R.drawable.logo),
             contentDescription = "Mô tả hình ảnh",
             modifier = Modifier.align(Alignment.Center) // Căn giữa
         )
 
-        // Text gần đáy
+        // Hiển thị tên nhóm ở đáy màn hình
         Text(
             text = "CKC F.IT SmartNet Solutions",
             fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .align(Alignment.BottomCenter) // Căn ở đáy và giữa màn hình
-                .padding(bottom = 42.dp) // Cách đáy 16dp
+                .padding(bottom = 42.dp) // Cách đáy 42dp
         )
     }
 
