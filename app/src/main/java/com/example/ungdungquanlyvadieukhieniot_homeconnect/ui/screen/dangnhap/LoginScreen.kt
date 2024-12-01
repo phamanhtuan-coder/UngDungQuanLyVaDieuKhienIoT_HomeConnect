@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -29,37 +30,41 @@ import androidx.wear.compose.material3.TextButton
  * Ngày viết: 01/12/2024
  * Lần cập nhật cuối: 01/12/2024
  * -----------------------------------------
- * Input:
+ * Input: Không có
  *
- *
- * Output:
- *
+ * Output: Column chứa các thành phần giao diện của màn hình đăng nhập
  * ---------------------------------------
+ * Người cập nhật: Phạm Anh Tuấn
+ * Ngày cập nhật: 01/12/2024
+ * ---------------------------------------
+ * Nội dung cập nhật:
+ *  - Dịch sang tiếng việt
+ *  - Bỏ các biến tạm
+ *  - Chỉnh sửa bố cục giao diện
  */
 
 
 @Preview(showBackground = true)
 @Composable
 fun LoginScreen() {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-
-    Column(
+    return Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
             .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
 
         Text(
-            text = "Login",
+            text = "Đăng nhập",
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(top = 40.dp)
         )
         Text(
-            text = "Please sign in to continue.",
+            text = "Hãy đăng nhập để tiếp tục",
             fontSize = 16.sp,
             color = Color.Gray,
             modifier = Modifier.padding(top = 8.dp)
@@ -69,8 +74,10 @@ fun LoginScreen() {
 
         // Email
         OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
+            value = "",
+            onValueChange = {
+                /* xử lý thay đổi giá trị */
+            },
             label = { Text("Email") },
             leadingIcon = { Icon(Icons.Filled.Email, contentDescription = "Email Icon") },
             modifier = Modifier.fillMaxWidth()
@@ -85,9 +92,10 @@ fun LoginScreen() {
                 .height(60.dp)
         ) {
             OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Password") },
+                value = "",
+                onValueChange = {
+                     /* xử lý thay đổi giá trị */                },
+                label = { Text("Mật khẩu") },
                 leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = "Lock Icon") },
                 visualTransformation = PasswordVisualTransformation(),
                 modifier = Modifier
@@ -96,22 +104,24 @@ fun LoginScreen() {
 
 
             TextButton(
-                onClick = { /* xử lý hiện mật khẩu */ },
+                onClick = {
+                /* xử lý hiện mật khẩu */
+                },
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
                     .padding(end = 12.dp).size(70.dp)
             ) {
-                Text(text = "FORGOT", color = Color(0xFFFFA726))
+                Text(text = "QUÊN", color = Color(0xFFFFA726))
             }
         }
 
         Spacer(modifier = Modifier.height(40.dp))
 
-        // nút Login
+        // Nút Login
         Button(
-            onClick = { /* xử lýLogin */ },
+            onClick = { /* xử lý Login */ },
             modifier = Modifier
-                .width(150.dp)
+                .width(200.dp)
                 .height(50.dp)
                 .align(Alignment.End)
                 .padding(end = 12.dp),
@@ -124,16 +134,16 @@ fun LoginScreen() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
-                Spacer(modifier = Modifier.weight(1f))
+                //Spacer(modifier = Modifier.weight(1f))
                 Text(
-                    text = "LOGIN",
+                    text = "ĐĂNG NHẬP",
                     color = Color.White,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(8.dp))
                 Icon(
-                    imageVector = Icons.Filled.ArrowForward,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = "Arrow Icon",
                     tint = Color.White
                 )
@@ -142,21 +152,23 @@ fun LoginScreen() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        //nút tới đăng ký
+        //Nút tới đăng ký
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Don't have an account?",
+                text = "Chưa có tài khoản?",
                 color = Color.Gray,
                 fontSize = 14.sp
             )
             Spacer(modifier = Modifier.width(4.dp))
-            TextButton(onClick = { /* xử lý tới đăng ký */ }) {
+            TextButton(onClick = {
+            /* xử lý tới đăng ký */
+            }) {
                 Text(
-                    text = "Sign up",
+                    text = "Đăng ký",
                     color = Color(0xFFFFA726),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
@@ -165,6 +177,3 @@ fun LoginScreen() {
         }
     }
 }
-
-
-
