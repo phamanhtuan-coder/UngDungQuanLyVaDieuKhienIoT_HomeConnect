@@ -1,11 +1,10 @@
-package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.dangnhap
+package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.login
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
