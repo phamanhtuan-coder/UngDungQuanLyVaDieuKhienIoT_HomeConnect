@@ -54,7 +54,7 @@ import androidx.compose.ui.unit.sp
  * -----------------------------------------
  * Người viết: Nguyễn Thanh Sang
  * Ngày viết: 1/12/2024
- * Lần cập nhật cuối: 1/12/2024
+ * Lần cập nhật cuối: 2/12/2024
  * -----------------------------------------
  *
  * Mô tả:
@@ -69,32 +69,48 @@ import androidx.compose.ui.unit.sp
  * - Liên kết quay lại để chuyển về màn hình đăng nhập.
  */
 
+/**
+ * Các phần đã thêm/sửa
+ * -----------------------------------------
+ * Lần cập nhật: 2/12/2024
+ * -----------------------------------------
+ * 1. Thêm `scaleFactor` để giao diện tương thích với nhiều kích thước màn hình.
+ * 2. Sử dụng `lineHeight` để tăng khoảng cách giữa các dòng văn bản.
+ * 3. Tăng `fontSize` và chỉnh màu chữ trong `OutlinedTextField`.
+ * 4. Tính chiều rộng động với `onGloballyPositioned` để đồng bộ bố cục.
+ * 5. Cải thiện căn chỉnh và thêm hành động nhấn cho liên kết "Quay lại".
+ */
+
 
 @Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PasswordRecoveryScreen() {
+    // Lấy thông tin màn hình
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp // Lấy chiều rộng màn hình
     val density = LocalDensity.current.density // Mật độ điểm ảnh
-    val scaleFactor = screenWidth / 360f // Tỷ lệ co dựa trên màn hình thiết kế chuẩn
+    val scaleFactor = screenWidth / 360f // Tỷ lệ co dựa trên kích thước thiết kế chuẩn
 
+    // Biến lưu kích thước chiều rộng của Text (px và dp)
     var textWidthPx by remember { mutableStateOf(0) }
     var textWidthDp by remember { mutableStateOf(0.dp) }
 
-    // Chuyển đổi pixel sang dp khi kích thước thay đổi
+    // Chuyển đổi kích thước từ px sang dp khi kích thước thay đổi
     LaunchedEffect(textWidthPx) {
-        textWidthDp = with(density) { textWidthPx.dp }
+        textWidthDp = with(density) { textWidthPx.dp}
     }
 
+    // Giao diện chính
     Column(
         modifier = Modifier
             .fillMaxSize()
             .imePadding() // Tự động thêm khoảng trống khi bàn phím xuất hiện
-            .verticalScroll(rememberScrollState())
-            .background(color = Color.White), // Đặt nền trắng
+            .verticalScroll(rememberScrollState()) // Cho phép cuộn
+            .background(color = Color.White), // Nền trắng
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Cột chứa toàn bộ nội dung màn hình
         Column(
             modifier = Modifier.padding(
                 top = (38 * scaleFactor).dp,
@@ -126,18 +142,20 @@ fun PasswordRecoveryScreen() {
             Text(
                 text = "Đừng lo, chúng tôi sẽ gửi hướng dẫn đặt lại (mật khẩu) cho bạn.",
                 textAlign = TextAlign.Center,
-                lineHeight = 36.sp,
+                lineHeight = (18 * scaleFactor).sp, // Thêm khoảng cách giữa các dòng
                 fontSize = (16 * scaleFactor).sp,
                 modifier = Modifier
                     .onGloballyPositioned { coordinates ->
-                        textWidthPx = coordinates.size.width // Lấy kích thước của Text sau khi bố trí
+                        // Lưu chiều rộng của Text sau khi bố trí (đơn vị px)
+                        textWidthPx = coordinates.size.width
                     }
             )
 
             Spacer(modifier = Modifier.height((32 * scaleFactor).dp))
 
+            // Cột chứa trường nhập email và nút hành động
             Column(
-                modifier = Modifier.width(textWidthDp) // Sử dụng giá trị dp đã chuyển đổi
+                modifier = Modifier.width(textWidthDp) // Chiều rộng khớp với Text
             ) {
                 // Tiêu đề "Email"
                 Text(
@@ -145,14 +163,14 @@ fun PasswordRecoveryScreen() {
                     fontSize = (16 * scaleFactor).sp
                 )
 
-                // Trường nhập email với viền xung quanh
+                // Trường nhập email
                 OutlinedTextField(
                     value = "",
                     onValueChange = {},
                     placeholder = {
                         Text(
                             text = "Nhập email của bạn",
-                            fontSize = (20 * scaleFactor).sp
+                            fontSize = (20 * scaleFactor).sp // Tăng kích thước chữ placeholder
                         )
                     },
                     colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -162,7 +180,7 @@ fun PasswordRecoveryScreen() {
                     ),
                     textStyle = androidx.compose.ui.text.TextStyle(
                         fontSize = (18 * scaleFactor).sp, // Tăng kích thước chữ trong trường nhập liệu
-                        color = Color.Black // Đặt màu chữ cho nội dung nhập
+                        color = Color.Black // Màu chữ khi nhập liệu
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -199,11 +217,11 @@ fun PasswordRecoveryScreen() {
 
                 Spacer(modifier = Modifier.height((32 * scaleFactor).dp))
 
-                // Hàng ngang chứa biểu tượng mũi tên và văn bản "Quay lại"
+                // Hàng ngang chứa liên kết "Quay lại"
                 Row(
                     modifier = Modifier.width(textWidthDp),
                 ) {
-                    Row (
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable(onClick = {}),
@@ -231,5 +249,6 @@ fun PasswordRecoveryScreen() {
         }
     }
 }
+
 
 
