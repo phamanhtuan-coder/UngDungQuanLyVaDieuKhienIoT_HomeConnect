@@ -30,9 +30,15 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -68,6 +74,19 @@ import androidx.compose.ui.unit.sp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PasswordRecoveryScreen() {
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp // Lấy chiều rộng màn hình
+    val density = LocalDensity.current.density // Mật độ điểm ảnh
+    val scaleFactor = screenWidth / 360f // Tỷ lệ co dựa trên màn hình thiết kế chuẩn
+
+    var textWidthPx by remember { mutableStateOf(0) }
+    var textWidthDp by remember { mutableStateOf(0.dp) }
+
+    // Chuyển đổi pixel sang dp khi kích thước thay đổi
+    LaunchedEffect(textWidthPx) {
+        textWidthDp = with(density) { textWidthPx.dp }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -76,125 +95,141 @@ fun PasswordRecoveryScreen() {
             .background(color = Color.White), // Đặt nền trắng
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Một cột con chứa toàn bộ các thành phần bên trong
         Column(
-            modifier = Modifier
-                .padding(top = 32.dp, start = 16.dp, end = 16.dp, bottom = 32.dp) // Cột con chiếm toàn bộ chiều rộng
+            modifier = Modifier.padding(
+                top = (38 * scaleFactor).dp,
+                start = (16 * scaleFactor).dp,
+                end = (16 * scaleFactor).dp,
+                bottom = (38 * scaleFactor).dp
+            ),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Cột chứa phần tiêu đề
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Logo ứng dụng
-                Image(
-                    painter = painterResource(id = R.drawable.logo),
-                    contentDescription = "Logo ứng dụng HomeConnect"
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Tiêu đề "Khôi phục mật khẩu"
-                Text(
-                    text = "Khôi phục mật khẩu?",
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 20.sp,
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Văn bản hướng dẫn khôi phục mật khẩu
-                Text(
-                    text = "Đừng lo, chúng tôi sẽ gửi hướng dẫn đặt lại (mật khẩu) cho bạn.",
-                    textAlign = TextAlign.Center, // Căn giữa văn bản
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    fontSize = 16.sp
-                )
-            }
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Tiêu đề "Email"
-            Text(text = "Email", fontSize = 16.sp)
-
-            // Trường nhập email với viền xung quanh
-            OutlinedTextField(
-                value = "",
-                onValueChange = {},
-                placeholder = {
-                    // Nhãn "Nhập email của bạn"
-                    Text(
-                        text = "Nhập email của bạn",
-                        fontSize = 20.sp
-                    )
-                },
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color(0xFF6534BB),// Màu viền khi focus
-                    unfocusedBorderColor = Color.Gray,     // Màu viền khi không focus
-                    disabledBorderColor = Color.Gray, // Màu viền khi bị vô hiệu hóa
-                    errorBorderColor = Color.Red           // Màu viền khi có lỗi
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp)
-                    .height(56.dp),
-                singleLine = false, // Cho phép nhập nhiều dòng
-                shape = RoundedCornerShape(8.dp),
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Email, // Hiển thị bàn phím nhập email
-                    imeAction = ImeAction.Done // Nút "Done" trên bàn phím
-                )
+            // Logo ứng dụng
+            Image(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = "Logo ứng dụng HomeConnect",
+                modifier = Modifier.size((100 * scaleFactor).dp)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
 
-            // Nút "Khôi phục mật khẩu"
-            Button(
-                onClick = {},
+            // Tiêu đề "Khôi phục mật khẩu"
+            Text(
+                text = "Khôi phục mật khẩu?",
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = (20 * scaleFactor).sp,
+            )
+
+            Spacer(modifier = Modifier.height((8 * scaleFactor).dp))
+
+            // Văn bản hướng dẫn khôi phục mật khẩu
+            Text(
+                text = "Đừng lo, chúng tôi sẽ gửi hướng dẫn đặt lại (mật khẩu) cho bạn.",
+                textAlign = TextAlign.Center,
+                lineHeight = 36.sp,
+                fontSize = (16 * scaleFactor).sp,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp)
-                    .height(56.dp),
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF6534BB), // Màu nền nút
-                    contentColor = Color.White
-                )
+                    .onGloballyPositioned { coordinates ->
+                        textWidthPx = coordinates.size.width // Lấy kích thước của Text sau khi bố trí
+                    }
+            )
+
+            Spacer(modifier = Modifier.height((32 * scaleFactor).dp))
+
+            Column(
+                modifier = Modifier.width(textWidthDp) // Sử dụng giá trị dp đã chuyển đổi
             ) {
-                // Văn bản trên nút
+                // Tiêu đề "Email"
                 Text(
-                    text = "Khôi phục mật khẩu",
-                    fontSize = 20.sp
-                )
-            }
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Hàng ngang chứa biểu tượng mũi tên và văn bản "Quay lại"
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { /* Xử lý sự kiện khi nhấn vào */ }
-            ) {
-                // Biểu tượng mũi tên quay lại
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Back",
-                    tint = Color.Black,
-                    modifier = Modifier.size(20.dp)
+                    text = "Email",
+                    fontSize = (16 * scaleFactor).sp
                 )
 
-                Spacer(modifier = Modifier.width(8.dp))
-
-                // Văn bản "Quay lại để đăng nhập"
-                Text(
-                    text = "Quay lại để đăng nhập",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                // Trường nhập email với viền xung quanh
+                OutlinedTextField(
+                    value = "",
+                    onValueChange = {},
+                    placeholder = {
+                        Text(
+                            text = "Nhập email của bạn",
+                            fontSize = (20 * scaleFactor).sp
+                        )
+                    },
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = Color(0xFF6534BB), // Màu viền khi focus
+                        unfocusedBorderColor = Color.Gray, // Màu viền khi không focus
+                        errorBorderColor = Color.Red // Màu viền khi có lỗi
+                    ),
+                    textStyle = androidx.compose.ui.text.TextStyle(
+                        fontSize = (18 * scaleFactor).sp, // Tăng kích thước chữ trong trường nhập liệu
+                        color = Color.Black // Đặt màu chữ cho nội dung nhập
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding((4 * scaleFactor).dp)
+                        .height((58 * scaleFactor).dp),
+                    singleLine = true,
+                    shape = RoundedCornerShape((8 * scaleFactor).dp),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Done
+                    )
                 )
+
+                Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
+
+                // Nút "Khôi phục mật khẩu"
+                Button(
+                    onClick = {},
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding((4 * scaleFactor).dp)
+                        .height((58 * scaleFactor).dp),
+                    shape = RoundedCornerShape((8 * scaleFactor).dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF6534BB),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(
+                        text = "Khôi phục mật khẩu",
+                        fontSize = (20 * scaleFactor).sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.height((32 * scaleFactor).dp))
+
+                // Hàng ngang chứa biểu tượng mũi tên và văn bản "Quay lại"
+                Row(
+                    modifier = Modifier.width(textWidthDp),
+                ) {
+                    Row (
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable(onClick = {}),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.Black,
+                            modifier = Modifier.size((20 * scaleFactor).dp)
+                        )
+
+                        Spacer(modifier = Modifier.width((8 * scaleFactor).dp))
+
+                        Text(
+                            text = "Quay lại để đăng nhập",
+                            fontSize = (16 * scaleFactor).sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black
+                        )
+                    }
+                }
             }
         }
     }
 }
+
+
