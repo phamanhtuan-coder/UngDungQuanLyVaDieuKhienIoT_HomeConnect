@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.otp.OTPVerificationScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.UngDungQuanLyVaDieuKhienIoT_HomeConnectTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,8 +20,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             UngDungQuanLyVaDieuKhienIoT_HomeConnectTheme {
-
-
+                OTPVerificationScreen()
             }
         }
     }
