@@ -21,7 +21,6 @@ class MainActivity : ComponentActivity() {
             UngDungQuanLyVaDieuKhienIoT_HomeConnectTheme {
 
 
-
             }
         }
     }
