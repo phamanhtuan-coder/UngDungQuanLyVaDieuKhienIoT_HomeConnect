@@ -74,37 +74,30 @@ import androidx.compose.ui.unit.sp
  * -----------------------------------------
  * Lần cập nhật: 2/12/2024
  * -----------------------------------------
- * 1. Thêm `scaleFactor` để giao diện tương thích với nhiều kích thước màn hình.
- * 2. Sử dụng `lineHeight` để tăng khoảng cách giữa các dòng văn bản.
- * 3. Tăng `fontSize` và chỉnh màu chữ trong `OutlinedTextField`.
- * 4. Tính chiều rộng động với `onGloballyPositioned` để đồng bộ bố cục.
- * 5. Cải thiện căn chỉnh và thêm hành động nhấn cho liên kết "Quay lại".
+ * 1. Sử dụng `lineHeight` để tăng khoảng cách giữa các dòng văn bản.
+ * 2. Tăng `fontSize` và chỉnh màu chữ trong `OutlinedTextField`.
+ * 3. Tính chiều rộng động với `onGloballyPositioned` để đồng bộ bố cục.
+ * 4. Cải thiện căn chỉnh và thêm hành động nhấn cho liên kết "Quay lại".
  */
-
 
 @Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PasswordRecoveryScreen() {
-    // Lấy thông tin màn hình
-    val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp // Lấy chiều rộng màn hình
-    val density = LocalDensity.current.density // Mật độ điểm ảnh
-    val scaleFactor = screenWidth / 360f // Tỷ lệ co dựa trên kích thước thiết kế chuẩn
-
     // Biến lưu kích thước chiều rộng của Text (px và dp)
     var textWidthPx by remember { mutableStateOf(0) }
     var textWidthDp by remember { mutableStateOf(0.dp) }
 
     // Chuyển đổi kích thước từ px sang dp khi kích thước thay đổi
+    val density = LocalDensity.current
     LaunchedEffect(textWidthPx) {
-        textWidthDp = with(density) { textWidthPx.dp}
+        textWidthDp = with(density) { textWidthPx.toDp() }
     }
 
     // Giao diện chính
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .imePadding() // Tự động thêm khoảng trống khi bàn phím xuất hiện
             .verticalScroll(rememberScrollState()) // Cho phép cuộn
             .background(color = Color.White), // Nền trắng
@@ -113,10 +106,10 @@ fun PasswordRecoveryScreen() {
         // Cột chứa toàn bộ nội dung màn hình
         Column(
             modifier = Modifier.padding(
-                top = (38 * scaleFactor).dp,
-                start = (16 * scaleFactor).dp,
-                end = (16 * scaleFactor).dp,
-                bottom = (38 * scaleFactor).dp
+                top = 38.dp,
+                start = 16.dp,
+                end = 16.dp,
+                bottom = 38.dp
             ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -124,26 +117,26 @@ fun PasswordRecoveryScreen() {
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Logo ứng dụng HomeConnect",
-                modifier = Modifier.size((100 * scaleFactor).dp)
+                modifier = Modifier.size(100.dp)
             )
 
-            Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Tiêu đề "Khôi phục mật khẩu"
             Text(
                 text = "Khôi phục mật khẩu?",
                 fontWeight = FontWeight.ExtraBold,
-                fontSize = (20 * scaleFactor).sp,
+                fontSize = 20.sp,
             )
 
-            Spacer(modifier = Modifier.height((8 * scaleFactor).dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Văn bản hướng dẫn khôi phục mật khẩu
             Text(
                 text = "Đừng lo, chúng tôi sẽ gửi hướng dẫn đặt lại (mật khẩu) cho bạn.",
                 textAlign = TextAlign.Center,
-                lineHeight = (18 * scaleFactor).sp, // Thêm khoảng cách giữa các dòng
-                fontSize = (16 * scaleFactor).sp,
+                lineHeight = 24.sp, // Thêm khoảng cách giữa các dòng
+                fontSize = 16.sp,
                 modifier = Modifier
                     .onGloballyPositioned { coordinates ->
                         // Lưu chiều rộng của Text sau khi bố trí (đơn vị px)
@@ -151,7 +144,7 @@ fun PasswordRecoveryScreen() {
                     }
             )
 
-            Spacer(modifier = Modifier.height((32 * scaleFactor).dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             // Cột chứa trường nhập email và nút hành động
             Column(
@@ -160,7 +153,7 @@ fun PasswordRecoveryScreen() {
                 // Tiêu đề "Email"
                 Text(
                     text = "Email",
-                    fontSize = (16 * scaleFactor).sp
+                    fontSize = 16.sp
                 )
 
                 // Trường nhập email
@@ -170,7 +163,7 @@ fun PasswordRecoveryScreen() {
                     placeholder = {
                         Text(
                             text = "Nhập email của bạn",
-                            fontSize = (20 * scaleFactor).sp // Tăng kích thước chữ placeholder
+                            fontSize = 16.sp // Tăng kích thước chữ placeholder
                         )
                     },
                     colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -179,31 +172,31 @@ fun PasswordRecoveryScreen() {
                         errorBorderColor = Color.Red // Màu viền khi có lỗi
                     ),
                     textStyle = androidx.compose.ui.text.TextStyle(
-                        fontSize = (18 * scaleFactor).sp, // Tăng kích thước chữ trong trường nhập liệu
+                        fontSize = 18.sp, // Tăng kích thước chữ trong trường nhập liệu
                         color = Color.Black // Màu chữ khi nhập liệu
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding((4 * scaleFactor).dp)
-                        .height((58 * scaleFactor).dp),
+                        .padding(4.dp)
+                        .height(58.dp),
                     singleLine = true,
-                    shape = RoundedCornerShape((8 * scaleFactor).dp),
+                    shape = RoundedCornerShape(8.dp),
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Email,
                         imeAction = ImeAction.Done
                     )
                 )
 
-                Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 // Nút "Khôi phục mật khẩu"
                 Button(
                     onClick = {},
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding((4 * scaleFactor).dp)
-                        .height((58 * scaleFactor).dp),
-                    shape = RoundedCornerShape((8 * scaleFactor).dp),
+                        .padding(4.dp)
+                        .height(58.dp),
+                    shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF6534BB),
                         contentColor = Color.White
@@ -211,11 +204,11 @@ fun PasswordRecoveryScreen() {
                 ) {
                     Text(
                         text = "Khôi phục mật khẩu",
-                        fontSize = (20 * scaleFactor).sp
+                        fontSize = 20.sp
                     )
                 }
 
-                Spacer(modifier = Modifier.height((32 * scaleFactor).dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
                 // Hàng ngang chứa liên kết "Quay lại"
                 Row(
@@ -232,14 +225,14 @@ fun PasswordRecoveryScreen() {
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back",
                             tint = Color.Black,
-                            modifier = Modifier.size((20 * scaleFactor).dp)
+                            modifier = Modifier.size(20.dp)
                         )
 
-                        Spacer(modifier = Modifier.width((8 * scaleFactor).dp))
+                        Spacer(modifier = Modifier.width(8.dp))
 
                         Text(
                             text = "Quay lại để đăng nhập",
-                            fontSize = (16 * scaleFactor).sp,
+                            fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.Black
                         )
