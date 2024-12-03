@@ -55,6 +55,11 @@ import androidx.compose.ui.text.input.KeyboardType
  *  ---------------------------------------
  *  Nội dung cập nhật:
  *  - responsive
+ *  Người cập nhật: Phạm Xuân Nhân
+ *  Ngày cập nhật: 03/12/2024
+ *  ---------------------------------------
+ *  Nội dung cập nhật:
+ *  - responsive
  */
 
 
@@ -62,7 +67,7 @@ import androidx.compose.ui.text.input.KeyboardType
 
 
 @Composable
-fun ResponsiveLoginScreen() {
+fun LoginScreen() {
     // Nhận cấu hình màn hình
     val configuration = LocalConfiguration.current
     val screenHeightDp = configuration.screenHeightDp.dp
@@ -88,12 +93,15 @@ fun ResponsiveLoginScreen() {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
+        Box(modifier = Modifier.align(Alignment.Center)){
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
                 .padding(horizontal = horizontalPadding)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .heightIn(max=800.dp)
+                .widthIn(max=600.dp),
             verticalArrangement = if (isLandscape) Arrangement.Center else Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -220,7 +228,7 @@ fun ResponsiveLoginScreen() {
             Spacer(modifier = Modifier.weight(1f))
         }
     }
-}
+}}
 
 
 
