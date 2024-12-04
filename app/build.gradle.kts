@@ -40,7 +40,11 @@ android {
 }
 
 dependencies {
+    implementation ("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+    implementation ("androidx.compose.material:material-icons-core:1.4.0")
+    implementation ("androidx.compose.material:material-icons-extended:1.4.0")
 
+    implementation("androidx.compose.foundation:foundation-layout:1.7.5")
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
