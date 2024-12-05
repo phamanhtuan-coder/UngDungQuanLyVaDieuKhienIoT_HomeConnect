@@ -1,4 +1,4 @@
-package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.newpass
+package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.updatepassword
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -39,7 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 
 @Preview(showBackground = true)
 @Composable
-fun NewPasswordScreen() {
+fun UpdatePassWord() {
     val configuration = LocalConfiguration.current
     val screenHeightDp = configuration.screenHeightDp.dp
     val screenWidthDp = configuration.screenWidthDp.dp
@@ -79,7 +79,7 @@ fun NewPasswordScreen() {
                 verticalArrangement = if (isLandscape) Arrangement.Center else Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Tạo khẩu mới",
+                    text = "Cập nhật Mật Khẩu",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
@@ -92,7 +92,18 @@ fun NewPasswordScreen() {
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(24.dp))
-
+                //MẬT KHẨU CŨ
+                OutlinedTextField(
+                    value = "",
+                    onValueChange = {},
+                    label = { Text("MẬT KHẨU CŨ") },
+                    leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = "Lock Icon") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+                Spacer(modifier = Modifier.height(16.dp))
                 // MẬT KHẨU MỚI
                 OutlinedTextField(
                     value = "",
@@ -160,7 +171,7 @@ fun NewPasswordScreen() {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 TextButton(onClick = { }) {
-                    Text("⬅ Quay lại đăng nhập")
+                    Text("⬅ Quay lại")
                 }
             }
         }
