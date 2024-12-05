@@ -1,14 +1,17 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.personal
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.*
@@ -18,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -50,15 +54,15 @@ fun PersonalScreen() {
     val isTablet = screenWidthDp >= 600.dp // Xác định thiết bị là tablet hay điện thoại
 
     // Điều chỉnh kích thước và phông chữ dựa trên loại thiết bị
-    val mainBoxWidth = if (isTablet) 600.dp else 350.dp
-    val mainBoxHeight = if (isTablet) 300.dp else 180.dp
-    val circleSize = if (isTablet) 150.dp else 80.dp
-    val innerCircleSize = if (isTablet) 140.dp else 70.dp
+    val mainBoxWidth = if (isTablet) 580.dp else 350.dp
+    val mainBoxHeight = if (isTablet) 280.dp else 180.dp
+    val circleSize = if (isTablet) 130.dp else 80.dp
+    val innerCircleSize = if (isTablet) 120.dp else 70.dp
     val topPadding = if (isTablet) 100.dp else 64.dp
     val nameFontSize = if (isTablet) 40.sp else 25.sp
     val emailFontSize = if (isTablet) 24.sp else 20.sp
-    val buttonWidth = if (isTablet) 330.dp else 190.dp
-    val buttonHeight = if (isTablet) 110.dp else 60.dp
+    val buttonWidth = if (isTablet) 310.dp else 190.dp
+    val buttonHeight = if (isTablet) 90.dp else 60.dp
     val buttonFontSize = if (isTablet) 18.sp else 14.sp
     val circleOffsetY = if (isTablet) (-40).dp else (-20).dp
     val topColumnPadding = if (isTablet) 120.dp else 70.dp
@@ -130,7 +134,10 @@ fun PersonalScreen() {
                             Box(
                                 modifier = Modifier
                                     .align(Alignment.CenterEnd)
-                                    .offset(x = (if (isTablet) 20 else 10).dp, y = (if (isTablet) 50 else 25).dp),
+                                    .offset(
+                                        x = (if (isTablet) 10 else 10).dp,
+                                        y = (if (isTablet) 40 else 25).dp
+                                    ),
                                 contentAlignment = Alignment.TopEnd
                             ) {
                                 Icon(
@@ -138,7 +145,7 @@ fun PersonalScreen() {
                                     contentDescription = "Verified",
                                     tint = Color.Green,
                                     modifier = Modifier
-                                        .size((if (isTablet) 80 else 40).dp)
+                                        .size((if (isTablet) 70 else 40).dp)
                                         .padding(
                                             start = if (isTablet) 16.dp else 8.dp,
                                             end = if (isTablet) 16.dp else 8.dp,
@@ -286,7 +293,7 @@ fun PersonalScreen() {
                     Column(
                         modifier = Modifier
                             .size(width = mainBoxWidth, height = columnHeight.dp)
-                            .padding(bottom = 32.dp)
+                            .padding(bottom = if (isTablet) 35.dp else 25.dp)
                             .shadow(
                                 elevation = 8.dp,
                                 shape = RoundedCornerShape(12.dp),
@@ -302,6 +309,7 @@ fun PersonalScreen() {
                             onValueChange = { /* TODO: Xử lý thay đổi giá trị */ },
                             label = { Text("Họ và tên") },
                             modifier = Modifier
+                                .height(itemHeight.dp)
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp)
                         )
@@ -314,6 +322,7 @@ fun PersonalScreen() {
                             onValueChange = { /* TODO: Xử lý thay đổi giá trị */ },
                             label = { Text("Số điện thoại") },
                             modifier = Modifier
+                                .height(itemHeight.dp)
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp)
                         )
@@ -327,42 +336,34 @@ fun PersonalScreen() {
                                 onValueChange = { /* TODO: Xử lý thay đổi giá trị */ },
                                 label = { Text("Nơi sống hiện tại") },
                                 modifier = Modifier
+                                    .height(itemHeight.dp)
                                     .fillMaxWidth()
                                     .padding(horizontal = 16.dp)
                                     .clickable { /* TODO: Mở rộng danh sách */ },
                                 readOnly = true,
-                                trailingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.KeyboardArrowDown,
-                                        contentDescription = null
-                                    )
-                                }
                             )
                             // TODO: Thêm logic cho menu dropdown
                         }
 
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        // Trường "Giới tính" (Dropdown)
-                        Box {
-                            OutlinedTextField(
-                                value = "",
-                                onValueChange = { /* TODO: Xử lý thay đổi giá trị */ },
-                                label = { Text("Giới tính") },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp)
-                                    .clickable { /* TODO: Mở rộng danh sách */ },
-                                readOnly = true,
-                                trailingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.KeyboardArrowDown,
-                                        contentDescription = null
-                                    )
-                                }
-                            )
-                            // TODO: Thêm logic cho menu dropdown
-                        }
+                        OutlinedTextField(
+                            value = "",
+                            onValueChange = { /* TODO: Xử lý thay đổi giá trị */ },
+                            label = { Text("Email") },
+                            modifier = Modifier
+                                .height(itemHeight.dp)
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                                .clickable { /* TODO: Mở rộng danh sách */ },
+                            readOnly = true,
+                            trailingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.CheckCircle,
+                                    contentDescription = null
+                                )
+                            }
+                        )
 
                         Spacer(modifier = Modifier.height(12.dp))
 
@@ -372,6 +373,7 @@ fun PersonalScreen() {
                             onValueChange = { /* TODO: Xử lý thay đổi giá trị */ },
                             label = { Text("Ngày sinh (dd/mm/yyyy)") },
                             modifier = Modifier
+                                .height(itemHeight.dp)
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp),
                             trailingIcon = {
