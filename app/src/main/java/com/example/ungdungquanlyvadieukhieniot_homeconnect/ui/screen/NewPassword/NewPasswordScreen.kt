@@ -1,4 +1,4 @@
-package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.newpass
+package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.NewPassword
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
