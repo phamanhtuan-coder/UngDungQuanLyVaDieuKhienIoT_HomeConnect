@@ -26,7 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 
-/** Giao diện màn hình mật khẩu mới (NewPassword Screen)
+/** Giao diện màn hình Tạo mật khẩu mới (NewPassword Screen)
  * -----------------------------------------
  * Người viết: Phạm Xuân Nhân
  * Ngày viết: 03/12/2024
@@ -34,7 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
  * -----------------------------------------
  * Input: Không có
  *
- * Output: Column chứa các thành phần giao diện của màn hình mật khẩu mới
+ * Output: Column chứa các thành phần giao diện của màn hình Tạo mật khẩu mới
  */
 
 @Preview(showBackground = true)

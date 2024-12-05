@@ -26,22 +26,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 
-/** Giao diện màn hình mật khẩu mới (NewPassword Screen)
+/** Giao diện màn hình Xác Thực Mật Khẩu (Password authentication Screen)
  * -----------------------------------------
  * Người viết: Phạm Xuân Nhân
- * Ngày viết: 03/12/2024
- * Lần cập nhật cuối: 04/12/2024
+ * Ngày viết: 04/12/2024
+ * Lần cập nhật cuối: 05/12/2024
  * -----------------------------------------
  * Input: Không có
  *
- * Output: Column chứa các thành phần giao diện của màn hình mật khẩu mới
+ * Output: Column chứa các thành phần giao diện của màn hình Xác Thực Mật Khẩu
  */
 
 @Preview(showBackground = true)
 @Composable
-fun UpdatePassWord() {
+fun Passwordauthentication() {
     val configuration = LocalConfiguration.current
-    val screenHeightDp = configuration.screenHeightDp.dp
     val screenWidthDp = configuration.screenWidthDp.dp
 
     // Xác định xem nếu chúng ta đang ở chế độ ngang
