@@ -1,4 +1,4 @@
-package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.editprofile
+package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.editProfile
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -114,4 +114,3 @@ fun EditProfileField(label: String, value: String) {
         )
     }
 }
-

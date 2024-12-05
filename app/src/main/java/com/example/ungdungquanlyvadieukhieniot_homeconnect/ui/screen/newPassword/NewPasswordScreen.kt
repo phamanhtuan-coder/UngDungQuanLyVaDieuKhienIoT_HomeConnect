@@ -1,4 +1,4 @@
-package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.NewPassword
+package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.newPassword
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -37,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
  * Output: Column chứa các thành phần giao diện của màn hình Tạo mật khẩu mới
  */
 
+// sửa lại các chỗ lỗi giống UpdatePasswordScreen
 @Preview(showBackground = true)
 @Composable
 fun NewPasswordScreen() {
@@ -97,7 +98,7 @@ fun NewPasswordScreen() {
                 OutlinedTextField(
                     value = "",
                     onValueChange = {},
-                    label = { Text("MẬT KHẨU MỚI") },
+                    label = { Text("Mật khẩu mới") },
                     leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = "Lock Icon") },
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -110,7 +111,7 @@ fun NewPasswordScreen() {
                 OutlinedTextField(
                     value = "",
                     onValueChange = { },
-                    label = { Text("NHẬP LẠI MẬT KHẨU MỚI ") },
+                    label = { Text("Nhập lại mật khẩu mới ") },
                     leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = "Lock Icon") },
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),

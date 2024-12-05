@@ -64,8 +64,8 @@ fun HomeScreen(
         topBar = {
             /*
             * Hiển thị Header
-             */
-            Header()
+             */ Header()
+
         },
         bottomBar = {
             /*

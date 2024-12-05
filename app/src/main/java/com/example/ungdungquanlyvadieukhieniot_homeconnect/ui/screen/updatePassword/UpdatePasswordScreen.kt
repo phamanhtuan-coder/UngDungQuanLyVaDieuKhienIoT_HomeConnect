@@ -1,4 +1,4 @@
-package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.updatepassword
+package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.updatePassword
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -50,7 +50,7 @@ import androidx.compose.ui.unit.sp
 
 @Preview(showBackground = true)
 @Composable
-fun UpdatePassWord() {
+fun UpdatePasswordScreen() {
     val configuration = LocalConfiguration.current
     val screenHeightDp = configuration.screenHeightDp.dp
     val screenWidthDp = configuration.screenWidthDp.dp
@@ -89,6 +89,7 @@ fun UpdatePassWord() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = if (isLandscape) Arrangement.Center else Arrangement.SpaceBetween
             ) {
+                //Thiếu Image
                 Text(
                     text = "Cập nhật Mật Khẩu",
                     fontSize = 20.sp,
@@ -96,6 +97,8 @@ fun UpdatePassWord() {
                     color = Color.Black
                 )
                 Spacer(modifier = Modifier.height(8.dp))
+
+                //Căn lại tỉ lệ chữ
                 Text(
                     text = "Mật khẩu mới của bạn phải khác với mật khẩu đã sử dụng trước đó.",
                     fontSize = 14.sp,
@@ -104,10 +107,12 @@ fun UpdatePassWord() {
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 //MẬT KHẨU CŨ
+
+                //Sửa lại cac textfield cho có thêm icon ẩn hiện mật khẩu
                 OutlinedTextField(
                     value = "",
                     onValueChange = {},
-                    label = { Text("MẬT KHẨU CŨ") },
+                    label = { Text("Mật khẩu cũ") },
                     leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = "Lock Icon") },
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -119,7 +124,7 @@ fun UpdatePassWord() {
                 OutlinedTextField(
                     value = "",
                     onValueChange = {},
-                    label = { Text("MẬT KHẨU MỚI") },
+                    label = { Text("Mật khẩu mới") },
                     leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = "Lock Icon") },
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -132,7 +137,7 @@ fun UpdatePassWord() {
                 OutlinedTextField(
                     value = "",
                     onValueChange = { },
-                    label = { Text("NHẬP LẠI MẬT KHẨU MỚI ") },
+                    label = { Text("Nhập lại mật khẩu mới ") },
                     leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = "Lock Icon") },
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -150,6 +155,7 @@ fun UpdatePassWord() {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Spacer(modifier = Modifier.width(4.dp))
+                    //Thêm Icon cho ký tự đặc biệt check và X
                     Text(
                         text = if (bien) "✔ Phải có ít nhất 8 ký tự" else "✘ Phải có ít nhất 8 ký tự",
                         color = if (bien) Color.Green else Color.Red,
@@ -164,6 +170,7 @@ fun UpdatePassWord() {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Spacer(modifier = Modifier.width(4.dp))
+                    //Thêm Icon cho ký tự đặc biệt check và X
                     Text(
                         text = if (bien) "✔ Phải chứa một ký tự đặc biệt" else "✘ Phải chứa một ký tự đặc biệt",
                         color = if (bien) Color.Green else Color.Red,
@@ -181,6 +188,7 @@ fun UpdatePassWord() {
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
+                //Sửa thành IconButton
                 TextButton(onClick = { }) {
                     Text("⬅ Quay lại")
                 }

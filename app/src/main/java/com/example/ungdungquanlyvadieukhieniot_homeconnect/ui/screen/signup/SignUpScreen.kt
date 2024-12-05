@@ -39,7 +39,7 @@ import androidx.compose.ui.platform.LocalConfiguration
  */
 @Preview(showBackground = true)
 @Composable
-fun SignupScreen() {
+fun SignUpScreen() {
     // Nhận cấu hình màn hình
     val configuration = LocalConfiguration.current
     val screenHeightDp = configuration.screenHeightDp.dp

@@ -1,4 +1,4 @@
-package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.passwordauthentication
+package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.passwordAuthentication
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -37,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
  * Output: Column chứa các thành phần giao diện của màn hình Xác Thực Mật Khẩu
  */
 
+//Sai thiết kế màn hình
 @Preview(showBackground = true)
 @Composable
 fun Passwordauthentication() {
@@ -114,4 +115,3 @@ fun Passwordauthentication() {
         }
     }
 }
-
