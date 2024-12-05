@@ -104,7 +104,7 @@ fun SignupScreen() {
                     OutlinedTextField(
                         value = "",
                         onValueChange = { },
-                        label = { Text("HỌ TÊN") },
+                        label = { Text("Họ Tên") },
                         leadingIcon = {
                             Icon(
                                 Icons.Default.Person,
@@ -147,7 +147,7 @@ fun SignupScreen() {
                     OutlinedTextField(
                         value = "",
                         onValueChange = { },
-                        label = { Text("NHẬP LẠI MẬT KHẨU") },
+                        label = { Text("Nhập lại mật khẩu") },
                         leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = "Lock Icon") },
                         visualTransformation = PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -161,7 +161,7 @@ fun SignupScreen() {
                         leadingIcon = {
                             Icon(
                                 Icons.Default.LocationOn,
-                                contentDescription = "LocationOn Icon"
+                                contentDescription = "Location Icon"
                             )
                         },
                         modifier = Modifier.fillMaxWidth(),
@@ -170,7 +170,7 @@ fun SignupScreen() {
                     OutlinedTextField(
                         value = "",
                         onValueChange = { },
-                        label = { Text("SĐT") },
+                        label = { Text("Số điện thoại") },
                         leadingIcon = {
                             Icon(
                                 Icons.Default.Phone,
@@ -206,7 +206,7 @@ fun SignupScreen() {
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "SIGN UP →",
+                            text = "Đăng Ký →",
                             color = Color.White,
                             fontWeight = FontWeight.Bold,
                             fontSize = if (isLandscape) 14.sp else 16.sp
