@@ -23,8 +23,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
@@ -40,6 +43,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -286,7 +290,53 @@ fun DeviceDetailScreen() {
                                         .fillMaxWidth()
                                         .clip(RoundedCornerShape(topEndPercent = 100)) // Clip nội dung ScrollableTabRow
                                 ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth() // Đảm bảo Row chiếm toàn bộ chiều rộng
+                                            .padding(top = 12.dp, start = 12.dp, end = 8.dp), // Khoảng cách bên trong Row
+                                        horizontalArrangement = Arrangement.SpaceBetween, // Đẩy các phần tử ra hai bên
+                                        verticalAlignment = Alignment.CenterVertically // Căn giữa theo chiều dọc
+                                    ) {
+                                        // Nội dung bên trái (Schedule + số 3)
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = "Schedule",
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 18.sp
+                                            )
+                                            Spacer(modifier = Modifier.width(4.dp)) // Khoảng cách giữa "Schedule" và Box
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(20.dp) // Kích thước Box
+                                                    .background(color = Color.Blue, shape = RoundedCornerShape(6.dp)), // Màu nền
+                                                contentAlignment = Alignment.Center // Đưa nội dung bên trong vào giữa Box
+                                            ) {
+                                                Text(
+                                                    text = "3", // Nội dung số 3
+                                                    color = Color.White, // Màu chữ
+                                                    fontWeight = FontWeight.Bold,
+                                                    style = androidx.compose.ui.text.TextStyle(fontSize = 12.sp) // Kích thước chữ
+                                                )
+                                            }
+                                        }
 
+                                        // Nội dung bên phải (Icon trong Box)
+                                        Box(
+                                            modifier = Modifier
+                                                .padding(end = 12.dp)
+                                                .size(36.dp) // Kích thước Box
+                                                .background(color = Color.White, shape = RoundedCornerShape(6.dp)), // Màu nền và góc bo
+                                            contentAlignment = Alignment.Center // Đưa Icon vào giữa Box
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Add,
+                                                contentDescription = "Add",
+                                                modifier = Modifier.size(24.dp) // Kích thước Icon
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }
