@@ -54,16 +54,55 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.zIndex
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
 import kotlin.times
 
+// Data class cho LayoutConfig
+data class LayoutConfig(
+    val outerPadding: Dp,
+    val textFieldSpacing: Dp,
+    val headingFontSize: TextUnit,
+    val textFontSize: TextUnit,
+    val contentWidth: Dp,
+    val iconSize: Dp,
+    val boxHeight: Dp,
+    val cornerBoxSize: Dp,          // Kích thước cho Box góc lõm
+    val cornerBoxRadius: Int,       // Bo tròn góc cho Box góc lõm
+    val dialogPadding: Dp           // Padding cho AlertDialog
+)
+
+// Tính toán LayoutConfig dựa trên kích thước màn hình
+@Composable
+fun rememberResponsiveLayoutConfig(): LayoutConfig {
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+
+    return LayoutConfig(
+        outerPadding = screenWidth * 0.05f,                    // 5% chiều rộng màn hình
+        textFieldSpacing = 8.dp + screenHeight * 0.01f,              // 1% chiều cao màn hình
+        headingFontSize = (12 + screenWidth.value * 0.04f).sp, // Tỷ lệ font size theo chiều rộng
+        textFontSize = (10 + screenWidth.value * 0.03f).sp,    // Font size mô tả
+        contentWidth = screenWidth * 0.8f,                    // Chiếm 80% chiều rộng màn hình
+        iconSize = screenWidth * 0.08f,                       // 8% của chiều rộng màn hình
+        boxHeight = screenHeight * 0.1f,                      // 10% của chiều cao màn hình
+        cornerBoxSize = screenWidth * 0.1f,                   // Kích thước cố định cho Box góc lõm
+        cornerBoxRadius = 50,                                 // Phần trăm bo góc
+        dialogPadding = screenWidth * 0.04f                   // Padding cho hộp thoại
+    )
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun WiFiConnectionScreen() {
+    val layoutConfig = rememberResponsiveLayoutConfig() // Lấy LayoutConfig
+    var showDialog by remember { mutableStateOf(false) }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = Color.LightGray,
@@ -72,23 +111,11 @@ fun WiFiConnectionScreen() {
         floatingActionButton = { NutHome() },
         floatingActionButtonPosition = FabPosition.Center,
         content = { innerPadding ->
-            val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-            val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-
-            // Kích thước
-            val outerPadding = 6.dp + screenWidth * 0.05f
-            val textFieldSpacing = 8.dp + screenHeight * 0.01f
-            val headingFontSize = (12 + screenWidth.value * 0.06f).sp
-            val textFontSize = (3 + screenWidth.value * 0.035f).sp
-            val contentWidth = (120.dp + screenWidth) * 0.7f
-
-            var showDialog by remember { mutableStateOf(false) }
-            val a = innerPadding
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = outerPadding)
-                    .padding(innerPadding), // Giữ padding của Scaffold,
+//                    .padding(bottom = layoutConfig.outerPadding) // Padding linh hoạt
+                    .padding(innerPadding),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -96,7 +123,7 @@ fun WiFiConnectionScreen() {
                 item {
                     Box(
                         modifier = Modifier
-                            .fillMaxSize()
+                            .fillMaxWidth()
                             .wrapContentHeight()
                             .background(color = Color.LightGray)
                     ) {
@@ -105,106 +132,97 @@ fun WiFiConnectionScreen() {
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .wrapContentHeight() // Chiều cao vừa với nội dung bên trong
-                                    .background(color = Color.LightGray)
+                                    .wrapContentHeight()
+                                    .background(
+                                        color = Color.Blue,
+                                        shape = RoundedCornerShape(bottomStart = 40.dp)
+                                    )
                             ) {
-                                // Hộp màu xanh dương
-                                Box(
+                                Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .wrapContentHeight()
-                                        .background(
-                                            color = Color.Blue,
-                                            shape = RoundedCornerShape(bottomStart = 40.dp)
-                                        )
+                                        .padding(horizontal = layoutConfig.outerPadding, vertical = layoutConfig.textFieldSpacing),
+                                    horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 16.dp, vertical = 16.dp), // Canh lề các thành phần
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        // Tiêu đề
-                                        Text("KẾT NỐI", fontSize = 24.sp, color = Color.White)
-                                        Text("ĐIỂM TRUY CẬP", fontSize = 24.sp, color = Color.White)
+                                    Text(
+                                        "KẾT NỐI",
+                                        fontSize = layoutConfig.headingFontSize,
+                                        color = Color.White
+                                    )
+                                    Text(
+                                        "ĐIỂM TRUY CẬP",
+                                        fontSize = layoutConfig.headingFontSize,
+                                        color = Color.White
+                                    )
 
-                                        Spacer(modifier = Modifier.height(8.dp))
+                                    Spacer(modifier = Modifier.height(layoutConfig.textFieldSpacing))
 
-                                        // TextField 1
-                                        OutlinedTextField(
-                                            value = "",
-                                            onValueChange = {},
-                                            label = { Text("ID thiết bị của bạn là:") },
-                                            singleLine = true,
-                                            modifier = Modifier
-                                                .width(contentWidth),
-                                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                                containerColor = Color.LightGray,               // Màu nền
-                                                focusedBorderColor = Color.Black,            // Màu viền khi focus
-                                                unfocusedBorderColor = Color.Gray,          // Màu viền khi không focus
-                                                cursorColor = Color.Red,                    // Màu con trỏ
-                                                focusedLabelColor = Color.LightGray,             // Màu nhãn khi focus
-                                                unfocusedLabelColor = Color.Gray            // Màu nhãn khi không focus
-                                            )
+                                    OutlinedTextField(
+                                        value = "",
+                                        onValueChange = {},
+                                        placeholder = { Text("ID thiết bị của bạn là:") },
+                                        singleLine = true,
+                                        modifier = Modifier.width(layoutConfig.contentWidth),
+                                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                                            containerColor = Color.White,             // Màu nền của TextField
+                                            focusedBorderColor = Color.Black,         // Màu viền khi focus
+                                            unfocusedBorderColor = Color.Gray,        // Màu viền khi không focus
+                                            cursorColor = Color.Black,                // Màu con trỏ nhập liệu
+                                            focusedLabelColor = Color.Black,           // Màu Label khi focus
+                                            unfocusedLabelColor = Color.LightGray      // Màu Label khi không focus
                                         )
+                                    )
 
-                                        Spacer(modifier = Modifier.height(8.dp))
+                                    Spacer(modifier = Modifier.height(layoutConfig.textFieldSpacing))
 
-                                        // TextField 2
-                                        OutlinedTextField(
-                                            value = "",
-                                            onValueChange = {},
-                                            label = { Text("Tên thiết bị của bạn là:") },
-                                            singleLine = true,
-                                            modifier = Modifier
-                                                .width(contentWidth),
-                                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                                containerColor = Color.LightGray,               // Màu nền
-                                                focusedBorderColor = Color.Black,            // Màu viền khi focus
-                                                unfocusedBorderColor = Color.Gray,          // Màu viền khi không focus
-                                                cursorColor = Color.Red,                    // Màu con trỏ
-                                                focusedLabelColor = Color.LightGray,             // Màu nhãn khi focus
-                                                unfocusedLabelColor = Color.Gray            // Màu nhãn khi không focus
-                                            )
+                                    OutlinedTextField(
+                                        value = "",
+                                        onValueChange = {},
+                                        placeholder = { Text("Tên thiết bị của bạn là:") },
+                                        singleLine = true,
+                                        modifier = Modifier.width(layoutConfig.contentWidth),
+                                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                                            containerColor = Color.White,             // Màu nền của TextField
+                                            focusedBorderColor = Color.Black,         // Màu viền khi focus
+                                            unfocusedBorderColor = Color.Gray,        // Màu viền khi không focus
+                                            cursorColor = Color.Black,                // Màu con trỏ nhập liệu
+                                            focusedLabelColor = Color.Black,           // Màu Label khi focus
+                                            unfocusedLabelColor = Color.LightGray      // Màu Label khi không focus
                                         )
-                                    }
+                                    )
                                 }
                             }
-
-                            // Hộp màu xanh lá cây với góc lõm
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .width(40.dp)
-                                    .height(50.dp)
+                                    .height(layoutConfig.cornerBoxSize)
                             ) {
                                 // Box màu vàng (ở dưới)
                                 Box(
                                     modifier = Modifier
-                                        .width(40.dp)
-                                        .height(40.dp)
+                                        .size(layoutConfig.cornerBoxSize)
                                         .align(Alignment.TopEnd)
                                         .background(color = Color.Blue)
-                                        .zIndex(1f) // Z-index thấp hơn
+                                        .zIndex(1f)
                                 )
 
-                                // Box màu xanh lá cây (ở trên)
+                                // Box màu xám với góc lõm (ở trên)
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .background(
                                             color = Color.LightGray,
-                                            shape = RoundedCornerShape(topEndPercent = 50)
+                                            shape = RoundedCornerShape(topEndPercent = layoutConfig.cornerBoxRadius)
                                         )
-                                        .padding(start = outerPadding, end = outerPadding)
-                                        .width(50.dp)
-                                        .height(50.dp)
-                                        .zIndex(2f) // Z-index cao hơn
+                                        .height(layoutConfig.cornerBoxSize)
+                                        .zIndex(2f)
                                 ) {
                                     IconButton(
                                         onClick = { showDialog = true },
                                         modifier = Modifier
                                             .align(Alignment.CenterEnd)
+                                            .padding(end = layoutConfig.outerPadding)
+                                            .size(layoutConfig.iconSize)
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.Info,
@@ -218,109 +236,26 @@ fun WiFiConnectionScreen() {
                     }
                 }
 
-                // Hộp thoại bật lên
-                if (showDialog) {
-                    item {
-                        AlertDialog(
-                            onDismissRequest = { showDialog = false },
-                            confirmButton = {
-                                TextButton(onClick = { showDialog = false }) {
-                                    Text("Đóng", color = Color.Blue)
-                                }
-                            },
-                            shape = RoundedCornerShape(12.dp),
-                            text = {
-                                LazyColumn(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(start = outerPadding, end = outerPadding, bottom = outerPadding)
-                                ) {
-                                    item {
-                                        Text(
-                                            "Bạn hãy chọn điểm truy cập (Access Point) của thiết bị bạn muốn kết nối.\n" +
-                                                    "Tên của điểm truy cập sẽ có cú pháp: AP-{Tên_thiết_bị}-{ID_thiết_bị}.",
-                                            fontSize = textFontSize,
-                                            lineHeight = textFontSize * 1.2,
-                                            color = Color.Black
-                                        )
-                                        Spacer(modifier = Modifier.height(textFieldSpacing))
-
-                                        Text(
-                                            "Tên và Id thiết bị sẽ được hiển thị ở bên dưới",
-                                            lineHeight = textFontSize * 1.2,
-                                            fontSize = textFontSize,
-                                            color = Color.Black
-                                        )
-                                        Spacer(modifier = Modifier.height(textFieldSpacing))
-
-                                        Text(
-                                            "Ví dụ: ",
-                                            fontSize = textFontSize,
-                                            fontWeight = FontWeight.Bold,
-                                            lineHeight = textFontSize * 1.2,
-                                            color = Color.Black
-                                        )
-                                        Spacer(modifier = Modifier.width(textFieldSpacing))
-                                        Text(
-                                            "AP-DenThongMinh_A1-SLB_001",
-                                            fontSize = textFontSize,
-                                            lineHeight = textFontSize * 1.2,
-                                            color = Color.Black
-                                        )
-                                    }
-                                }
-                            }
-                        )
-                    }
-                }
-
                 // Công tắc Wi-Fi
                 item {
-                    Column (
+                    Column(
                         modifier = Modifier
-                            .padding(start = outerPadding, end = outerPadding)
-                            .width(contentWidth),
+                            .padding(horizontal = layoutConfig.outerPadding)
+                            .width(layoutConfig.contentWidth),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Row(
-                            modifier = Modifier
-                                .padding(top = 8.dp)
-                                .width(contentWidth),
+                            modifier = Modifier.width(layoutConfig.contentWidth),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("Wi-Fi: ", fontSize = textFontSize)
+                            Text("Wi-Fi:", fontSize = layoutConfig.textFontSize)
                             Switch(checked = true, onCheckedChange = {})
                         }
-                        WiFiCard(wifiName = "ABC", isConnected = true, onClick = {})
                     }
                 }
 
                 // Danh sách các mạng Wi-Fi khả dụng
-                item {
-                    Row (
-                        modifier = Modifier
-                            .padding(start = outerPadding, end = outerPadding)
-                            .padding(top = 8.dp)
-                            .width(contentWidth),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("Available networks:", fontSize = textFontSize)
-
-                        Icon(
-                            imageVector = Icons.Default.Refresh, // Biểu tượng refresh
-                            contentDescription = "Refresh Icon",
-                            tint = Color.Black,
-                            modifier = Modifier
-                                .size(36.dp) // Kích thước của icon
-                                .clickable(
-                                    onClick = {}
-                                )
-                        )
-                    }
-                }
-
                 item {
                     val wifiList = listOf(
                         "AP-DenThongMinh_A1-SLB_001",
@@ -329,8 +264,8 @@ fun WiFiConnectionScreen() {
                     )
                     Column(
                         modifier = Modifier
-                            .padding(start = outerPadding, end = outerPadding)
-                            .width(contentWidth)
+                            .padding(horizontal = layoutConfig.outerPadding)
+                            .width(layoutConfig.contentWidth)
                     ) {
                         for (wifiName in wifiList) {
                             WiFiCard(
@@ -341,6 +276,58 @@ fun WiFiConnectionScreen() {
                         }
                     }
                 }
+            }
+            // Đặt AlertDialog ngoài LazyColumn
+            if (showDialog) {
+                AlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    confirmButton = {
+                        TextButton(onClick = { showDialog = false }) {
+                            Text("Đóng", color = Color.Blue)
+                        }
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    text = {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = layoutConfig.dialogPadding, vertical = layoutConfig.textFieldSpacing)
+                        ) {
+                            item {
+                                Text(
+                                    "Bạn hãy chọn điểm truy cập (Access Point) của thiết bị bạn muốn kết nối.\n" +
+                                            "Tên của điểm truy cập sẽ có cú pháp: AP-{Tên_thiết_bị}-{ID_thiết_bị}.",
+                                    fontSize = layoutConfig.textFontSize,
+                                    lineHeight = layoutConfig.textFontSize * 1.2,
+                                    color = Color.Black
+                                )
+                                Spacer(modifier = Modifier.height(layoutConfig.textFieldSpacing))
+
+                                Text(
+                                    "Tên và Id thiết bị sẽ được hiển thị ở bên dưới",
+                                    lineHeight = layoutConfig.textFontSize * 1.2,
+                                    fontSize = layoutConfig.textFontSize,
+                                    color = Color.Black
+                                )
+                                Spacer(modifier = Modifier.height(layoutConfig.textFieldSpacing))
+
+                                Text(
+                                    "Ví dụ: ",
+                                    fontSize = layoutConfig.textFontSize,
+                                    fontWeight = FontWeight.Bold,
+                                    lineHeight = layoutConfig.textFontSize * 1.2,
+                                    color = Color.Black
+                                )
+                                Text(
+                                    "AP-DenThongMinh_A1-SLB_001",
+                                    fontSize = layoutConfig.textFontSize,
+                                    lineHeight = layoutConfig.textFontSize * 1.2,
+                                    color = Color.Black
+                                )
+                            }
+                        }
+                    }
+                )
             }
         }
     )
