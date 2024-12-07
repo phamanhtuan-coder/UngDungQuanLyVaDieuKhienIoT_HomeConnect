@@ -58,6 +58,7 @@ import androidx.compose.ui.zIndex
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
+import kotlin.times
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
@@ -65,6 +66,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
 fun WiFiConnectionScreen() {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        containerColor = Color.LightGray,
         topBar = { Header() },
         bottomBar = { MenuBottom() },
         floatingActionButton = { NutHome() },
@@ -81,13 +83,12 @@ fun WiFiConnectionScreen() {
             val contentWidth = (120.dp + screenWidth) * 0.7f
 
             var showDialog by remember { mutableStateOf(false) }
-
-            // Thay thế Column bằng LazyColumn
+            val a = innerPadding
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(bottom = outerPadding)
-                    .padding(innerPadding),
+                    .padding(innerPadding), // Giữ padding của Scaffold,
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -95,105 +96,122 @@ fun WiFiConnectionScreen() {
                 item {
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .fillMaxSize()
                             .wrapContentHeight()
                             .background(color = Color.LightGray)
-                            .height(450.dp)
                     ) {
-                        // Hộp màu xanh dương
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentHeight() // Chiều cao vừa với nội dung bên trong
-                                .background(color = Color.LightGray)
-                        ) {
+                        Column {
                             // Hộp màu xanh dương
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .wrapContentHeight()
-                                    .background(
-                                        color = Color.Blue,
-                                        shape = RoundedCornerShape(bottomStart = 40.dp)
-                                    )
+                                    .wrapContentHeight() // Chiều cao vừa với nội dung bên trong
+                                    .background(color = Color.LightGray)
                             ) {
-                                Column(
+                                // Hộp màu xanh dương
+                                Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(horizontal = 16.dp, vertical = 8.dp), // Canh lề các thành phần
-                                    horizontalAlignment = Alignment.CenterHorizontally
+                                        .wrapContentHeight()
+                                        .background(
+                                            color = Color.Blue,
+                                            shape = RoundedCornerShape(bottomStart = 40.dp)
+                                        )
                                 ) {
-                                    // Tiêu đề
-                                    Text("KẾT NỐI", fontSize = 24.sp, color = Color.White)
-                                    Text("ĐIỂM TRUY CẬP", fontSize = 24.sp, color = Color.White)
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 16.dp, vertical = 16.dp), // Canh lề các thành phần
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        // Tiêu đề
+                                        Text("KẾT NỐI", fontSize = 24.sp, color = Color.White)
+                                        Text("ĐIỂM TRUY CẬP", fontSize = 24.sp, color = Color.White)
 
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                        Spacer(modifier = Modifier.height(8.dp))
 
-                                    // TextField 1
-                                    OutlinedTextField(
-                                        value = "",
-                                        onValueChange = {},
-                                        label = { Text("ID thiết bị của bạn là:") },
-                                        singleLine = true,
-                                        modifier = Modifier.fillMaxWidth(0.8f) // Chiếm 80% chiều rộng màn hình
-                                    )
+                                        // TextField 1
+                                        OutlinedTextField(
+                                            value = "",
+                                            onValueChange = {},
+                                            label = { Text("ID thiết bị của bạn là:") },
+                                            singleLine = true,
+                                            modifier = Modifier
+                                                .width(contentWidth),
+                                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                                containerColor = Color.LightGray,               // Màu nền
+                                                focusedBorderColor = Color.Black,            // Màu viền khi focus
+                                                unfocusedBorderColor = Color.Gray,          // Màu viền khi không focus
+                                                cursorColor = Color.Red,                    // Màu con trỏ
+                                                focusedLabelColor = Color.LightGray,             // Màu nhãn khi focus
+                                                unfocusedLabelColor = Color.Gray            // Màu nhãn khi không focus
+                                            )
+                                        )
 
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                        Spacer(modifier = Modifier.height(8.dp))
 
-                                    // TextField 2
-                                    OutlinedTextField(
-                                        value = "",
-                                        onValueChange = {},
-                                        label = { Text("Tên thiết bị của bạn là:") },
-                                        singleLine = true,
-                                        modifier = Modifier.fillMaxWidth(0.8f) // Chiếm 80% chiều rộng màn hình
-                                    )
+                                        // TextField 2
+                                        OutlinedTextField(
+                                            value = "",
+                                            onValueChange = {},
+                                            label = { Text("Tên thiết bị của bạn là:") },
+                                            singleLine = true,
+                                            modifier = Modifier
+                                                .width(contentWidth),
+                                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                                containerColor = Color.LightGray,               // Màu nền
+                                                focusedBorderColor = Color.Black,            // Màu viền khi focus
+                                                unfocusedBorderColor = Color.Gray,          // Màu viền khi không focus
+                                                cursorColor = Color.Red,                    // Màu con trỏ
+                                                focusedLabelColor = Color.LightGray,             // Màu nhãn khi focus
+                                                unfocusedLabelColor = Color.Gray            // Màu nhãn khi không focus
+                                            )
+                                        )
+                                    }
                                 }
                             }
-                        }
 
-                        // Hộp màu xanh lá cây với góc lõm
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .offset(y = 1.dp)
-                                .padding(top = 400.dp)
-                                .width(40.dp)
-                                .height(50.dp)
-                        ) {
-                            // Box màu vàng (ở dưới)
-                            Box(
-                                modifier = Modifier
-                                    .width(40.dp)
-                                    .height(40.dp)
-                                    .align(Alignment.TopEnd)
-                                    .background(color = Color.Blue)
-                                    .zIndex(1f) // Z-index thấp hơn
-                            )
-
-                            // Box màu xanh lá cây (ở trên)
+                            // Hộp màu xanh lá cây với góc lõm
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .background(
-                                        color = Color.LightGray,
-                                        shape = RoundedCornerShape(topEndPercent = 50)
-                                    )
-                                    .padding(start = outerPadding, end = outerPadding)
-                                    .width(50.dp)
+                                    .width(40.dp)
                                     .height(50.dp)
-                                    .zIndex(2f) // Z-index cao hơn
                             ) {
-                                IconButton(
-                                    onClick = { showDialog = true },
+                                // Box màu vàng (ở dưới)
+                                Box(
                                     modifier = Modifier
-                                        .align(Alignment.CenterEnd)
+                                        .width(40.dp)
+                                        .height(40.dp)
+                                        .align(Alignment.TopEnd)
+                                        .background(color = Color.Blue)
+                                        .zIndex(1f) // Z-index thấp hơn
+                                )
+
+                                // Box màu xanh lá cây (ở trên)
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(
+                                            color = Color.LightGray,
+                                            shape = RoundedCornerShape(topEndPercent = 50)
+                                        )
+                                        .padding(start = outerPadding, end = outerPadding)
+                                        .width(50.dp)
+                                        .height(50.dp)
+                                        .zIndex(2f) // Z-index cao hơn
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Info,
-                                        contentDescription = "Info Icon",
-                                        tint = Color.Gray
-                                    )
+                                    IconButton(
+                                        onClick = { showDialog = true },
+                                        modifier = Modifier
+                                            .align(Alignment.CenterEnd)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Info,
+                                            contentDescription = "Info Icon",
+                                            tint = Color.Gray
+                                        )
+                                    }
                                 }
                             }
                         }
