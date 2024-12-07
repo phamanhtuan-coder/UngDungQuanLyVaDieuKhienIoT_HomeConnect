@@ -1,5 +1,6 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.wificonnection
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,10 +12,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -30,7 +33,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -44,16 +46,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.material.icons.filled.ArrowForwardIos // Biểu tượng mũi tên
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Wifi
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.zIndex
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun WiFiConnectionScreen() {
@@ -80,36 +86,116 @@ fun WiFiConnectionScreen() {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(start = outerPadding, end = outerPadding, bottom = outerPadding)
+                    .padding(bottom = outerPadding)
                     .padding(innerPadding),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // Tiêu đề
                 item {
-                    Column(
+                    Box(
                         modifier = Modifier
-                            .padding(top = outerPadding),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                            .fillMaxWidth()
+                            .wrapContentHeight()
+                            .background(color = Color.LightGray)
+                            .height(450.dp)
                     ) {
-                        Text("KẾT NỐI", fontSize = headingFontSize, color = Color.Black)
-                        Text("ĐIỂM TRUY CẬP", fontSize = headingFontSize, color = Color.Black)
-                    }
-                }
+                        // Hộp màu xanh dương
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight() // Chiều cao vừa với nội dung bên trong
+                                .background(color = Color.LightGray)
+                        ) {
+                            // Hộp màu xanh dương
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentHeight()
+                                    .background(
+                                        color = Color.Blue,
+                                        shape = RoundedCornerShape(bottomStart = 40.dp)
+                                    )
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp, vertical = 8.dp), // Canh lề các thành phần
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    // Tiêu đề
+                                    Text("KẾT NỐI", fontSize = 24.sp, color = Color.White)
+                                    Text("ĐIỂM TRUY CẬP", fontSize = 24.sp, color = Color.White)
 
-                // Icon hiển thị
-                item {
-                    Row (
-                        modifier = Modifier
-                            .width(contentWidth),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        IconButton(onClick = { showDialog = true }) {
-                            Icon(
-                                imageVector = Icons.Default.Info,
-                                contentDescription = "Info Icon",
-                                tint = Color.Gray
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                    // TextField 1
+                                    OutlinedTextField(
+                                        value = "",
+                                        onValueChange = {},
+                                        label = { Text("ID thiết bị của bạn là:") },
+                                        singleLine = true,
+                                        modifier = Modifier.fillMaxWidth(0.8f) // Chiếm 80% chiều rộng màn hình
+                                    )
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                    // TextField 2
+                                    OutlinedTextField(
+                                        value = "",
+                                        onValueChange = {},
+                                        label = { Text("Tên thiết bị của bạn là:") },
+                                        singleLine = true,
+                                        modifier = Modifier.fillMaxWidth(0.8f) // Chiếm 80% chiều rộng màn hình
+                                    )
+                                }
+                            }
+                        }
+
+                        // Hộp màu xanh lá cây với góc lõm
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .offset(y = 1.dp)
+                                .padding(top = 400.dp)
+                                .width(40.dp)
+                                .height(50.dp)
+                        ) {
+                            // Box màu vàng (ở dưới)
+                            Box(
+                                modifier = Modifier
+                                    .width(40.dp)
+                                    .height(40.dp)
+                                    .align(Alignment.TopEnd)
+                                    .background(color = Color.Blue)
+                                    .zIndex(1f) // Z-index thấp hơn
                             )
+
+                            // Box màu xanh lá cây (ở trên)
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(
+                                        color = Color.LightGray,
+                                        shape = RoundedCornerShape(topEndPercent = 50)
+                                    )
+                                    .padding(start = outerPadding, end = outerPadding)
+                                    .width(50.dp)
+                                    .height(50.dp)
+                                    .zIndex(2f) // Z-index cao hơn
+                            ) {
+                                IconButton(
+                                    onClick = { showDialog = true },
+                                    modifier = Modifier
+                                        .align(Alignment.CenterEnd)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Info,
+                                        contentDescription = "Info Icon",
+                                        tint = Color.Gray
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -129,7 +215,7 @@ fun WiFiConnectionScreen() {
                                 LazyColumn(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(8.dp)
+                                        .padding(start = outerPadding, end = outerPadding, bottom = outerPadding)
                                 ) {
                                     item {
                                         Text(
@@ -170,34 +256,11 @@ fun WiFiConnectionScreen() {
                     }
                 }
 
-                // ID thiết bị
-                item {
-                    OutlinedTextField(
-                        value = "", // Giá trị hiện tại của TextField
-                        onValueChange = { }, // Sự kiện khi giá trị thay đổi
-                        label = { Text("ID thiết bị của bạn là:", fontSize = textFontSize) }, // Nhãn cho TextField
-                        singleLine = true, // Chỉ hiển thị một dòng
-                        modifier = Modifier
-                            .width(contentWidth) // Chiều rộng của TextField
-                    )
-                }
-
-                // Tên thiết bị
-                item {
-                    OutlinedTextField(
-                        value = "", // Giá trị hiện tại của TextField
-                        onValueChange = { }, // Sự kiện khi giá trị thay đổi
-                        label = { Text("Tên thiết bị của bạn là:", fontSize = textFontSize) }, // Nhãn cho TextField
-                        singleLine = true, // Chỉ hiển thị một dòng
-                        modifier = Modifier
-                            .width(contentWidth) // Chiều rộng của TextField
-                    )
-                }
-
                 // Công tắc Wi-Fi
                 item {
                     Column (
                         modifier = Modifier
+                            .padding(start = outerPadding, end = outerPadding)
                             .width(contentWidth),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -219,6 +282,7 @@ fun WiFiConnectionScreen() {
                 item {
                     Row (
                         modifier = Modifier
+                            .padding(start = outerPadding, end = outerPadding)
                             .padding(top = 8.dp)
                             .width(contentWidth),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -246,7 +310,9 @@ fun WiFiConnectionScreen() {
                         "AP-DenThongMinh_A1-SLB_003"
                     )
                     Column(
-                        modifier = Modifier.width(contentWidth)
+                        modifier = Modifier
+                            .padding(start = outerPadding, end = outerPadding)
+                            .width(contentWidth)
                     ) {
                         for (wifiName in wifiList) {
                             WiFiCard(
