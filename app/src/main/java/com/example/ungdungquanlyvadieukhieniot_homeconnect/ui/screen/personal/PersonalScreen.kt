@@ -54,14 +54,14 @@ fun PersonalScreen() {
     val isTablet = screenWidthDp >= 600.dp // Xác định thiết bị là tablet hay điện thoại
 
     // Điều chỉnh kích thước và phông chữ dựa trên loại thiết bị
-    val mainBoxWidth = if (isTablet) 580.dp else 350.dp
+    val mainBoxWidth = if (isTablet) 480.dp else 350.dp
     val mainBoxHeight = if (isTablet) 280.dp else 180.dp
     val circleSize = if (isTablet) 130.dp else 80.dp
     val innerCircleSize = if (isTablet) 120.dp else 70.dp
     val topPadding = if (isTablet) 100.dp else 64.dp
     val nameFontSize = if (isTablet) 40.sp else 25.sp
     val emailFontSize = if (isTablet) 24.sp else 20.sp
-    val buttonWidth = if (isTablet) 310.dp else 190.dp
+    val buttonWidth = if (isTablet) 260.dp else 190.dp
     val buttonHeight = if (isTablet) 90.dp else 60.dp
     val buttonFontSize = if (isTablet) 18.sp else 14.sp
     val circleOffsetY = if (isTablet) (-40).dp else (-20).dp
