@@ -65,13 +65,19 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
  * -----------------------------------------
  * Người viết: Nguyễn Thanh Sang
  * Ngày viết: 07/12/2024
- * Lần cập nhật cuối: 08/12/2024
+ * Lần cập nhật cuối: 09/12/2024
  * -----------------------------------------
  * Input:
  *
  * Output: Scaffold
  *
  * ---------------------------------------
+ */
+/**
+ * Sủa lại phần giao diện cho thiết bị tablet
+ * ---------------------------
+ * Lần cập nhật 9/12/2024
+ * ---------------------------
  */
 
 fun isTablet(): Boolean {
