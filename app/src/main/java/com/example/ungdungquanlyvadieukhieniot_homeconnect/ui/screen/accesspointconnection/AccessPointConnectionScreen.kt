@@ -1,5 +1,7 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.accesspointconnection
 
+import android.content.Context
+import android.content.res.Resources
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -71,6 +74,12 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
  * ---------------------------------------
  */
 
+fun isTablet(): Boolean {
+    val screenSize = Resources.getSystem().configuration.smallestScreenWidthDp
+    return screenSize >= 600
+}
+
+
 data class LayoutConfig(
     val outerPadding: Dp,  // Padding bên ngoài, thường được tính theo tỉ lệ chiều rộng màn hình
     val textFieldSpacing: Dp, // Khoảng cách giữa các thành phần, dựa trên chiều cao màn hình
@@ -95,7 +104,7 @@ fun rememberResponsiveLayoutConfig(): LayoutConfig {
         textFieldSpacing = 8.dp + screenHeight * 0.01f,       // Khoảng cách giữa các thành phần = 8dp + 1% chiều cao màn hình
         headingFontSize = (12 + screenWidth.value * 0.04f).sp,// Font size tiêu đề dựa trên chiều rộng màn hình
         textFontSize = (10 + screenWidth.value * 0.03f).sp,   // Font size nội dung dựa trên chiều rộng màn hình
-        contentWidth = screenWidth * 0.8f,                    // Chiều rộng của nội dung chính bằng 80% chiều rộng màn hình
+        contentWidth = 400.dp + if (isTablet()) screenWidth * 0.05f else screenWidth * 0.025f,                    // Chiều rộng của nội dung chính bằng 80% chiều rộng màn hình
         iconSize = screenWidth * 0.08f,                       // Kích thước icon bằng 8% chiều rộng màn hình
         boxHeight = screenHeight * 0.1f,                      // Chiều cao Box là 10% chiều cao màn hình
         cornerBoxSize = screenWidth * 0.1f,                   // Kích thước cho Box góc lõm bằng 10% chiều rộng màn hình
@@ -234,21 +243,31 @@ fun AccessPointConnectionScreen() {
                                             shape = RoundedCornerShape(topEndPercent = layoutConfig.cornerBoxRadius)
                                         )
                                         .height(layoutConfig.cornerBoxSize) // Chiều cao linh hoạt
-                                        .zIndex(2f) // Z-index cao hơn
+                                        .zIndex(2f), // Z-index cao hơn
+                                    contentAlignment = Alignment.Center
                                 ) {
-                                    // Nút Icon thông tin
-                                    IconButton(
-                                        onClick = { showDialog = true },
+                                    Row(
                                         modifier = Modifier
-                                            .align(Alignment.CenterEnd)
-                                            .padding(end = layoutConfig.outerPadding)
-                                            .size(layoutConfig.iconSize)
+                                            .padding(horizontal = layoutConfig.outerPadding)
+                                            .width(layoutConfig.contentWidth), // Độ rộng linh hoạt theo LayoutConfig
+                                        horizontalArrangement = Arrangement.SpaceBetween,     // Các thành phần được bố trí cách xa nhau
+                                        verticalAlignment = Alignment.CenterVertically        // Căn giữa theo chiều dọc
                                     ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Info,
-                                            contentDescription = "Info Icon",
-                                            tint = Color.Gray
-                                        )
+                                        Box() {
+
+                                        }
+                                        // Nút Icon thông tin
+                                        IconButton(
+                                            onClick = { showDialog = true },
+                                            modifier = Modifier
+                                                .size(layoutConfig.iconSize)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Info,
+                                                contentDescription = "Info Icon",
+                                                tint = Color.Gray
+                                            )
+                                        }
                                     }
                                 }
                             }
