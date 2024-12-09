@@ -37,14 +37,19 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
  * -----------------------------------------
  * Người viết: Nguyễn Thanh Sang
  * Ngày viết: 29/11/2024
- * Lần cập nhật cuối: 4/11/2024
+ * Lần cập nhật cuối: 9/12/2024
  * -----------------------------------------
  * Input:
  *
  * Output: Scaffold
  * ---------------------------------------
  */
-
+/**
+ * Sủa lại phần giao diện cho thiết bị tablet
+ * ---------------------------
+ * Lần cập nhật 9/12/2024
+ * ---------------------------
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
