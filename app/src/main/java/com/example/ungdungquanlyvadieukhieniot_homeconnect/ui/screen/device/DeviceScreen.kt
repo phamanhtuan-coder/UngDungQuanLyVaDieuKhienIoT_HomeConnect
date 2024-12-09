@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -19,7 +20,9 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
@@ -58,7 +61,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
@@ -108,7 +113,6 @@ fun DeviceScreen() {
                     Column (
                         modifier = Modifier
                             .fillMaxSize() // Đảm bảo chiếm toàn bộ không gian
-                            .fillMaxHeight()
                             .imePadding() // Tự động thêm khoảng trống khi bàn phím xuất hiện
                             .verticalScroll(rememberScrollState()) // Cho phép cuộn
                             .padding(innerPadding)
@@ -225,48 +229,52 @@ fun DeviceScreen() {
                                 }
                             }
                         }
-                        Column(
+                        Row(
                             modifier = Modifier
-                                .fillMaxSize()
-                                .background(color = Color.LightGray)
+                                .padding(8.dp),
+                            verticalAlignment = Alignment.CenterVertically // Căn giữa theo chiều dọc
                         ) {
-                            Row(
+                            Text(
+                                text = "Số lượng thiết bị:",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Black,
+                                modifier = Modifier.padding(end = 4.dp) // Thêm khoảng cách giữa Text và Box
+                            )
+                            Box(
                                 modifier = Modifier
-                                    .padding(8.dp),
-                                verticalAlignment = Alignment.CenterVertically // Căn giữa theo chiều dọc
+                                    .size(24.dp) // Kích thước Box
+                                    .background(color = Color.DarkGray, shape = RoundedCornerShape(4.dp)), // Màu nền và góc bo
+                                contentAlignment = Alignment.Center // Căn Text nằm giữa Box
                             ) {
                                 Text(
-                                    text = "Số lượng thiết bị:",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.Black,
-                                    modifier = Modifier.padding(end = 4.dp) // Thêm khoảng cách giữa Text và Box
+                                    text = "4",
+                                    color = Color.White, // Màu chữ
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold
                                 )
-                                Box(
-                                    modifier = Modifier
-                                        .size(24.dp) // Kích thước Box
-                                        .background(color = Color.DarkGray, shape = RoundedCornerShape(4.dp)), // Màu nền và góc bo
-                                    contentAlignment = Alignment.Center // Căn Text nằm giữa Box
-                                ) {
-                                    Text(
-                                        text = "4",
-                                        color = Color.White, // Màu chữ
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
                             }
-                            Column {
-                                SmartLampCard(isTablet)
-                                SmartLampCard(isTablet)
-                                SmartLampCard(isTablet)
-                                SmartLampCard(isTablet)
+                        }
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(color = Color.LightGray),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Column (
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                SmartCard(isTablet)
+                                SmartCard(isTablet)
+                                SmartCard(isTablet)
+                                SmartCard(isTablet)
                             }
                         }
                     }
                 }
             }
             else {
+                var widgetWidth by remember { mutableStateOf(0) }
                 Box (
                     modifier = Modifier
                         .fillMaxSize()
@@ -274,7 +282,6 @@ fun DeviceScreen() {
                     Column (
                         modifier = Modifier
                             .fillMaxSize() // Đảm bảo chiếm toàn bộ không gian
-                            .fillMaxHeight()
                             .imePadding() // Tự động thêm khoảng trống khi bàn phím xuất hiện
                             .verticalScroll(rememberScrollState()) // Cho phép cuộn
                             .padding(innerPadding)
@@ -295,14 +302,17 @@ fun DeviceScreen() {
                                     .background(color = Color.Blue, shape = RoundedCornerShape(bottomStartPercent = 60))
                                     .zIndex(1f)
                             ) {
-                                Box {
+                                Box (
+                                    modifier = Modifier
+                                        .width(300.dp)
+                                        .align(Alignment.Center)
+                                ){
                                     OutlinedTextField(
                                         value = "", // Giá trị mặc định
                                         onValueChange = { /* Read-only TextField, so no updates here */ },
                                         placeholder = { Text("tp.Hồ Chí Mính", fontWeight = FontWeight.Bold, fontSize = 20.sp) },
                                         modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(start = 20.dp, top = 16.dp, end = 16.dp)
+                                            .width(widgetWidth.dp)
                                             .clickable { /* Handle dropdown expansion */ },
                                         readOnly = true, // Không cho phép nhập tay
                                         trailingIcon = {
@@ -328,7 +338,6 @@ fun DeviceScreen() {
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .offset(y = 1.dp)
                                     .padding(top = 100.dp)
                                     .width(40.dp)
                                     .height(40.dp)
@@ -362,42 +371,51 @@ fun DeviceScreen() {
                                 }
                             }
                         }
-                        Column(
+                        Row(
                             modifier = Modifier
-                                .fillMaxSize()
-                                .background(color = Color.LightGray)
+                                .padding(8.dp),
+                            verticalAlignment = Alignment.CenterVertically // Căn giữa theo chiều dọc
                         ) {
-                            Row(
+                            Text(
+                                text = "Số lượng thiết bị:",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.Black,
+                                modifier = Modifier.padding(end = 4.dp) // Thêm khoảng cách giữa Text và Box
+                            )
+                            Box(
                                 modifier = Modifier
-                                    .padding(8.dp),
-                                verticalAlignment = Alignment.CenterVertically // Căn giữa theo chiều dọc
+                                    .size(24.dp) // Kích thước Box
+                                    .background(color = Color.DarkGray, shape = RoundedCornerShape(4.dp)), // Màu nền và góc bo
+                                contentAlignment = Alignment.Center // Căn Text nằm giữa Box
                             ) {
                                 Text(
-                                    text = "Số lượng thiết bị:",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.Black,
-                                    modifier = Modifier.padding(end = 4.dp) // Thêm khoảng cách giữa Text và Box
+                                    text = "4",
+                                    color = Color.White, // Màu chữ
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold
                                 )
-                                Box(
-                                    modifier = Modifier
-                                        .size(24.dp) // Kích thước Box
-                                        .background(color = Color.DarkGray, shape = RoundedCornerShape(4.dp)), // Màu nền và góc bo
-                                    contentAlignment = Alignment.Center // Căn Text nằm giữa Box
-                                ) {
-                                    Text(
-                                        text = "4",
-                                        color = Color.White, // Màu chữ
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
                             }
-                            Column {
-                                SmartLampCard(isTablet)
-                                SmartLampCard(isTablet)
-                                SmartLampCard(isTablet)
-                                SmartLampCard(isTablet)
+                        }
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(color = Color.LightGray),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Column (
+                                modifier = Modifier
+                                    .onGloballyPositioned { coordinates ->
+                                        // Lấy Width của Widget
+                                        widgetWidth = coordinates.size.width
+                                    }
+                                    .wrapContentSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                SmartCard(isTablet)
+                                SmartCard(isTablet)
+                                SmartCard(isTablet)
+                                SmartCard(isTablet)
                             }
                         }
                     }
@@ -406,7 +424,6 @@ fun DeviceScreen() {
         }
     )
 }
-
 
 @Composable
 fun CustomScrollableTabRow() {
@@ -445,207 +462,6 @@ fun CustomScrollableTabRow() {
 }
 
 @Composable
-fun SmartLampCard(isTablet: Boolean) {
-    val endpadding = if (isTablet) 128.dp else 64.dp
-    Card(
-        modifier = Modifier
-            .wrapContentSize() // Chỉ chiếm không gian nội dung
-            .padding(8.dp)
-            .clip(RoundedCornerShape(16.dp)),
-        colors = CardDefaults.cardColors(containerColor = Color.White), // Nền màu trắng
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(8.dp)
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween, // Căn chỉnh khoảng cách giữa các phần tử
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()// Đảm bảo Row chỉ chiếm chiều ngang nội dung
-            ) {
-                Column {
-                    Text(text = "Smart Lamp", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                    Text(text = "Dining Room | Tue Thu", fontSize = 12.sp, color = Color.Gray)
-                }
-                Box(
-                    modifier = Modifier
-                        .padding(end = 8.dp)
-                        .size(40.dp)
-                    ,
-                    contentAlignment = Alignment.Center
-                ) {
-                    Switch(checked = false,
-                        onCheckedChange = {},
-                        thumbContent = {
-                            if (true) {
-                                Icon(
-                                    imageVector = Icons.Filled.Check,
-                                    contentDescription = ""
-                                )
-                            } else {
-                                Icon(
-                                    imageVector = Icons.Filled.Close,
-                                    contentDescription = ""
-                                )
-                            }
-                        }
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                horizontalArrangement = Arrangement.Absolute.SpaceBetween, // Căn chỉnh khoảng cách giữa các phần tử
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()// Đảm bảo Row chỉ chiếm chiều ngang nội dung
-            ) {
-                Row (
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row (
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row (
-                            horizontalArrangement = Arrangement.Start,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .padding(end = 30.dp)
-                                    .size(40.dp)
-                                    .background(Color(0xFFFFE082), RoundedCornerShape(8.dp)), // Màu vàng nhạt cho icon
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(text = "\uD83D\uDCA1", fontSize = 20.sp) // Biểu tượng đèn
-                            }
-
-                            Spacer(modifier = Modifier.width(16.dp))
-
-                            Column(
-                                modifier = Modifier.padding(end = 12.dp),
-                                horizontalAlignment = Alignment.Start
-                            ) {
-                                Text(text = "from", fontSize = 12.sp, color = Color.Gray)
-                                Text(text = "8 pm", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                            }
-
-                            Box(
-                                modifier = Modifier
-                                    .padding(end = endpadding)
-                                    .width(1.dp) // Độ rộng của đường
-                                    .height(50.dp) // Độ cao của đường
-                                    .background(Color.Gray) // Màu của đường
-                            )
-                            Row (
-                                horizontalArrangement = Arrangement.Start,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column (
-                                    modifier = Modifier
-                                        .padding(end = 12.dp),
-                                    horizontalAlignment = Alignment.End,
-                                    verticalArrangement = Arrangement.Center
-                                ) {
-                                    Text(text = "to", fontSize = 12.sp, color = Color.Gray)
-                                    Text(text = "8 am", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                                }
-
-
-                                Box(
-                                    modifier = Modifier
-                                        .padding(end = endpadding)
-                                        .width(1.dp) // Độ rộng của đường
-                                        .height(50.dp) // Độ cao của đường
-                                        .background(Color.Gray), // Màu của đường
-                                )
-                            }
-
-                            if (isTablet) {
-                                Row (
-                                    horizontalArrangement = Arrangement.Start,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Column (
-                                        modifier = Modifier
-                                            .padding(end = 12.dp),
-                                        horizontalAlignment = Alignment.End,
-                                        verticalArrangement = Arrangement.Center
-                                    ) {
-                                        Text(text = "Điện áp hoạt động", fontSize = 12.sp, color = Color.Gray)
-                                        Text(text = "5V", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                                    }
-
-                                    Box(
-                                        modifier = Modifier
-                                            .padding(end = endpadding)
-                                            .width(1.dp) // Độ rộng của đường
-                                            .height(50.dp) // Độ cao của đường
-                                            .background(Color.Gray), // Màu của đường
-                                    )
-                                }
-
-                                Row (
-                                    horizontalArrangement = Arrangement.Start,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Column (
-                                        modifier = Modifier
-                                            .padding(end = 12.dp),
-                                        horizontalAlignment = Alignment.End,
-                                        verticalArrangement = Arrangement.Center
-                                    ) {
-                                        Text(text = "Dòng tiêu thụ", fontSize = 12.sp, color = Color.Gray)
-                                        Text(text = "20mA", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                                    }
-
-                                    Box(
-                                        modifier = Modifier
-                                            .width(1.dp) // Độ rộng của đường
-                                            .height(50.dp) // Độ cao của đường
-                                            .background(Color.Gray), // Màu của đường
-                                    )
-                                }
-                            }
-
-                            Column (
-                                horizontalAlignment = Alignment.End,
-                                verticalArrangement = Arrangement.Center,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                        .background(Color.LightGray, RoundedCornerShape(4.dp)),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(text = "\uD83D\uDDD1", fontSize = 12.sp) // Icon delete
-                                }
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Box(
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                        .background(Color.LightGray, RoundedCornerShape(4.dp)),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(text = "\u270E", fontSize = 12.sp) // Icon edit
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
 fun WeatherInfoItem(icon: String?, description: String, temperature: String?) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally, // Căn giữa
@@ -655,7 +471,7 @@ fun WeatherInfoItem(icon: String?, description: String, temperature: String?) {
         icon?.let {
             Text(
                 text = it,
-                fontSize = 30.sp, // Kích thước lớn cho biểu tượng
+                fontSize = 20.sp, // Kích thước lớn cho biểu tượng
                 modifier = Modifier.padding(bottom = 4.dp)
             )
         }
@@ -663,7 +479,7 @@ fun WeatherInfoItem(icon: String?, description: String, temperature: String?) {
         temperature?.let {
             Text(
                 text = it,
-                fontSize = 30.sp,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
                 modifier = Modifier.padding(top = 4.dp)
@@ -675,10 +491,164 @@ fun WeatherInfoItem(icon: String?, description: String, temperature: String?) {
         BasicText(
             text = description,
             style = TextStyle(
-                fontSize = 20.sp, // Nhỏ hơn cho mô tả
+                fontSize = 15.sp, // Nhỏ hơn cho mô tả
                 fontWeight = FontWeight.Normal,
                 color = Color.Gray
             )
         )
+    }
+}
+
+@Composable
+fun SmartCard(isTablet: Boolean) {
+    val endPadding = 32.dp
+
+    Card(
+        modifier = Modifier
+            .width(IntrinsicSize.Max)
+            .padding(8.dp)
+            .clip(RoundedCornerShape(16.dp)),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(8.dp)
+        ) {
+            HeaderRow()
+            Spacer(modifier = Modifier.height(8.dp))
+            ContentRow(isTablet, endPadding)
+        }
+    }
+
+}
+
+@Composable
+fun HeaderRow() {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column {
+            Text(text = "Smart Lamp", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text(text = "Dining Room | Tue Thu", fontSize = 12.sp, color = Color.Gray)
+        }
+        Box(
+            modifier = Modifier.padding(end = 8.dp).size(40.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Switch(
+                checked = false,
+                onCheckedChange = {},
+                thumbContent = {
+                    Icon(
+                        imageVector = if (false) Icons.Filled.Check else Icons.Filled.Close,
+                        contentDescription = ""
+                    )
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun ContentRow(isTablet: Boolean, endPadding: Dp) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.wrapContentWidth()
+    ) {
+        DeviceInfoSection("8 pm", "8 am", endPadding)
+
+        if (isTablet) {
+            ExtraInfoSection("Điện áp hoạt động", "5V", endPadding / 2)
+            ExtraInfoSection("Dòng tiêu thụ", "20mA", endPadding / 2)
+        }
+
+        ActionIcons()
+    }
+}
+
+@Composable
+fun DeviceInfoSection(fromTime: String, toTime: String, endPadding: Dp) {
+    Row(horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
+        IconBox("\uD83D\uDCA1", Color(0xFFFFE082))
+        TimeInfo("from", fromTime)
+        DividerLine(endPadding)
+        TimeInfo("to", toTime)
+        DividerLine(endPadding)
+    }
+}
+
+@Composable
+fun ExtraInfoSection(label: String, value: String, endPadding: Dp) {
+    Column(
+        modifier = Modifier.padding(end = endPadding),
+        horizontalAlignment = Alignment.End,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(text = label, fontSize = 12.sp, color = Color.Gray)
+        Text(text = value, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+    }
+    DividerLine(endPadding)
+}
+
+@Composable
+fun ActionIcons() {
+    Column(
+        horizontalAlignment = Alignment.End,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        IconButtonBox("\uD83D\uDDD1")
+        Spacer(modifier = Modifier.height(4.dp))
+        IconButtonBox("\u270E")
+    }
+}
+
+@Composable
+fun IconBox(icon: String, color: Color) {
+    Box(
+        modifier = Modifier
+            .padding(end = 30.dp)
+            .size(40.dp)
+            .background(color, RoundedCornerShape(8.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text = icon, fontSize = 20.sp)
+    }
+}
+
+@Composable
+fun TimeInfo(label: String, time: String) {
+    Column(
+        modifier = Modifier.padding(end = 12.dp),
+        horizontalAlignment = Alignment.End
+    ) {
+        Text(text = label, fontSize = 12.sp, color = Color.Gray)
+        Text(text = time, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+    }
+}
+
+@Composable
+fun DividerLine(endPadding: Dp) {
+    Box(
+        modifier = Modifier
+            .padding(end = endPadding)
+            .width(1.dp)
+            .height(50.dp)
+            .background(Color.Gray)
+    )
+}
+
+@Composable
+fun IconButtonBox(icon: String) {
+    Box(
+        modifier = Modifier
+            .size(24.dp)
+            .background(Color.LightGray, RoundedCornerShape(4.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text = icon, fontSize = 12.sp)
     }
 }
