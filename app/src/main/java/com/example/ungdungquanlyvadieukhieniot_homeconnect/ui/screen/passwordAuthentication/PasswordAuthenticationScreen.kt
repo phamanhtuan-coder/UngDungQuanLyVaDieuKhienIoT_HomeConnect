@@ -80,7 +80,7 @@ fun Passwordauthentication() {
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "hãy nhập email để chúng tôi gửi mã xác thực.",
+                    text = "hãy nhập mật khẩu xác thực.",
                     fontSize = 14.sp,
                     color = Color.Gray,
                     textAlign = TextAlign.Center
@@ -90,7 +90,7 @@ fun Passwordauthentication() {
                 OutlinedTextField(
                     value = "",
                     onValueChange = {},
-                    label = { Text("EMAIL") },
+                    label = { Text("Mật khẩu") },
                     leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = "Lock Icon") },
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -104,7 +104,7 @@ fun Passwordauthentication() {
                     onClick = { },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Gửi xác thực")
+                    Text("Xác thực")
                 }
                 Spacer(modifier = Modifier.height(16.dp))
 
