@@ -68,6 +68,26 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
 
+
+/** Giao diện màn hình Device Screen
+ * -----------------------------------------
+ * Người viết: Nguyễn Thanh Sang
+ * Ngày viết: 3/12/2024
+ * Lần cập nhật cuối: 9/12/2024
+ * -----------------------------------------
+ * Input:
+ *
+ * Output: Scaffold
+ *
+ * ---------------------------------------
+ */
+
+/**
+ * Sủa lại phần giao diện cho thiết bị tablet
+ * ---------------------------
+ * Lần cập nhật 9/12/2024
+ * ---------------------------
+ */
 @Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,7 +100,7 @@ fun DeviceScreen() {
     // Lấy mật độ để tính px
     val cornerRadiusPx = with(LocalDensity.current) { 16.dp.toPx() }
 
-    Scaffold(
+    return Scaffold(
         containerColor = Color.LightGray,
         topBar = {
             /*
