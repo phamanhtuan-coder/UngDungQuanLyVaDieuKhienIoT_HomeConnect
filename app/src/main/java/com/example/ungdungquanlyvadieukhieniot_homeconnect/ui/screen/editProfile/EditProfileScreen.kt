@@ -24,7 +24,16 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+/** Giao diện màn hình Sửa thông tin (EditProfile Screen)
+ * -----------------------------------------
+ * Người viết: Phạm Xuân Nhân
+ * Ngày viết: 05/12/2024
+ * Lần cập nhật cuối: 06/12/2024
+ * -----------------------------------------
+ * Input: Không có
+ *
+ * Output: Column chứa các thành phần giao diện của màn hình Sửa thông tin
+ */
 
 @Preview(showBackground = true)
 @Composable
