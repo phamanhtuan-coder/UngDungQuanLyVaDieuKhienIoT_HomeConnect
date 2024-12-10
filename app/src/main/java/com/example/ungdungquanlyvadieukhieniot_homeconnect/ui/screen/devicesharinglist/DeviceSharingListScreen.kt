@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -239,19 +240,28 @@ fun DeviceSharingListScreen() {
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Delete,
-                                            contentDescription = "Clear",
-                                            tint = Color.Black,
-                                            modifier = Modifier.size(layoutConfig.iconSize) // Icon kích thước từ layoutConfig
-                                        )
+                                        IconButton(
+                                            onClick = {},
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Delete,
+                                                contentDescription = "Clear",
+                                                tint = Color.Black,
+                                                modifier = Modifier.size(layoutConfig.iconSize) // Icon kích thước từ layoutConfig
+                                            )
+                                        }
 
-                                        Icon(
-                                            imageVector = Icons.Default.Add,
-                                            contentDescription = "Add",
-                                            tint = Color.Black,
-                                            modifier = Modifier.size(layoutConfig.iconSize) // Icon kích thước từ layoutConfig
-                                        )
+
+                                        IconButton(
+                                            onClick = {}
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Add,
+                                                contentDescription = "Add",
+                                                tint = Color.Black,
+                                                modifier = Modifier.size(layoutConfig.iconSize) // Icon kích thước từ layoutConfig
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -302,6 +312,7 @@ fun DeviceSharingListScreen() {
     )
 }
 
+
 @Composable
 fun JobCard(
     companyName: String,
@@ -312,7 +323,7 @@ fun JobCard(
     appliedStatus: String
 ) {
     val layoutConfig = rememberResponsiveLayoutConfig()
-    Card(
+    return Card(
         modifier = Modifier
             .padding(top = layoutConfig.textFieldSpacing)
             .fillMaxWidth(),
@@ -341,7 +352,7 @@ fun JobCard(
                 // Company Name
                 Text(
                     text = companyName,
-                    fontSize = layoutConfig.textFontSize,
+                    fontSize = layoutConfig.textFontSize/ 1.5f,
                     color = Color.Gray
                 )
             }
@@ -351,7 +362,7 @@ fun JobCard(
             // Job Title
             Text(
                 text = jobTitle,
-                fontSize = layoutConfig.headingFontSize,
+                fontSize = layoutConfig.headingFontSize/1.5f ,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black
             )
@@ -359,10 +370,13 @@ fun JobCard(
             Spacer(modifier = Modifier.height(4.dp))
 
             // Location & Job Type
-            Row {
+            Row (
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
                     text = location,
-                    fontSize = layoutConfig.textFontSize,
+                    fontSize = layoutConfig.textFontSize/1.5f,
                     color = Color.Gray
                 )
 
@@ -370,7 +384,7 @@ fun JobCard(
 
                 Text(
                     text = "• $jobType",
-                    fontSize = layoutConfig.textFontSize,
+                    fontSize = layoutConfig.textFontSize/1.5f,
                     color = Color(0xFFE74C3C),
                     fontWeight = FontWeight.Bold
                 )
@@ -396,7 +410,7 @@ fun JobCard(
                     Text(
                         text = appliedStatus,
                         color = Color(0xFFE74C3C),
-                        fontSize = layoutConfig.textFontSize,
+                        fontSize = layoutConfig.textFontSize/1.2f,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -404,7 +418,7 @@ fun JobCard(
                 // Applied Date
                 Text(
                     text = "Applied at $appliedDate",
-                    fontSize = layoutConfig.textFontSize,
+                    fontSize = layoutConfig.textFontSize/ 2,
                     color = Color.Gray
                 )
             }
