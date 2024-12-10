@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -31,17 +33,92 @@ import androidx.compose.ui.unit.sp
  * Ngày viết: 29/11/2024
  * Lần cập nhật cuối: 29/11/2024
  * -----------------------------------------
- * Input: Không có
+ * Input: Chuỗi loại cho header
  * Output: TopAppBar
  *
  *
  * ---------------------------------------
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
-fun Header() {
-   return TopAppBar(
+fun Header(
+    type: String = "Home",
+    title: String = "",
+) {
+    when (type) {
+        "Home" -> HomeHeader()
+        "Back" -> BackHeader(title)
+    }
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BackHeader(
+    title: String,
+) {
+        return TopAppBar(
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = Color.Blue,
+            ),
+            /*
+            * Hiển thị tên màn hình hiện tại
+             */
+            title = {
+
+                    Text(
+                        modifier = Modifier.padding(8.dp),
+                        text = title,
+                        color = Color.White,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+
+
+
+
+            },
+            navigationIcon = {
+                IconButton(
+                    modifier = Modifier
+                        .padding(horizontal = 2.dp)
+                        .clip(CircleShape),
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = Color.White,
+                        contentColor = Color.Black
+                    ),
+                    onClick = {
+                        /*TODO*/
+                    }
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                }
+            },
+            /*
+            * Hiển thị Nút thông báo
+             */
+            actions = {
+                IconButton(
+                    modifier = Modifier
+                        .padding(horizontal = 2.dp)
+                        .clip(CircleShape),
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = Color.White,
+                        contentColor = Color.Black
+                    ),
+                    onClick = { /*TODO*/ }
+                ) {
+                    Icon(Icons.Filled.Notifications, contentDescription = "Notifications")
+                }
+            }
+        )
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HomeHeader() {
+    return TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.Blue,
         ),

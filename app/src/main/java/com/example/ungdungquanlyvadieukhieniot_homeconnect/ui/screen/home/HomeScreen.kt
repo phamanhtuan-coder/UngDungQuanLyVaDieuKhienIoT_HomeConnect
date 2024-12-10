@@ -2,7 +2,9 @@ package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,10 +17,12 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -28,15 +32,21 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
@@ -54,7 +64,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
  *
  * ---------------------------------------
  */
-@Preview(showBackground = true)
+@Preview(showBackground = true,showSystemUi = true)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier
@@ -81,329 +91,410 @@ fun HomeScreen(
         },
         floatingActionButtonPosition = FabPosition.Center,
         content = {
-            Column(
-                modifier = Modifier
-                    .padding(it)
-                    .padding(0.dp)
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.Top,
-            ) {
-                /*
+
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(it)
+                        .padding(0.dp),
+                    verticalArrangement = Arrangement.Top,
+                ) {
+                    /*
                 * Hiển thị thông tin thời tiết
                  */
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .padding(8.dp)
-                        .background(Color.Blue)
-                        .clip(
-                            RoundedCornerShape(
-                                bottomStartPercent = 25,
-                                bottomEndPercent = 25
-                            )
-                        ),
-                ) {
                     Column(
                         modifier = Modifier
-                            .padding(16.dp)
-                            .clip(RoundedCornerShape(25))
+
                             .fillMaxWidth()
-                            .background(Color.LightGray),
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(8.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(Icons.Filled.Info, contentDescription = "null")
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Column {
-                                Text(
-                                    text = "May 16, 2023 10:05 am",
-                                    color = Color.Black,
-                                    fontSize = 16.sp
+                            .height(200.dp)
+
+                            .background(Color.Blue,shape=RoundedCornerShape(
+                                bottomStartPercent = 25,
+                                bottomEndPercent = 25
+                            ))
+                            .clip(
+                                RoundedCornerShape(
+                                    bottomStartPercent = 25,
+                                    bottomEndPercent = 25
                                 )
+                            ),
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .clip(RoundedCornerShape(25))
+                                .fillMaxWidth()
+                                .background(Color.LightGray),
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(Icons.Filled.Info, contentDescription = "null")
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Column {
+                                    Text(
+                                        text = "May 16, 2023 10:05 am",
+                                        color = Color.Black,
+                                        fontSize = 16.sp
+                                    )
+                                    Text(
+                                        text = "Cloudy",
+                                        color = Color.Black,
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        text = "Hanoi, Vietnam",
+                                        color = Color.Black,
+                                        fontSize = 16.sp
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Text(text = "25°C", color = Color.Black, fontSize = 40.sp)
+                            }
+                            Spacer(modifier = Modifier.height(3.dp))
+                            HorizontalDivider(
+                                modifier = modifier.padding(horizontal = 5.dp),
+                                thickness = 1.dp,
+                                color = Color.Blue
+                            )
+                            Spacer(modifier = Modifier.height(3.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceEvenly,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                /*
+                            * Thông tin về độ ẩm
+                             */
+                                Card(
+                                    modifier = Modifier
+                                        .background(Color.White),
+                                    content = {
+                                        Column(
+                                            modifier = Modifier.padding(2.dp),
+                                            verticalArrangement = Arrangement.SpaceBetween,
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            Row(
+                                                modifier = Modifier.padding(horizontal = 2.dp),
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                IconButton(
+                                                    modifier = Modifier
+                                                        .padding(horizontal = 2.dp)
+                                                        .clip(CircleShape),
+                                                    colors = IconButtonDefaults.iconButtonColors(
+                                                        containerColor = Color.White,
+                                                        contentColor = Color.Black
+                                                    ),
+                                                    onClick = { /*TODO*/ }
+                                                ) {
+                                                    Icon(
+                                                        Icons.Filled.Notifications,
+                                                        contentDescription = ""
+                                                    )
+                                                }
+                                                Spacer(modifier = Modifier.width(3.dp))
+                                                Text(
+                                                    text = "97%",
+                                                    color = Color.Black,
+                                                    fontSize = 16.sp
+                                                )
+                                            }
+                                            Row(
+                                                modifier = Modifier.padding(horizontal = 2.dp),
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                                verticalAlignment = Alignment.CenterVertically
+                                            )
+                                            {
+                                                Text(
+                                                    text = "Humidity",
+                                                    color = Color.Black,
+                                                    fontSize = 16.sp
+                                                )
+                                            }
+
+                                        }
+                                    }
+                                )
+                                /*
+                            * Thông tin về tầm nhìn
+                            */
+                                Card(
+                                    modifier = Modifier
+                                        .background(Color.White),
+                                    content = {
+                                        Column(
+                                            modifier = Modifier.padding(2.dp),
+                                            verticalArrangement = Arrangement.SpaceBetween,
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            Row(
+                                                modifier = Modifier.padding(horizontal = 2.dp),
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                IconButton(
+                                                    modifier = Modifier
+                                                        .padding(horizontal = 2.dp)
+                                                        .clip(CircleShape),
+                                                    colors = IconButtonDefaults.iconButtonColors(
+                                                        containerColor = Color.White,
+                                                        contentColor = Color.Black
+                                                    ),
+                                                    onClick = { /*TODO*/ }
+                                                ) {
+                                                    Icon(
+                                                        Icons.Filled.Notifications,
+                                                        contentDescription = ""
+                                                    )
+                                                }
+                                                Spacer(modifier = Modifier.width(3.dp))
+                                                Text(
+                                                    text = "7 km",
+                                                    color = Color.Black,
+                                                    fontSize = 16.sp
+                                                )
+                                            }
+                                            Row(
+                                                modifier = Modifier.padding(horizontal = 2.dp),
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                                verticalAlignment = Alignment.CenterVertically
+                                            )
+                                            {
+                                                Text(
+                                                    text = "Visibility",
+                                                    color = Color.Black,
+                                                    fontSize = 16.sp
+                                                )
+                                            }
+
+                                        }
+                                    }
+                                )
+                                /*
+                           * Thông tin về gió
+                           */
+                                Card(
+                                    modifier = Modifier
+                                        .background(Color.White),
+                                    content = {
+                                        Column(
+                                            modifier = Modifier.padding(2.dp),
+                                            verticalArrangement = Arrangement.SpaceBetween,
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            Row(
+                                                modifier = Modifier.padding(horizontal = 2.dp),
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                IconButton(
+                                                    modifier = Modifier
+                                                        .padding(horizontal = 2.dp)
+                                                        .clip(CircleShape),
+                                                    colors = IconButtonDefaults.iconButtonColors(
+                                                        containerColor = Color.White,
+                                                        contentColor = Color.Black
+                                                    ),
+                                                    onClick = { /*TODO*/ }
+                                                ) {
+                                                    Icon(
+                                                        Icons.Filled.Notifications,
+                                                        contentDescription = ""
+                                                    )
+                                                }
+                                                Spacer(modifier = Modifier.width(3.dp))
+                                                Text(
+                                                    text = "3 km/h",
+                                                    color = Color.Black,
+                                                    fontSize = 16.sp
+                                                )
+                                            }
+                                            Row(
+                                                modifier = Modifier.padding(horizontal = 2.dp),
+                                                horizontalArrangement = Arrangement.SpaceBetween,
+                                                verticalAlignment = Alignment.CenterVertically
+                                            )
+                                            {
+                                                Text(
+                                                    text = "NE Wind",
+                                                    color = Color.Black,
+                                                    fontSize = 16.sp
+                                                )
+                                            }
+
+                                        }
+                                    }
+                                )
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(3.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+
+                        Column (){
+                            Row(
+                                modifier = Modifier.padding(8.dp).fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ){
+                                HouseSelection()
+
+                            }
+                            Row(
+                                modifier = Modifier.padding(8.dp).fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
                                 Text(
-                                    text = "Cloudy",
+                                    modifier = Modifier,
+                                    text = "Spaces",
                                     color = Color.Black,
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold
                                 )
-                                Text(text = "Hanoi, Vietnam", color = Color.Black, fontSize = 16.sp)
+                                Spacer(modifier = Modifier.width(150.dp))
+                                TextButton(
+                                    onClick = { /*TODO*/ },
+                                    colors = ButtonColors(
+                                        containerColor = Color.White,
+                                        contentColor = Color.Blue,
+                                        disabledContainerColor = Color.White,
+                                        disabledContentColor = Color.Gray
+                                    )
+                                ) {
+                                    Text(text = "Xem thêm", color = Color.Blue)
+                                }
+
                             }
-                            Spacer(modifier = Modifier.width(10.dp))
-                            Text(text = "25°C", color = Color.Black, fontSize = 40.sp)
-                        }
-                        Spacer(modifier = Modifier.height(3.dp))
-                        HorizontalDivider(
-                            modifier = modifier.padding(horizontal = 5.dp),
-                            thickness = 1.dp,
-                            color = Color.Blue
-                        )
-                        Spacer(modifier = Modifier.height(3.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            /*
-                            * Thông tin về độ ẩm
-                             */
-                            Card(
-                                modifier = Modifier
-                                    .background(Color.White),
-                                content = {
-                                    Column(
-                                        modifier = Modifier.padding(2.dp),
-                                        verticalArrangement = Arrangement.SpaceBetween,
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        Row(
-                                            modifier = Modifier.padding(horizontal = 2.dp),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            IconButton(
-                                                modifier = Modifier
-                                                    .padding(horizontal = 2.dp)
-                                                    .clip(CircleShape),
-                                                colors = IconButtonDefaults.iconButtonColors(
-                                                    containerColor = Color.White,
-                                                    contentColor = Color.Black
-                                                ),
-                                                onClick = { /*TODO*/ }
+                            LazyRow {
+                                items(5) {
+                                    Card(
+                                        modifier = Modifier
+                                            .padding(8.dp)
+                                            .clip(RoundedCornerShape(5))
+                                            .background(Color.LightGray)
+                                            .width(150.dp)
+                                            .height(150.dp),
+                                        content = {
+                                            Column(
+                                                modifier = Modifier.fillMaxSize()
                                             ) {
-                                                Icon(
-                                                    Icons.Filled.Notifications,
-                                                    contentDescription = ""
+                                                Row(
+                                                    modifier = Modifier
+                                                        .padding(10.dp)
+                                                        .background(Color.Magenta),
+                                                ) {
+                                                    Text(
+                                                        text = "19 C",
+                                                        color = Color.White,
+                                                        fontSize = 16.sp,
+                                                        fontWeight = FontWeight.Bold
+                                                    )
+                                                }
+                                                Spacer(modifier = Modifier.height(5.dp))
+                                                Image(
+                                                    imageVector = Icons.Filled.Info,
+                                                    contentDescription = "null",
+                                                    modifier = Modifier
+                                                        .align(Alignment.CenterHorizontally)
+                                                        .padding(8.dp)
+                                                        .fillMaxWidth()
                                                 )
-                                            }
-                                            Spacer(modifier = Modifier.width(3.dp))
-                                            Text(
-                                                text = "97%",
-                                                color = Color.Black,
-                                                fontSize = 16.sp
-                                            )
-                                        }
-                                        Row(
-                                            modifier = Modifier.padding(horizontal = 2.dp),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                            verticalAlignment = Alignment.CenterVertically
-                                        )
-                                        {
-                                            Text(
-                                                text = "Humidity",
-                                                color = Color.Black,
-                                                fontSize = 16.sp
-                                            )
-                                        }
-
-                                    }
-                                }
-                            )
-                            /*
-                            * Thông tin về tầm nhìn
-                            */
-                            Card(
-                                modifier = Modifier
-                                    .background(Color.White),
-                                content = {
-                                    Column(
-                                        modifier = Modifier.padding(2.dp),
-                                        verticalArrangement = Arrangement.SpaceBetween,
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        Row(
-                                            modifier = Modifier.padding(horizontal = 2.dp),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            IconButton(
-                                                modifier = Modifier
-                                                    .padding(horizontal = 2.dp)
-                                                    .clip(CircleShape),
-                                                colors = IconButtonDefaults.iconButtonColors(
-                                                    containerColor = Color.White,
-                                                    contentColor = Color.Black
-                                                ),
-                                                onClick = { /*TODO*/ }
-                                            ) {
-                                                Icon(
-                                                    Icons.Filled.Notifications,
-                                                    contentDescription = ""
-                                                )
-                                            }
-                                            Spacer(modifier = Modifier.width(3.dp))
-                                            Text(
-                                                text = "7 km",
-                                                color = Color.Black,
-                                                fontSize = 16.sp
-                                            )
-                                        }
-                                        Row(
-                                            modifier = Modifier.padding(horizontal = 2.dp),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                            verticalAlignment = Alignment.CenterVertically
-                                        )
-                                        {
-                                            Text(
-                                                text = "Visibility",
-                                                color = Color.Black,
-                                                fontSize = 16.sp
-                                            )
-                                        }
-
-                                    }
-                                }
-                            )
-                            /*
-                           * Thông tin về gió
-                           */
-                            Card(
-                                modifier = Modifier
-                                    .background(Color.White),
-                                content = {
-                                    Column(
-                                        modifier = Modifier.padding(2.dp),
-                                        verticalArrangement = Arrangement.SpaceBetween,
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        Row(
-                                            modifier = Modifier.padding(horizontal = 2.dp),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            IconButton(
-                                                modifier = Modifier
-                                                    .padding(horizontal = 2.dp)
-                                                    .clip(CircleShape),
-                                                colors = IconButtonDefaults.iconButtonColors(
-                                                    containerColor = Color.White,
-                                                    contentColor = Color.Black
-                                                ),
-                                                onClick = { /*TODO*/ }
-                                            ) {
-                                                Icon(
-                                                    Icons.Filled.Notifications,
-                                                    contentDescription = ""
-                                                )
-                                            }
-                                            Spacer(modifier = Modifier.width(3.dp))
-                                            Text(
-                                                text = "3 km/h",
-                                                color = Color.Black,
-                                                fontSize = 16.sp
-                                            )
-                                        }
-                                        Row(
-                                            modifier = Modifier.padding(horizontal = 2.dp),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                            verticalAlignment = Alignment.CenterVertically
-                                        )
-                                        {
-                                            Text(
-                                                text = "NE Wind",
-                                                color = Color.Black,
-                                                fontSize = 16.sp
-                                            )
-                                        }
-
-                                    }
-                                }
-                            )
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(10.dp))
-                Row {
-                    Column {
-                        Row(
-                            modifier = Modifier.padding(8.dp).fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                modifier = Modifier,
-                                text = "Spaces",
-                                color = Color.Black,
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Spacer(modifier = Modifier.width(150.dp))
-                            TextButton(
-                                onClick = { /*TODO*/ },
-                                colors = ButtonColors(
-                                    containerColor = Color.White,
-                                    contentColor = Color.Blue,
-                                    disabledContainerColor = Color.White,
-                                    disabledContentColor = Color.Gray
-                                )
-                            ) {
-                                Text(text = "Xem thêm", color = Color.Blue)
-                            }
-
-                        }
-                        LazyRow {
-                            items(5) {
-                                Card(
-                                    modifier = Modifier
-                                        .padding(8.dp)
-                                        .clip(RoundedCornerShape(5))
-                                        .background(Color.LightGray)
-                                        .width(150.dp)
-                                        .height(150.dp),
-                                    content = {
-                                        Column(
-                                            modifier = Modifier.fillMaxSize()
-                                        ) {
-                                            Row(
-                                                modifier = Modifier
-                                                    .padding(10.dp)
-                                                    .background(Color.Magenta),
-                                            ) {
                                                 Text(
-                                                    text = "19 C",
-                                                    color = Color.White,
-                                                    fontSize = 16.sp,
-                                                    fontWeight = FontWeight.Bold
+                                                    text = "Living Room",
+                                                    color = Color.Black,
+                                                    fontSize = 20.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    textAlign = TextAlign.Center
+                                                )
+                                                Text(
+                                                    text = "2 Devices",
+                                                    color = Color.Black,
+                                                    fontSize = 14.sp,
+                                                    textAlign = TextAlign.Center
                                                 )
                                             }
-                                            Spacer(modifier = Modifier.height(5.dp))
-                                            Image(
-                                                imageVector = Icons.Filled.Info,
-                                                contentDescription = "null",
-                                                modifier = Modifier
-                                                    .align(Alignment.CenterHorizontally)
-                                                    .padding(8.dp)
-                                                    .fillMaxWidth()
-                                            )
-                                            Text(
-                                                text = "Living Room",
-                                                color = Color.Black,
-                                                fontSize = 20.sp,
-                                                fontWeight = FontWeight.Bold,
-                                                textAlign = TextAlign.Center
-                                            )
-                                            Text(
-                                                text = "2 Devices",
-                                                color = Color.Black,
-                                                fontSize = 14.sp,
-                                                textAlign = TextAlign.Center
-                                            )
                                         }
-                                    }
-                                )
+                                    )
+                                }
                             }
                         }
+
                     }
 
                 }
 
-            }
 
 
         }
     )
 
+}
+
+@Composable
+fun HouseSelection() {
+    val houses = listOf("House 1", "House 2", "House 3")
+    var isDropdownExpanded by remember { mutableStateOf(false) }
+    var selectedItem by remember { mutableStateOf(houses.first()) } // Default to the first option
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.LightGray)
+                .clickable { isDropdownExpanded = !isDropdownExpanded }
+                .padding(12.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = selectedItem,
+                    color = Color.Black,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Icon(
+                    imageVector = Icons.Default.ArrowDropDown,
+                    contentDescription = "Dropdown Icon"
+                )
+            }
+        }
+
+        if (isDropdownExpanded) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White)
+                    .padding(vertical = 4.dp)
+            ) {
+                houses.forEach { house ->
+                    Text(
+                        text = house,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                selectedItem = house
+                                isDropdownExpanded = false
+                            }
+                            .padding(12.dp),
+                        fontSize = 16.sp,
+                        color = Color.Black
+                    )
+                }
+            }
+        }
+    }
 }
