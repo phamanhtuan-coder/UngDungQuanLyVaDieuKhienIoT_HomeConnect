@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -50,9 +51,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.material.icons.filled.ArrowForwardIos // Biểu tượng mũi tên
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Wifi
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -69,7 +73,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
  * -----------------------------------------
  * Người viết: Nguyễn Thanh Sang
  * Ngày viết: 07/12/2024
- * Lần cập nhật cuối: 08/12/2024
+ * Lần cập nhật cuối: 10/12/2024
  * -----------------------------------------
  * Input:
  *
@@ -108,7 +112,7 @@ fun rememberResponsiveLayoutConfig(): LayoutConfig {
         textFieldSpacing = 8.dp + screenHeight * 0.01f,       // Khoảng cách giữa các thành phần = 8dp + 1% chiều cao màn hình
         headingFontSize = (12 + screenWidth.value * 0.04f).sp,// Font size tiêu đề dựa trên chiều rộng màn hình
         textFontSize = (10 + screenWidth.value * 0.03f).sp,   // Font size nội dung dựa trên chiều rộng màn hình
-        contentWidth = screenWidth * 0.8f,                    // Chiều rộng của nội dung chính bằng 80% chiều rộng màn hình
+        contentWidth = if(isTablet()) 400.dp + screenWidth * 0.1f else 300.dp,                    // Chiều rộng của nội dung chính bằng 80% chiều rộng màn hình
         iconSize = screenWidth * 0.04f,                       // Kích thước icon bằng 8% chiều rộng màn hình
         boxHeight = screenHeight * 0.1f,                      // Chiều cao Box là 10% chiều cao màn hình
         cornerBoxSize = screenWidth * 0.1f,                   // Kích thước cho Box góc lõm bằng 10% chiều rộng màn hình
@@ -240,26 +244,40 @@ fun DeviceSharingListScreen() {
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        IconButton(
-                                            onClick = {},
+
+                                        // Nội dung bên phải (Icon trong Box)
+                                        Button(
+                                            onClick = {
+                                                showDialog = true
+                                            },
+                                            modifier = Modifier
+                                                .size(36.dp), // Kích thước tổng thể của Button
+                                            shape = CircleShape, // Đảm bảo Button có dạng hình tròn
+                                            contentPadding = PaddingValues(0.dp) // Loại bỏ padding mặc định
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Default.Delete,
                                                 contentDescription = "Clear",
                                                 tint = Color.Black,
-                                                modifier = Modifier.size(layoutConfig.iconSize) // Icon kích thước từ layoutConfig
+                                                modifier = Modifier.size(24.dp) // Icon kích thước từ layoutConfig
                                             )
                                         }
 
-
-                                        IconButton(
-                                            onClick = {}
+                                        // Nội dung bên phải (Icon trong Box)
+                                        Button(
+                                            onClick = {
+                                                showDialog = true
+                                            },
+                                            modifier = Modifier
+                                                .size(36.dp), // Kích thước tổng thể của Button
+                                            shape = CircleShape, // Đảm bảo Button có dạng hình tròn
+                                            contentPadding = PaddingValues(0.dp) // Loại bỏ padding mặc định
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Default.Add,
                                                 contentDescription = "Add",
                                                 tint = Color.Black,
-                                                modifier = Modifier.size(layoutConfig.iconSize) // Icon kích thước từ layoutConfig
+                                                modifier = Modifier.size(24.dp) // Icon kích thước từ layoutConfig
                                             )
                                         }
                                     }
@@ -322,10 +340,12 @@ fun JobCard(
     appliedDate: String,
     appliedStatus: String
 ) {
+    // Lấy thông tin layout responsive từ config
     val layoutConfig = rememberResponsiveLayoutConfig()
     return Card(
         modifier = Modifier
             .padding(top = layoutConfig.textFieldSpacing)
+            .clickable(onClick = {})
             .fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -336,11 +356,11 @@ fun JobCard(
                 .padding(layoutConfig.outerPadding)
                 .fillMaxWidth()
         ) {
-            // Header Row
+            // Row đầu tiên: Hiển thị logo người dùng được chia sẽ
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Logo
+                // Vùng hiển thị Logo
                 Box(
                     modifier = Modifier
                         .size(layoutConfig.iconSize * 2)
@@ -349,7 +369,7 @@ fun JobCard(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                // Company Name
+                // Tên người dùng được chia sẽ
                 Text(
                     text = companyName,
                     fontSize = layoutConfig.textFontSize/ 1.5f,
@@ -359,46 +379,70 @@ fun JobCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Job Title
-            Text(
-                text = jobTitle,
-                fontSize = layoutConfig.headingFontSize/1.5f ,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            // Location & Job Type
             Row (
-                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = location,
-                    fontSize = layoutConfig.textFontSize/1.5f,
-                    color = Color.Gray
-                )
+                Column {
+                    // Tiêu đề của phần chia sẽ
+                    Text(
+                        text = jobTitle,
+                        fontSize = layoutConfig.headingFontSize/1.5f ,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
 
-                Spacer(modifier = Modifier.width(4.dp))
+                    // Location & Job Type
+                    Row (
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = location,
+                            fontSize = layoutConfig.textFontSize/1.5f,
+                            color = Color.Gray
+                        )
 
-                Text(
-                    text = "• $jobType",
-                    fontSize = layoutConfig.textFontSize/1.5f,
-                    color = Color(0xFFE74C3C),
-                    fontWeight = FontWeight.Bold
-                )
+                        Spacer(modifier = Modifier.width(4.dp))
+
+                        Text(
+                            text = "• $jobType",
+                            fontSize = layoutConfig.textFontSize/1.5f,
+                            color = Color(0xFFE74C3C),
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+                // Nội dung bên phải (Icon trong Box)
+                Button(
+                    onClick = {},
+                    modifier = Modifier
+                        .size(36.dp), // Kích thước tổng thể của Button
+                    shape = CircleShape, // Đảm bảo Button có dạng hình tròn
+                    contentPadding = PaddingValues(0.dp), // Loại bỏ padding mặc định
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ChevronRight,
+                        contentDescription = "Clear",
+                        tint = Color.Black,
+                        modifier = Modifier.size(24.dp) // Icon kích thước từ layoutConfig
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Applied Status & Date
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Applied Badge
                 Box(
                     modifier = Modifier
                         .background(
@@ -415,7 +459,6 @@ fun JobCard(
                     )
                 }
 
-                // Applied Date
                 Text(
                     text = "Applied at $appliedDate",
                     fontSize = layoutConfig.textFontSize/ 2,
