@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,19 +44,19 @@ import androidx.compose.ui.unit.sp
  * @return Column chứa thanh dropdown chọn House
  *
  * ---------------------------------------
+ *
  */
 @Preview(showBackground = true)
 @Composable
 fun HouseSelection(
-    houses: List<String> = listOf("House 1", "House 2", "House 3")
-
+    houses: List<String> = listOf("House 1", "House 2", "House 3"),
+    onManageHouseClicked: () -> Unit = {} // Callback for managing house
 ) {
     var isDropdownExpanded by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf(houses.first()) }
 
-   return Column(
-        modifier = Modifier
-            .fillMaxWidth()
+    Column(
+        modifier = Modifier.fillMaxWidth()
     ) {
         Box(
             modifier = Modifier
@@ -93,6 +94,7 @@ fun HouseSelection(
                     .padding(vertical = 4.dp)
                     .border(1.dp, Color.LightGray, RoundedCornerShape(12.dp))
             ) {
+                // Display the house options
                 houses.forEach { house ->
                     Text(
                         text = house,
@@ -106,6 +108,31 @@ fun HouseSelection(
                         fontSize = 16.sp,
                         color = Color.Black
                     )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .clickable {
+                            onManageHouseClicked()
+                        }
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxSize()
+                            .background(Color(0xFF2196F3), RoundedCornerShape(18.dp))
+                        ,
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+
+                    ) {
+                        Text(
+                            text = "Quản lý danh sách nhà",
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
         }

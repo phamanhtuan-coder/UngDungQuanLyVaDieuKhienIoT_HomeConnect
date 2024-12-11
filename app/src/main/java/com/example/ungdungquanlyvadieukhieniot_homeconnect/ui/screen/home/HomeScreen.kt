@@ -94,7 +94,10 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        HouseSelection()
+                        HouseSelection(
+                            houses = listOf("House 1", "House 2", "House 3"),
+                            onManageHouseClicked = { /* TODO: Navigate */ }
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
