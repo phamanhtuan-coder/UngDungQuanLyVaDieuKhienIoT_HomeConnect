@@ -29,13 +29,18 @@ import androidx.compose.ui.unit.sp
 /**
  * Giao diện Header (TopAppBar)
  * -----------------------------------------
- * Người viết: Phạm Anh Tuấn
- * Ngày viết: 29/11/2024
- * Lần cập nhật cuối: 29/11/2024
+ * Người viết:
+ * - Phạm Anh Tuấn
+ * Ngày viết:
+ * - 29/11/2024
+ * Lần cập nhật cuối:
+ * - 11/12/2024
  * -----------------------------------------
- * Input: Chuỗi loại cho header
- * Output: TopAppBar
  *
+ * @param type Chuỗi loại cho header, mặc dđịnh là Home.
+ * @param title Chuỗi tiêu đề cho header khác Home.
+ *
+ * @return TopAppBar tùy chỉnh theo input
  *
  * ---------------------------------------
  */
