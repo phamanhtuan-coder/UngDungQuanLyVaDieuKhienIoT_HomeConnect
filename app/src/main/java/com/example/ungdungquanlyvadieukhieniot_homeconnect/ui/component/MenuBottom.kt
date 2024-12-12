@@ -1,6 +1,9 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component
 
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,6 +16,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Devices
 import androidx.compose.material.icons.filled.Home
@@ -31,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -110,7 +116,6 @@ fun MenuBottom() {
         }
     }
 }
-
 @Composable
 fun MenuItem(
     text: String,
@@ -121,24 +126,38 @@ fun MenuItem(
     textSize: TextUnit = 14.sp,
     iconSize: Dp = 36.dp
 ) {
+    val interactionSource = remember { MutableInteractionSource() } // For managing interactions
+
     if (isTablet) {
         // Tablet Layout:
         Row(
             modifier = Modifier
-                .clickable(onClick = onClick)
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
+                .clip(RoundedCornerShape(18.dp)) // Apply rounded shape first
+                .background(
+                    color = if (isSelected) MaterialTheme.colorScheme.surfaceVariant else Color.Transparent,
+                    shape = RoundedCornerShape(18.dp)
+                )
+                .clickable(
+                    onClick = onClick,
+                    interactionSource = interactionSource,
+                    indication = LocalIndication.current // Default ripple effect
+                )
+                .padding(8.dp), // Optional padding
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        )
+        {
+        Icon(
                 imageVector = icon,
                 contentDescription = text,
                 tint = if (isSelected) MaterialTheme.colorScheme.primary else Color.Gray,
                 modifier = Modifier
                     .size(iconSize)
-                    .shadow(if (isSelected) 6.dp else 0.dp)
+                    .padding(4.dp) // Adjust padding to remove offset white space
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(3.dp))
             Text(
+                modifier = Modifier.padding(3.dp),
                 text = text,
                 color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Gray,
                 fontSize = textSize,
@@ -149,11 +168,21 @@ fun MenuItem(
         // Mobile Layout:
         Column(
             modifier = Modifier
-                .clickable(onClick = onClick)
+                .clip(RoundedCornerShape(18.dp)) // Apply circular shape first
+                .background(
+                    color = if (isSelected) MaterialTheme.colorScheme.surfaceVariant else Color.Transparent,
+                    shape = RoundedCornerShape(18.dp)
+                )
+                .clickable(
+                    onClick = onClick,
+                    interactionSource = interactionSource,
+                    indication = LocalIndication.current // Default ripple effect
+                )
                 .padding(8.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        )
+        {
             val mobileIconSize = if (isSelected) 22.dp else 20.dp
             val mobileTextSize = if (isSelected) 12.sp else 10.sp
             Icon(
@@ -162,7 +191,7 @@ fun MenuItem(
                 tint = if (isSelected) MaterialTheme.colorScheme.primary else Color.Gray,
                 modifier = Modifier
                     .size(mobileIconSize)
-                    .shadow(if (isSelected) 6.dp else 0.dp)
+                    .padding(4.dp) // Remove extra offset space
             )
             Text(
                 text = text,
