@@ -66,11 +66,11 @@ fun HomeScreen(
         },
         floatingActionButton = {
             /*
-            * Hiển thị Nút Home
+            * Hiển thị FAB action nếu coó
              */
-           NutHome()
+
         },
-        floatingActionButtonPosition = FabPosition.Center,
+        floatingActionButtonPosition = FabPosition.End,
         content = {
 
             Column(

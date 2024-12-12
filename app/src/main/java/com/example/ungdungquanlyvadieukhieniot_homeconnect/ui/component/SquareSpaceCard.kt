@@ -56,7 +56,7 @@ fun SpaceCard(
   return Card(
         modifier = Modifier
             .padding(8.dp)
-            .size(150.dp)
+            .size(160.dp)
             .clip(RoundedCornerShape(12.dp))
             .shadow(4.dp, RoundedCornerShape(12.dp)),
         colors =  CardDefaults. cardColors(

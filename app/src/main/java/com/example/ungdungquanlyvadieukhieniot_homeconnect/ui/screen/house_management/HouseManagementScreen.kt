@@ -85,9 +85,9 @@ fun HouseManagementScreen(
             MenuBottom()
         },
         floatingActionButton = {
-            NutHome()
+            // FAB action nếu có
         },
-        floatingActionButtonPosition = FabPosition.Center,
+        floatingActionButtonPosition = FabPosition.End,
         content = {
             Column(
                 modifier = Modifier

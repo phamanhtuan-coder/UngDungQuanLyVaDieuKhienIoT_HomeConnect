@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Devices
-
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PieChart
 import androidx.compose.material.icons.filled.Settings
@@ -61,6 +61,7 @@ fun MenuBottom() {
     val items = listOf(
         "Dashboard" to Icons.Filled.PieChart,
         "Devices" to Icons.Filled.Devices,
+        "Home" to Icons.Filled.Home,
         "Personal" to Icons.Filled.Person,
         "Settings" to Icons.Filled.Settings
     )
@@ -87,16 +88,22 @@ fun MenuBottom() {
                 )
             }
 
-            // Spacer FAB
-            Spacer(modifier = Modifier.width(96.dp))
+            // Home Button
+            MenuItem(
+                text = items[2].first,
+                icon = items[2].second,
+                isSelected = selectedIndex == 2,
+                onClick = { selectedIndex = 2 },
+                isTablet = screenWidth > 600
+            )
 
             // Personal and Settings
-            items.subList(2, 4).forEachIndexed { index, item ->
+            items.subList(3, 5).forEachIndexed { index, item ->
                 MenuItem(
                     text = item.first,
                     icon = item.second,
-                    isSelected = selectedIndex == index + 2,
-                    onClick = { selectedIndex = index + 2 },
+                    isSelected = selectedIndex == index + 3,
+                    onClick = { selectedIndex = index + 3 },
                     isTablet = screenWidth > 600
                 )
             }

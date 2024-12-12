@@ -1,6 +1,7 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -59,7 +60,7 @@ fun DeviceCard(
    return Card(
         modifier = Modifier
             .padding(8.dp)
-            .size(150.dp)
+            .size(160.dp)
             .clip(RoundedCornerShape(12.dp))
             .shadow(4.dp, RoundedCornerShape(12.dp)),
         colors = CardDefaults.cardColors(
@@ -70,7 +71,7 @@ fun DeviceCard(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(12.dp),
+                    .padding(8.dp),
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -112,28 +113,32 @@ fun DeviceCard(
                 // Device Status Switch
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.End,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp)
+                        .padding(horizontal = 16.dp)
                 ) {
                     Text(
-                        text = if (deviceStatus) "Hoạt động" else "Không hoạt động",
+                        text = if (deviceStatus) "Hoạt động" else "Tắt",
                         color = if (deviceStatus) Color(0xFF4CAF50) else Color.Gray,
                         fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(end = 18.dp) // Add padding to position the text
                     )
                     Switch(
                         checked = deviceStatus,
-                        onCheckedChange = {/* TODO: Implement toggle functionality*/},
+                        onCheckedChange = { /* TODO: Implement toggle functionality */ },
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = Color(0xFF4CAF50),
                             uncheckedThumbColor = Color.Gray,
                             checkedTrackColor = Color(0xFFC8E6C9),
                             uncheckedTrackColor = Color(0xFFE0E0E0)
-                        )
+                        ),
+                        modifier = Modifier.size(30.dp)
                     )
                 }
+
             }
         }
     )
