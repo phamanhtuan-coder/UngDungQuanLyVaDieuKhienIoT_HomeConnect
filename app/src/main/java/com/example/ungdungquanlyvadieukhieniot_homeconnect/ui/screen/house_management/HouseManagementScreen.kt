@@ -24,21 +24,44 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.filled.Apartment
+import androidx.compose.material.icons.filled.Castle
+import androidx.compose.material.icons.filled.Cottage
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Hotel
+import androidx.compose.material.icons.filled.LocalLibrary
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Villa
+import androidx.compose.material.icons.filled.Work
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
@@ -61,18 +84,32 @@ fun HouseManagementScreen(
         bottomBar = {
             MenuBottom()
         },
+        floatingActionButton = {
+            NutHome()
+        },
+        floatingActionButtonPosition = FabPosition.Center,
         content = {
             Column(
                 modifier = Modifier
                     .padding(it)
                     .fillMaxSize()
                     .padding(16.dp)
-                     .verticalScroll(rememberScrollState()),
+                    .verticalScroll(rememberScrollState()),
 
             ) {
+                Text(
+                    text = "Danh sách nhà",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .padding(bottom = 16.dp)
+                        .fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
                 LazyColumn(
-                    modifier = Modifier.fillMaxWidth()
-                        .height(3 * 72.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(3 * 100.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(5) { index ->
@@ -83,22 +120,28 @@ fun HouseManagementScreen(
                         }
                     }
                 }
-                Button(
-                    onClick = {
-                        isEditing.value = false
-                        editingData.value = HouseData()
-                        isPopupVisible.value = true
-                    },
-                    modifier = Modifier
-                        .padding(top = 16.dp)
-                        .align(Alignment.End),
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = "Thêm nhà",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Button(
+                        onClick = {
+                            isEditing.value = false
+                            editingData.value = HouseData()
+                            isPopupVisible.value = true
+                        },
+                        modifier = Modifier
+                            .padding(top = 16.dp, end = if (isTablet) 60.dp else 16.dp)
+                            .align(Alignment.CenterEnd)
+                    ) {
+                        Text(
+                            text = "Thêm nhà",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
+
 
                 if (isPopupVisible.value) {
                     AddHousePopup(
@@ -124,7 +167,7 @@ fun CardHouse(isTablet: Boolean, onEdit: (String, String, String) -> Unit) {
     ) {
         Card(
             modifier = Modifier
-                .widthIn(max = if (isTablet) 600.dp else 400.dp) // Max width for tablet mode
+                .widthIn(max = if (isTablet) 600.dp else 400.dp)
                 .padding(8.dp),
             shape = RoundedCornerShape(12.dp)
         ) {
