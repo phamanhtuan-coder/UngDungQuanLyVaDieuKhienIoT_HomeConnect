@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.home.HomeScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.house_management.HouseManagementScreen
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screens.DashboardScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.UngDungQuanLyVaDieuKhienIoT_HomeConnectTheme
 
 class MainActivity : ComponentActivity() {
@@ -21,7 +22,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             UngDungQuanLyVaDieuKhienIoT_HomeConnectTheme {
-                HomeScreen()
+                DashboardScreen()
 
 
             }
