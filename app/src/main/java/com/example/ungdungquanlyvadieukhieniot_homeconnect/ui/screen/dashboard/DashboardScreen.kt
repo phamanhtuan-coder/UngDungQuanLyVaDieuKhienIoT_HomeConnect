@@ -154,6 +154,7 @@ fun MpAndroidChart(title: String, data: List<Float>, labels: List<String>) {
     val dataSet = LineDataSet(entries, title).apply {
         color = android.graphics.Color.BLUE
         valueTextColor = android.graphics.Color.BLACK
+        lineWidth = 2f
     }
     val lineData = LineData(dataSet)
 
@@ -162,15 +163,22 @@ fun MpAndroidChart(title: String, data: List<Float>, labels: List<String>) {
             LineChart(context).apply {
                 this.data = lineData
                 description.text = title
-                invalidate()
+                invalidate() // Redraw chart
             }
         },
         modifier = Modifier
             .fillMaxWidth()
             .height(200.dp)
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 16.dp),
+        update = { chart ->
+            //Cập nhật dữ liệu khi data thay đổi
+            chart.data = lineData
+            chart.description.text = title
+            chart.invalidate() // Trigger redraw
+        }
     )
 }
+
 
 // Mỗi thiết bị trong danh sách
 /**
