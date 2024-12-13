@@ -38,10 +38,10 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.WeatherI
  * Ngày viết: 29/11/2024
  * Lần cập nhật cuối: 29/11/2024
  * -----------------------------------------
- * Input:
+
  * @param modifier Modifier mở rộng để áp dụng cho layout (đã gán giá trị mặc dịnh).
  *
- * Output: Scaffold
+ * @return Scaffold chứa toàn bộ nội dung của màn hình Trang chủ.
  *
  * ---------------------------------------
  */

@@ -33,14 +33,14 @@ import androidx.compose.ui.unit.sp
 /**
  * Thanh dropdown chọn House
  * -----------------------------------------
- * Người viết: Phạm Anh Tuấn
- * Ngày viết: 10/12/2024
- * Lần cập nhật cuối: 11/12/2024
+ * - Người viết: Phạm Anh Tuấn
+ * - Ngày viết: 10/12/2024
+ * - Lần cập nhật cuối: 11/12/2024
  *
  * -----------------------------------------
  *
  * @param houses: Danh sách các House
- *
+ * @param onManageHouseClicked: Hàm xử lý khi click vào nút "Quản lý danh sách nhà"
  * @return Column chứa thanh dropdown chọn House
  *
  * ---------------------------------------

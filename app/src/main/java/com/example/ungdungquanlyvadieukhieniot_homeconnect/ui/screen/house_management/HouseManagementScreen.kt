@@ -63,6 +63,18 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
 
+
+/**
+ * Màn hình quản lý nhà
+ * --------------------------------------------
+ * Người viết: Phạm Anh Tuấn
+ * Ngày viết: 11/12/2024
+ * Lần cập nhật cuối: 13/12/2024
+ *
+ * --------------------------------------------
+ * @param modifier Modifier
+ * @return Scaffold Màn hình quản lý nhà
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
@@ -76,7 +88,7 @@ fun HouseManagementScreen(
     val isEditing = remember { mutableStateOf(false) }
     val editingData = remember { mutableStateOf(HouseData()) }
 
-    Scaffold(
+    return Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
             Header("Back", "Quản lý nhà")
@@ -159,13 +171,25 @@ fun HouseManagementScreen(
     )
 }
 
+/**
+ * Hiển thị card thông tin nhà
+ * --------------------------------------------
+ * Người viết: Phạm Anh Tuấn
+ * Ngày viết: 11/12/2024
+ * Lần cập nhật cuối: 13/12/2024
+ *
+ * --------------------------------------------
+ * @param isTablet trạng thái thiết bị là tablet hay không
+ * @param onEdit hàm xử lý khi click vào card
+ * @return Card chứa thông tin nhà
+ */
 @Composable
 fun CardHouse(isTablet: Boolean, onEdit: (String, String, String) -> Unit) {
     Box(
         modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
-        Card(
+      return  Card(
             modifier = Modifier
                 .widthIn(max = if (isTablet) 600.dp else 400.dp)
                 .padding(8.dp),
@@ -208,6 +232,22 @@ fun CardHouse(isTablet: Boolean, onEdit: (String, String, String) -> Unit) {
 }
 
 
+/**
+ * Hiển thị popup thêm hoặc chỉnh sửa nhà
+ * --------------------------------------------
+ * Người viết: Phạm Anh Tuấn
+ * Ngày viết: 11/12/2024
+ * Lần cập nhật cuối: 13/12/2024
+ *
+ * --------------------------------------------
+ *  @param houseData thông tin nhà
+ *  @param isEditing trạng thái chỉnh sửa
+ *  @param onDismiss hàm xử lý khi dismiss popup
+ *  @param onAddOrUpdateHouse hàm xử lý khi thêm hoặc cập nhật nhà
+ *  @param isTablet trạng thái thiết bị là tablet hay không
+ *
+ *  @return AlertDialog chứa thông tin nhà
+ */
 @Composable
 fun AddHousePopup(
     houseData: HouseData,
@@ -239,7 +279,7 @@ fun AddHousePopup(
         Color.Magenta, Color.Gray, Color.Black, Color.White, Color(0xFF2196F3)
     )
 
-    AlertDialog(
+    return AlertDialog(
         onDismissRequest = { onDismiss() },
         confirmButton = {
             Button(onClick = {
@@ -321,12 +361,25 @@ fun AddHousePopup(
     )
 }
 
+/**
+ * Hiển thị danh sách icon để chọn
+ * --------------------------------------------
+ * Người viết: Phạm Anh Tuấn
+ * Ngày viết: 11/12/2024
+ * Lần cập nhật cuối: 13/12/2024
+ *
+ * --------------------------------------------
+ *  @param icons danh sách icon
+ *  @param selectedIcon icon được chọn
+ *  @return Column chứa danh sách icon
+ *
+ */
 @Composable
 fun IconPicker(
     icons: List<Pair<ImageVector, String>>,
     selectedIcon: MutableState<String>
 ) {
-    Column(
+    return Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),

@@ -178,9 +178,22 @@ fun WeatherInfo() {
     }
 }
 
+/**
+ * Weather Widget
+ * Người tạo: Phạm Anh Tuấn
+ * Ngày tạo: 11/12/2024
+ * Lần cập nhật cuối: 13/12/2024
+ * ---------------------------------------
+ * @param icon: Icon of the weather widget
+ * @param value: Value of the weather widget
+ * @param label: Label of the weather widget
+ * @param isTablet: Boolean value to check if the device is a tablet
+ * @return Card chứa thông tin thời tiết
+ * ---------------------------------------
+ */
 @Composable
 fun WeatherWidget(icon: ImageVector, value: String, label: String, isTablet: Boolean) {
-    Card(
+    return Card(
         modifier = Modifier
             .padding(if (isTablet) 12.dp else 5.dp)
             .width(if (isTablet) 150.dp else 100.dp)
@@ -218,11 +231,10 @@ fun WeatherWidget(icon: ImageVector, value: String, label: String, isTablet: Boo
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            // Constrain the Column Layout
             Column(
                 modifier = Modifier
-                    .fillMaxWidth(),// Prevents unnecessary stretching
-                verticalArrangement = Arrangement.Center, // Keep the items close together
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
@@ -242,6 +254,7 @@ fun WeatherWidget(icon: ImageVector, value: String, label: String, isTablet: Boo
 }
 
 
+// Kiểm tra thời gian hiện tại có phải là ban ngày hay không
 fun isDayTime(): Boolean {
     val hour = LocalTime.now().hour
     return hour in 6..18

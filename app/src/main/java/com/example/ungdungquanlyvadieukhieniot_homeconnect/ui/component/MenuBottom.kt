@@ -54,10 +54,7 @@ import androidx.compose.ui.unit.sp
  * Ngày viết: 29/11/2024
  * Lần cập nhật cuối: 11/12/2024
  * -----------------------------------------
- * Input: Không có
- * Output: BottomAppBar
- *
- *
+ * @return BottomAppBar chứa các MenuItem
  * ---------------------------------------
  */
 @Preview(showBackground = true)
@@ -73,7 +70,7 @@ fun MenuBottom() {
     )
     val screenWidth = LocalConfiguration.current.screenWidthDp
 
-    BottomAppBar(
+   return BottomAppBar(
         tonalElevation = 4.dp,
         contentPadding = PaddingValues(16.dp),
         modifier = Modifier.height(110.dp)
@@ -116,6 +113,28 @@ fun MenuBottom() {
         }
     }
 }
+
+
+/**
+ * Giao diện MenuItem
+ * -----------------------------------------
+ * Người viết: Phạm Anh Tuấn
+ * Ngày viết: 29/11/2024
+ * Lần cập nhật cuối: 11/12/2024
+ * -----------------------------------------
+ *
+ * @param text: Tên menu
+ * @param icon: Icon của menu
+ * @param isSelected: Trạng thái chọn
+ * @param onClick: Hàm xử lý khi click vào menu
+ * @param isTablet: Kiểm tra thiết bị có phải là tablet không
+ * @param textSize: Kích thước chữ
+ * @param iconSize: Kích thước icon
+ *
+ * @return MenuItem chứa thông tin menu tùy theo thiết bị
+ *
+ * ---------------------------------------
+ */
 @Composable
 fun MenuItem(
     text: String,
@@ -126,13 +145,13 @@ fun MenuItem(
     textSize: TextUnit = 14.sp,
     iconSize: Dp = 36.dp
 ) {
-    val interactionSource = remember { MutableInteractionSource() } // For managing interactions
+    val interactionSource = remember { MutableInteractionSource() }
 
     if (isTablet) {
         // Tablet Layout:
-        Row(
+     return   Row(
             modifier = Modifier
-                .clip(RoundedCornerShape(18.dp)) // Apply rounded shape first
+                .clip(RoundedCornerShape(18.dp))
                 .background(
                     color = if (isSelected) MaterialTheme.colorScheme.surfaceVariant else Color.Transparent,
                     shape = RoundedCornerShape(18.dp)
@@ -140,7 +159,7 @@ fun MenuItem(
                 .clickable(
                     onClick = onClick,
                     interactionSource = interactionSource,
-                    indication = LocalIndication.current // Default ripple effect
+                    indication = LocalIndication.current
                 )
                 .padding(8.dp), // Optional padding
             verticalAlignment = Alignment.CenterVertically,
@@ -153,7 +172,7 @@ fun MenuItem(
                 tint = if (isSelected) MaterialTheme.colorScheme.primary else Color.Gray,
                 modifier = Modifier
                     .size(iconSize)
-                    .padding(4.dp) // Adjust padding to remove offset white space
+                    .padding(4.dp)
             )
             Spacer(modifier = Modifier.width(3.dp))
             Text(
@@ -166,9 +185,9 @@ fun MenuItem(
         }
     } else {
         // Mobile Layout:
-        Column(
+     return   Column(
             modifier = Modifier
-                .clip(RoundedCornerShape(18.dp)) // Apply circular shape first
+                .clip(RoundedCornerShape(18.dp))
                 .background(
                     color = if (isSelected) MaterialTheme.colorScheme.surfaceVariant else Color.Transparent,
                     shape = RoundedCornerShape(18.dp)
@@ -176,7 +195,7 @@ fun MenuItem(
                 .clickable(
                     onClick = onClick,
                     interactionSource = interactionSource,
-                    indication = LocalIndication.current // Default ripple effect
+                    indication = LocalIndication.current
                 )
                 .padding(8.dp),
             verticalArrangement = Arrangement.Top,
@@ -191,7 +210,7 @@ fun MenuItem(
                 tint = if (isSelected) MaterialTheme.colorScheme.primary else Color.Gray,
                 modifier = Modifier
                     .size(mobileIconSize)
-                    .padding(4.dp) // Remove extra offset space
+                    .padding(4.dp)
             )
             Text(
                 text = text,

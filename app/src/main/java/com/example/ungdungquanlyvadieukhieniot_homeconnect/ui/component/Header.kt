@@ -19,25 +19,43 @@ import androidx.compose.ui.unit.sp
 import java.time.LocalTime
 
 
-
+/**
+ * Lấy lời chào dựa vào thời gian hiện tại
+ * -----------------------------------------
+ * - Người viết: Phạm Anh Tuấn
+ * - Ngày viết: 29/11/2024
+ * - Lần cập nhật cuối: 13/12/2024
+ * -----------------------------------------
+ * @return Lời chào dựa vào thời gian hiện tại
+ * ---------------------------------------
+ */
 @Composable
 fun getGreeting(): String {
     val hour = LocalTime.now().hour
     return when (hour) {
-        in 6..11 -> "Good Morning,"
-        in 12..17 -> "Good Afternoon,"
-        else -> "Good Evening,"
+        in 6..11 -> "Chào buổi sáng,"
+        in 12..14 -> "Chào buổi trưa,"
+        in 15..18 -> "Chào buổi chiều,"
+        else -> "Chào buổi tối,"
     }
 }
 
 
 /**
- * Modernized Header (TopAppBar)
+ * Header cho màn hình Home hoặc Back
  * -----------------------------------------
- * Người viết: Phạm Anh Tuấn
- * Ngày viết: 29/11/2024
- * Ngày cập nhật gần nhất: 13/12/2024
+ * - Người viết: Phạm Anh Tuấn
+ * - Ngày viết: 29/11/2024
+ * - Ngày cập nhật gần nhất: 13/12/2024
  * -----------------------------------------
+ *
+ * @param type: Loại Header (Home hoặc Back)
+ * @param title: Tiêu đề của Header
+ * @param username: Tên người dùng
+ * @param onBackClick: Hàm xử lý khi click vào nút Back
+ * @param onNotificationClick: Hàm xử lý khi click vào nút Notification
+ *
+ * @return TopAppBar chứa thông tin Header
  */
 @Preview(showBackground = true)
 @Composable
@@ -54,6 +72,20 @@ fun Header(
     }
 }
 
+
+/**
+ * Header cho màn hình cần nút Back
+ * -----------------------------------------
+ * Người viết: Phạm Anh Tuấn
+ * Ngày viết: 29/11/2024
+ * Ngày cập nhật gần nhất: 13/12/2024
+ * -----------------------------------------
+ * @param title: Tiêu đề của Header
+ * @param onBackClick: Hàm xử lý khi click vào nút Back
+ * @param onNotificationClick: Hàm xử lý khi click vào nút Notification
+ * @return TopAppBar chứa thông tin Header
+ * ---------------------------------------
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BackHeader(
@@ -61,7 +93,7 @@ fun BackHeader(
     onBackClick: () -> Unit,
     onNotificationClick: () -> Unit
 ) {
-    TopAppBar(
+  return  TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primary
         ),
@@ -90,10 +122,22 @@ fun BackHeader(
     )
 }
 
+
+/**
+ * Header cho màn hình Home
+ * -----------------------------------------
+ * Người viết: Phạm Anh Tuấn
+ * Ngày viết: 29/11/2024
+ * Ngày cập nhật gần nhất: 13/12/2024
+ * -----------------------------------------
+ * @param username: Tên người dùng
+ * @param onNotificationClick: Hàm xử lý khi click vào nút Notification
+ * @return TopAppBar chứa thông tin Header
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeHeader(username: String, onNotificationClick: () -> Unit) {
-    TopAppBar(
+   return TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primary
         ),

@@ -31,7 +31,9 @@ fun LineChart(
             color = MaterialTheme.colorScheme.onSurface
         )
         Spacer(modifier = Modifier.height(16.dp))
-        Canvas(modifier = Modifier.fillMaxWidth().height(200.dp)) {
+        Canvas(modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp)) {
             val maxValue = (data.maxOrNull() ?: 1f) * 1.2f
             val stepX = size.width / (labels.size - 1)
             val stepY = size.height / maxValue
