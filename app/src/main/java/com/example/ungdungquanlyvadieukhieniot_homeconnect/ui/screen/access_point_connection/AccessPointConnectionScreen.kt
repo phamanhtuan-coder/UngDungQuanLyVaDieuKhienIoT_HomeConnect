@@ -1,7 +1,5 @@
-package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.accesspointconnection
+package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection
 
-import android.content.Context
-import android.content.res.Resources
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -13,7 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -22,40 +19,37 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.material.icons.filled.ArrowForwardIos // Biểu tượng mũi tên
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Wifi
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.zIndex
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
@@ -80,44 +74,44 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
  * ---------------------------
  */
 
-fun isTablet(): Boolean {
-    val screenSize = Resources.getSystem().configuration.smallestScreenWidthDp
-    return screenSize >= 600
-}
+//fun isTablet(): Boolean {
+//    val screenSize = Resources.getSystem().configuration.smallestScreenWidthDp
+//    return screenSize >= 600
+//}
 
 
-data class LayoutConfig(
-    val outerPadding: Dp,  // Padding bên ngoài, thường được tính theo tỉ lệ chiều rộng màn hình
-    val textFieldSpacing: Dp, // Khoảng cách giữa các thành phần, dựa trên chiều cao màn hình
-    val headingFontSize: TextUnit, // Kích thước chữ tiêu đề, tỉ lệ theo chiều rộng màn hình
-    val textFontSize: TextUnit, // Kích thước chữ mô tả hoặc nội dung
-    val contentWidth: Dp, // Chiều rộng của nội dung chính (ví dụ: TextField)
-    val iconSize: Dp, // Kích thước của icon trong giao diện
-    val boxHeight: Dp, // Chiều cao của các Box (ví dụ: hộp chứa góc lõm)
-    val cornerBoxSize: Dp,          // Kích thước cho Box góc lõm
-    val cornerBoxRadius: Int,       // Bo tròn góc cho Box góc lõm
-    val dialogPadding: Dp           // Padding cho AlertDialog
-)
+//data class LayoutConfig(
+//    val outerPadding: Dp,  // Padding bên ngoài, thường được tính theo tỉ lệ chiều rộng màn hình
+//    val textFieldSpacing: Dp, // Khoảng cách giữa các thành phần, dựa trên chiều cao màn hình
+//    val headingFontSize: TextUnit, // Kích thước chữ tiêu đề, tỉ lệ theo chiều rộng màn hình
+//    val textFontSize: TextUnit, // Kích thước chữ mô tả hoặc nội dung
+//    val contentWidth: Dp, // Chiều rộng của nội dung chính (ví dụ: TextField)
+//    val iconSize: Dp, // Kích thước của icon trong giao diện
+//    val boxHeight: Dp, // Chiều cao của các Box (ví dụ: hộp chứa góc lõm)
+//    val cornerBoxSize: Dp,          // Kích thước cho Box góc lõm
+//    val cornerBoxRadius: Int,       // Bo tròn góc cho Box góc lõm
+//    val dialogPadding: Dp           // Padding cho AlertDialog
+//)
 
 // Tính toán LayoutConfig dựa trên kích thước màn hình
-@Composable
-fun rememberResponsiveLayoutConfig(): LayoutConfig {
-    val screenWidth = LocalConfiguration.current.screenWidthDp.dp // Lấy chiều rộng màn hình
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp // Lấy chiều cao màn hình
-
-    return LayoutConfig(
-        outerPadding = screenWidth * 0.05f,                   // Padding bên ngoài bằng 5% chiều rộng màn hình
-        textFieldSpacing = 8.dp + screenHeight * 0.01f,       // Khoảng cách giữa các thành phần = 8dp + 1% chiều cao màn hình
-        headingFontSize = (12 + screenWidth.value * 0.04f).sp,// Font size tiêu đề dựa trên chiều rộng màn hình
-        textFontSize = (10 + screenWidth.value * 0.03f).sp,   // Font size nội dung dựa trên chiều rộng màn hình
-        contentWidth = 400.dp + if (isTablet()) screenWidth * 0.05f else screenWidth * 0.025f,                    // Chiều rộng của nội dung chính bằng 80% chiều rộng màn hình
-        iconSize = screenWidth * 0.08f,                       // Kích thước icon bằng 8% chiều rộng màn hình
-        boxHeight = screenHeight * 0.1f,                      // Chiều cao Box là 10% chiều cao màn hình
-        cornerBoxSize = screenWidth * 0.1f,                   // Kích thước cho Box góc lõm bằng 10% chiều rộng màn hình
-        cornerBoxRadius = 50,                                 // Độ bo góc cho Box góc lõm (theo phần trăm)
-        dialogPadding = screenWidth * 0.04f                   // Padding cho AlertDialog bằng 4% chiều rộng màn hình
-    )
-}
+//@Composable
+//fun rememberResponsiveLayoutConfig(): LayoutConfig {
+//    val screenWidth = LocalConfiguration.current.screenWidthDp.dp // Lấy chiều rộng màn hình
+//    val screenHeight = LocalConfiguration.current.screenHeightDp.dp // Lấy chiều cao màn hình
+//
+//    return LayoutConfig(
+//        outerPadding = screenWidth * 0.05f,                   // Padding bên ngoài bằng 5% chiều rộng màn hình
+//        textFieldSpacing = 8.dp + screenHeight * 0.01f,       // Khoảng cách giữa các thành phần = 8dp + 1% chiều cao màn hình
+//        headingFontSize = (12 + screenWidth.value * 0.04f).sp,// Font size tiêu đề dựa trên chiều rộng màn hình
+//        textFontSize = (10 + screenWidth.value * 0.03f).sp,   // Font size nội dung dựa trên chiều rộng màn hình
+//        contentWidth = 400.dp + if (isTablet()) screenWidth * 0.05f else screenWidth * 0.025f,                    // Chiều rộng của nội dung chính bằng 80% chiều rộng màn hình
+//        iconSize = screenWidth * 0.08f,                       // Kích thước icon bằng 8% chiều rộng màn hình
+//        boxHeight = screenHeight * 0.1f,                      // Chiều cao Box là 10% chiều cao màn hình
+//        cornerBoxSize = screenWidth * 0.1f,                   // Kích thước cho Box góc lõm bằng 10% chiều rộng màn hình
+//        cornerBoxRadius = 50,                                 // Độ bo góc cho Box góc lõm (theo phần trăm)
+//        dialogPadding = screenWidth * 0.04f                   // Padding cho AlertDialog bằng 4% chiều rộng màn hình
+//    )
+//}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
@@ -362,7 +356,10 @@ fun AccessPointConnectionScreen() {
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = layoutConfig.dialogPadding, vertical = layoutConfig.textFieldSpacing)
+                                .padding(
+                                    horizontal = layoutConfig.dialogPadding,
+                                    vertical = layoutConfig.textFieldSpacing
+                                )
                         ) {
                             item {
                                 // Đoạn văn bản mô tả hướng dẫn truy cập
@@ -480,6 +477,3 @@ fun WiFiCard(
         }
     }
 }
-
-
-

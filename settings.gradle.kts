@@ -21,5 +21,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "UngDungQuanLyVaDieuKhienIoT_HomeConnect"
+rootProject.name = "HomeConnect"
 include(":app")

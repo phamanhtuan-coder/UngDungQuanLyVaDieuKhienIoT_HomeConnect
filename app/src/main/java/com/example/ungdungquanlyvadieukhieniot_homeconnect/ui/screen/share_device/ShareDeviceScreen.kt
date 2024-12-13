@@ -1,4 +1,4 @@
-package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.sharedevice
+package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.share_device
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,7 +29,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
@@ -59,7 +58,10 @@ fun ShareDeviceScreens() {
         Box(
             modifier = Modifier
                 .weight(1f) // Chiếm 50% chiều rộng của Row
-                .background(Color.White, shape = RoundedCornerShape(12.dp)) // Nền trắng với góc bo tròn 12dp
+                .background(
+                    Color.White,
+                    shape = RoundedCornerShape(12.dp)
+                ) // Nền trắng với góc bo tròn 12dp
                 .padding(16.dp) // Khoảng cách bên trong Box
         ) {
             // Nội dung của màn hình
@@ -128,4 +130,3 @@ fun ShareDeviceScreens() {
         }
     }
 }
-

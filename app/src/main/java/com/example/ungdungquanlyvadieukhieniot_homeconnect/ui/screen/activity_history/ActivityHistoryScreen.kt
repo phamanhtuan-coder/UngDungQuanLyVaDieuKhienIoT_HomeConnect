@@ -1,10 +1,20 @@
-package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.activityHistory
+package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.activity_history
 
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -95,10 +105,12 @@ fun ActivityHistoryScreen() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardActivityHistory(label: String, time: String,detail:String) {
-    Box (modifier = Modifier.padding(vertical = 8.dp)
+    Box (modifier = Modifier
+        .padding(vertical = 8.dp)
         .border(2.dp, Color.Black, RoundedCornerShape(8.dp))
         ) {
-        Column( modifier = Modifier .fillMaxWidth()
+        Column( modifier = Modifier
+            .fillMaxWidth()
             .padding(16.dp)
         ) { Text(text = label, fontSize = 14.sp, color = Color.Gray)
             Spacer(modifier = Modifier.height(4.dp))

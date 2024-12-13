@@ -1,8 +1,7 @@
-package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.devicedetail
+package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail
 
 
 import android.annotation.SuppressLint
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -33,60 +32,49 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.sql.Time
 
 /** Giao diện màn hình Device Detail (DeviceDetailScreen)
  * -----------------------------------------
@@ -203,7 +191,10 @@ fun DeviceDetailPhoneScreen() {
                                             // Cột chứa các thông tin của phòng
                                             Column(
                                                 modifier = Modifier
-                                                    .padding(start = 12.dp, end = 12.dp) // Canh lề hai bên
+                                                    .padding(
+                                                        start = 12.dp,
+                                                        end = 12.dp
+                                                    ) // Canh lề hai bên
                                                     .fillMaxWidth() // Chiều rộng đầy đủ
                                                     .background(color = Color.Blue) // Nền màu xanh dương
                                                     .weight(0.2f), // Chiếm 20% trọng lượng của Row
@@ -382,7 +373,7 @@ fun DeviceDetailPhoneScreen() {
                                                 contentPadding = PaddingValues(0.dp) // Loại bỏ padding mặc định
                                             ) {
                                                 Icon(
-                                                    imageVector = Icons.Default.Wifi,
+                                                    imageVector = Icons.Default.Info,
                                                     contentDescription = "Info",
                                                     modifier = Modifier.size(24.dp) // Kích thước của Icon
                                                 )
@@ -608,7 +599,10 @@ fun DeviceDetailTabletScreen() {
                                             // Cột bên trái: Thông tin về phòng và độ sáng
                                             Column(
                                                 modifier = Modifier
-                                                    .padding(start = 12.dp, end = 12.dp) // Canh lề trái và phải
+                                                    .padding(
+                                                        start = 12.dp,
+                                                        end = 12.dp
+                                                    ) // Canh lề trái và phải
                                                     .fillMaxWidth() // Chiều rộng đầy đủ
                                                     .background(color = Color.Blue) // Nền xanh
                                                     .weight(0.2f), // Trọng lượng chiếm 20% của Row
@@ -686,7 +680,9 @@ fun DeviceDetailTabletScreen() {
                                                     // Hình bóng đèn tắt
                                                     Image(
                                                         painter = painterResource(id = R.drawable.bulboff),
-                                                        modifier = Modifier.padding(end = 8.dp).size(24.dp),
+                                                        modifier = Modifier
+                                                            .padding(end = 8.dp)
+                                                            .size(24.dp),
                                                         contentDescription = ""
                                                     )
 
@@ -699,7 +695,9 @@ fun DeviceDetailTabletScreen() {
                                                     // Hình bóng đèn bật
                                                     Image(
                                                         painter = painterResource(id = R.drawable.bulb),
-                                                        modifier = Modifier.padding(start = 8.dp).size(24.dp),
+                                                        modifier = Modifier
+                                                            .padding(start = 8.dp)
+                                                            .size(24.dp),
                                                         contentDescription = ""
                                                     )
                                                 }
@@ -724,7 +722,11 @@ fun DeviceDetailTabletScreen() {
                                         ) {
                                             Column(
                                                 modifier = Modifier
-                                                    .padding(top = 12.dp, start = 12.dp, end = 12.dp)
+                                                    .padding(
+                                                        top = 12.dp,
+                                                        start = 12.dp,
+                                                        end = 12.dp
+                                                    )
                                                     .width(500.dp),
                                                 horizontalAlignment = Alignment.CenterHorizontally,
                                                 verticalArrangement = Arrangement.Center
@@ -801,7 +803,7 @@ fun DeviceDetailTabletScreen() {
                                                 contentPadding = PaddingValues(0.dp) // Loại bỏ padding mặc định
                                             ) {
                                                 Icon(
-                                                    imageVector = Icons.Default.Wifi,
+                                                    imageVector = Icons.Default.Info,
                                                     contentDescription = "Info",
                                                     modifier = Modifier.size(36.dp) // Kích thước của Icon
                                                 )
@@ -882,7 +884,10 @@ fun DeviceDetailTabletScreen() {
                                 Dialog(onDismissRequest = { showDialogTimePickerBegin = false }) {
                                     Box(
                                         modifier = Modifier
-                                            .background(Color.Black, shape = RoundedCornerShape(12.dp))
+                                            .background(
+                                                Color.Black,
+                                                shape = RoundedCornerShape(12.dp)
+                                            )
                                             .padding(16.dp)
                                             .wrapContentSize()
                                     ) {
@@ -897,7 +902,10 @@ fun DeviceDetailTabletScreen() {
                                 Dialog(onDismissRequest = { showDialogTimePickerEnd = false }) {
                                     Box(
                                         modifier = Modifier
-                                            .background(Color.Black, shape = RoundedCornerShape(12.dp))
+                                            .background(
+                                                Color.Black,
+                                                shape = RoundedCornerShape(12.dp)
+                                            )
                                             .padding(16.dp)
                                             .wrapContentSize()
                                     ) {
@@ -968,7 +976,13 @@ fun GradientSlider() {
                 .drawWithCache {
                     val gradient = Brush.horizontalGradient(
                         colors = listOf(
-                            Color.Red, Color.Yellow, Color.Green, Color.Cyan, Color.Blue, Color.Magenta, Color.Red
+                            Color.Red,
+                            Color.Yellow,
+                            Color.Green,
+                            Color.Cyan,
+                            Color.Blue,
+                            Color.Magenta,
+                            Color.Red
                         ),
                         startX = 0f,
                         endX = size.width
