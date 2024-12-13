@@ -1,169 +1,153 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.time.LocalTime
+
+
+
+@Composable
+fun getGreeting(): String {
+    val hour = LocalTime.now().hour
+    return when (hour) {
+        in 6..11 -> "Good Morning,"
+        in 12..17 -> "Good Afternoon,"
+        else -> "Good Evening,"
+    }
+}
+
 
 /**
- * Giao diện Header (TopAppBar)
+ * Modernized Header (TopAppBar)
  * -----------------------------------------
- * Người viết:
- * - Phạm Anh Tuấn
- * Ngày viết:
- * - 29/11/2024
- * Lần cập nhật cuối:
- * - 11/12/2024
+ * Người viết: Phạm Anh Tuấn
+ * Ngày viết: 29/11/2024
+ * Ngày cập nhật gần nhất: 13/12/2024
  * -----------------------------------------
- *
- * @param type Chuỗi loại cho header, mặc dđịnh là Home.
- * @param title Chuỗi tiêu đề cho header khác Home.
- *
- * @return TopAppBar tùy chỉnh theo input
- *
- * ---------------------------------------
  */
 @Preview(showBackground = true)
 @Composable
 fun Header(
     type: String = "Home",
     title: String = "",
+    username: String = "Username",
+    onBackClick: () -> Unit = {},
+    onNotificationClick: () -> Unit = {}
 ) {
     when (type) {
-        "Home" -> HomeHeader()
-        "Back" -> BackHeader(title)
+        "Home" -> HomeHeader(username, onNotificationClick)
+        "Back" -> BackHeader(title, onBackClick, onNotificationClick)
     }
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BackHeader(
     title: String,
+    onBackClick: () -> Unit,
+    onNotificationClick: () -> Unit
 ) {
-        return TopAppBar(
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color.Blue,
-            ),
-            /*
-            * Hiển thị tên màn hình hiện tại
-             */
-            title = {
-
-                    Text(
-                        modifier = Modifier.padding(8.dp),
-                        text = title,
-                        color = Color.White,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-
-
-
-            },
-            navigationIcon = {
-                IconButton(
-                    modifier = Modifier
-                        .padding(horizontal = 2.dp)
-                        .clip(CircleShape),
-                    colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = Color.White,
-                        contentColor = Color.Black
-                    ),
-                    onClick = {
-                        /*TODO*/
-                    }
-                ) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                }
-            },
-            /*
-            * Hiển thị Nút thông báo
-             */
-            actions = {
-                IconButton(
-                    modifier = Modifier
-                        .padding(horizontal = 2.dp)
-                        .clip(CircleShape),
-                    colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = Color.White,
-                        contentColor = Color.Black
-                    ),
-                    onClick = { /*TODO*/ }
-                ) {
-                    Icon(Icons.Filled.Notifications, contentDescription = "Notifications")
-                }
-            }
-        )
-
+    TopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primary
+        ),
+        title = {
+            Text(
+                text = title,
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        },
+        navigationIcon = {
+            RoundedIconButton(
+                icon = Icons.AutoMirrored.Filled.ArrowBack,
+                description = "Back",
+                onClick = onBackClick
+            )
+        },
+        actions = {
+            RoundedIconButton(
+                icon = Icons.Filled.Notifications,
+                description = "Notifications",
+                onClick = onNotificationClick
+            )
+        }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeHeader() {
-    return TopAppBar(
+fun HomeHeader(username: String, onNotificationClick: () -> Unit) {
+    TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Blue,
+            containerColor = MaterialTheme.colorScheme.primary
         ),
-        /*
-        * Hiển thị câu chào tên người dùng
-         */
         title = {
             Column(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "Good Morning,",
-                    color = Color.White,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
+                    text = getGreeting(),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold
                 )
-                Text(text = "Username", color = Color.Black, fontSize = 16.sp)
-
+                Text(
+                    text = username,
+                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
+                    fontSize = 14.sp
+                )
             }
-
-
         },
-        /*
-        * Hiển thị Nút thông báo
-         */
         actions = {
-            IconButton(
-                modifier = Modifier
-                    .padding(horizontal = 2.dp)
-                    .clip(CircleShape),
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = Color.White,
-                    contentColor = Color.Black
-                ),
-                onClick = { /*TODO*/ }
-            ) {
-                Icon(Icons.Filled.Notifications, contentDescription = "Notifications")
-            }
+            RoundedIconButton(
+                icon = Icons.Filled.Notifications,
+                description = "Notifications",
+                onClick = onNotificationClick
+            )
         }
     )
+}
+
+@Composable
+fun RoundedIconButton(icon: ImageVector, description: String, onClick: () -> Unit) {
+    IconButton(
+        modifier = Modifier
+            .padding(horizontal = 8.dp)
+            .background(MaterialTheme.colorScheme.onPrimary, shape = CircleShape),
+        onClick = onClick
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = description,
+            tint = MaterialTheme.colorScheme.primary
+        )
+    }
+}
+
+@Preview(showBackground = true, widthDp = 360)
+@Composable
+fun HeaderPhonePreview() {
+    Header(type = "Home", username = "Alice")
+}
+
+@Preview(showBackground = true, widthDp = 720)
+@Composable
+fun HeaderTabletPreview() {
+    Header(type = "Back", title = "Settings", username = "Bob")
 }
