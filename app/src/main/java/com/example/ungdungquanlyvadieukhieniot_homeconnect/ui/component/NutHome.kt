@@ -1,13 +1,17 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component
 
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
@@ -26,12 +30,30 @@ import androidx.compose.ui.unit.dp
 @Preview(showBackground = true)
 @Composable
 fun NutHome() {
-  return  FloatingActionButton(
-        modifier = Modifier.offset(y = 52.dp),
+    val screenWidth = LocalConfiguration.current.screenWidthDp
+    val isTablet = screenWidth > 600
+    val fabSize = if (isTablet) 72.dp else 64.dp
+    val fabElevation = FloatingActionButtonDefaults.elevation(
+        defaultElevation = if (isTablet) 8.dp else 6.dp,
+        pressedElevation = if (isTablet) 12.dp else 8.dp
+    )
+
+    FloatingActionButton(
+        modifier = Modifier
+            .offset(y = 60.dp)
+            .size(fabSize),
+        elevation = fabElevation,
         shape = CircleShape,
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
         onClick = {
             /*TODO*/
-        },
-        content = { Icon(Icons.Filled.Home, contentDescription = "Home") }
-    )
+        }
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Home,
+            contentDescription = "Home",
+            modifier = Modifier.size(if (isTablet) 42.dp else 36.dp)
+        )
+    }
 }
