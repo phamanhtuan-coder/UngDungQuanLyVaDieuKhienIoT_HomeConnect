@@ -119,7 +119,8 @@ fun HouseSelection(
                         }
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier
+                            .fillMaxSize()
                             .background(Color(0xFF2196F3), RoundedCornerShape(18.dp))
                         ,
                         horizontalArrangement = Arrangement.Center,

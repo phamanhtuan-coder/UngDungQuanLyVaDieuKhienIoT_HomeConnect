@@ -28,7 +28,6 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.DeviceCa
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.HouseSelection
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.SpaceCard
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.WeatherInfo
 

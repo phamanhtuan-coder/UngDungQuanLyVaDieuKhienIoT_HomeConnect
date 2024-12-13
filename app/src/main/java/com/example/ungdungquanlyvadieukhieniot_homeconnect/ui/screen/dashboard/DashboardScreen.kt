@@ -1,15 +1,33 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screens
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AcUnit
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Tv
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,7 +66,7 @@ fun DashboardScreen() {
     val chartOptions = listOf("Sử dụng điện", "Nhiệt độ", "Độ ẩm")
     val selectedChart = remember { mutableStateOf(0) }
 
-   return Scaffold(
+    return Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             Header(
@@ -63,13 +81,14 @@ fun DashboardScreen() {
         bottomBar = {
             MenuBottom()
         },
-        content= { innerPadding ->
-            Column(modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+        content = { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally
-            ){
+            ) {
 
                 // Biểu đồ và tab biểu đồ
                 Column(modifier = Modifier.fillMaxWidth()) {
@@ -118,7 +137,9 @@ fun DashboardScreen() {
                 // Danh sách thiết bị
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(getDevicesForRoom(selectedTab.value)) { device ->
-                        DeviceItem(device = device, onDetailsClick = { /* Điều hướng đến trang điều khiển */ })
+                        DeviceItem(
+                            device = device,
+                            onDetailsClick = { /* Điều hướng đến trang điều khiển */ })
                     }
                 }
             }
@@ -165,7 +186,7 @@ fun MpAndroidChart(title: String, data: List<Float>, labels: List<String>) {
  */
 @Composable
 fun DeviceItem(device: Device, onDetailsClick: () -> Unit) {
-   return Card(
+    return Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
@@ -226,7 +247,6 @@ fun DeviceItem(device: Device, onDetailsClick: () -> Unit) {
 }
 
 
-
 @Preview(showBackground = true)
 @Composable
 fun DashboardScreenPreview() {
@@ -250,12 +270,15 @@ fun getDevicesForRoom(roomIndex: Int): List<Device> {
             Device("Đèn phòng khách", "Bóng đèn", "Bật", Icons.Filled.Lightbulb, 50f, 0f),
             Device("TV", "Tivi", "Tắt", Icons.Filled.Tv, 0f, 0f)
         )
+
         1 -> listOf(
             Device("Điều hòa phòng ngủ", "Máy điều hòa", "Bật", Icons.Filled.AcUnit, 150f, 22f)
         )
+
         2 -> listOf(
             Device("Lò nướng nhà bếp", "Lò nướng", "Tắt", Icons.Filled.Home, 0f, 0f)
         )
+
         else -> emptyList()
     }
 }

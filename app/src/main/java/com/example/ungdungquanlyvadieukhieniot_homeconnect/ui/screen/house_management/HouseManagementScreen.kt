@@ -61,7 +61,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
 
 
 /**
@@ -189,7 +188,7 @@ fun CardHouse(isTablet: Boolean, onEdit: (String, String, String) -> Unit) {
         modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
-      return  Card(
+        return Card(
             modifier = Modifier
                 .widthIn(max = if (isTablet) 600.dp else 400.dp)
                 .padding(8.dp),
