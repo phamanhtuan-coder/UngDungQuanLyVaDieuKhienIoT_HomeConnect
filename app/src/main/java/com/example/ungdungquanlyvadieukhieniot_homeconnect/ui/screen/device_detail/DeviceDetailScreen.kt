@@ -978,7 +978,7 @@ fun GradientSlider() {
                     }
                 }
         ) {
-            androidx.compose.material.Slider(
+            Slider(
                 value = sliderPosition,
                 onValueChange = { sliderPosition = it },
                 modifier = Modifier
