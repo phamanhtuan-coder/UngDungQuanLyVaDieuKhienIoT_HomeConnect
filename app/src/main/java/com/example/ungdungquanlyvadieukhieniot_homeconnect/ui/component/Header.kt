@@ -22,6 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import java.time.LocalTime
 
@@ -52,29 +54,33 @@ fun getGreeting(): String {
  * -----------------------------------------
  * - Người viết: Phạm Anh Tuấn
  * - Ngày viết: 29/11/2024
- * - Ngày cập nhật gần nhất: 13/12/2024
+ * - Ngày cập nhật gần nhất: 15/12/2024
  * -----------------------------------------
- *
+ * @param navController: Đối tượng điều khiển điều hướng
  * @param type: Loại Header (Home hoặc Back)
  * @param title: Tiêu đề của Header
  * @param username: Tên người dùng
- * @param onBackClick: Hàm xử lý khi click vào nút Back
  * @param onNotificationClick: Hàm xử lý khi click vào nút Notification
  *
  * @return TopAppBar chứa thông tin Header
+ * ---------------------------------------
+ * Người cập nhật: Phạm Anh Tuấn
+ * Ngày cập nhật: 15/12/2024
+ * Nội dung cập nhật:
+ * - Thêm điều hướng quay lại màn hình trước đó
+ *
  */
-@Preview(showBackground = true)
 @Composable
 fun Header(
+    navController: NavHostController,
     type: String = "Home",
     title: String = "",
     username: String = "Username",
-    onBackClick: () -> Unit = {},
     onNotificationClick: () -> Unit = {}
 ) {
     when (type) {
-        "Home" -> HomeHeader(username, onNotificationClick)
-        "Back" -> BackHeader(title, onBackClick, onNotificationClick)
+        "Home" -> HomeHeader(navController, username, onNotificationClick)
+        "Back" -> BackHeader(navController, title, onNotificationClick)
     }
 }
 
@@ -86,7 +92,6 @@ fun Header(
  * Ngày cập nhật gần nhất: 13/12/2024
  * -----------------------------------------
  * @param title: Tiêu đề của Header
- * @param onBackClick: Hàm xử lý khi click vào nút Back
  * @param onNotificationClick: Hàm xử lý khi click vào nút Notification
  * @return TopAppBar chứa thông tin Header
  * ---------------------------------------
@@ -94,8 +99,8 @@ fun Header(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BackHeader(
+    navController: NavHostController,
     title: String,
-    onBackClick: () -> Unit,
     onNotificationClick: () -> Unit
 ) {
     AppTheme {
@@ -115,7 +120,9 @@ fun BackHeader(
                 RoundedIconButton(
                     icon = Icons.AutoMirrored.Filled.ArrowBack,
                     description = "Back",
-                    onClick = onBackClick
+                    onClick = {
+                        navController.popBackStack()
+                    }
                 )
             },
             actions = {
@@ -142,7 +149,10 @@ fun BackHeader(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeHeader(username: String, onNotificationClick: () -> Unit) {
+fun HomeHeader(
+    navController: NavHostController,
+    username: String, onNotificationClick: () -> Unit
+) {
     AppTheme {
         TopAppBar(
             colors = TopAppBarDefaults.topAppBarColors(
@@ -197,11 +207,16 @@ fun RoundedIconButton(icon: ImageVector, description: String, onClick: () -> Uni
 @Preview(showBackground = true, widthDp = 360)
 @Composable
 fun HeaderPhonePreview() {
-    Header(type = "Home", username = "Alice")
+    Header(navController = rememberNavController(), type = "Home", username = "Alice")
 }
 
 @Preview(showBackground = true, widthDp = 720)
 @Composable
 fun HeaderTabletPreview() {
-    Header(type = "Back", title = "Settings", username = "Bob")
+    Header(
+        navController = rememberNavController(),
+        type = "Back",
+        title = "Settings",
+        username = "Bob"
+    )
 }
