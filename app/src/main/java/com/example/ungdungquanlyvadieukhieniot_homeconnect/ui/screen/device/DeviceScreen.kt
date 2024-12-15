@@ -106,21 +106,18 @@ fun DeviceScreen() {
             /*
             * Hiển thị Header
              */
-            Header()
+
         },
         bottomBar = {
             /*
             * Hiển thị Thanh Menu dưới cùng
              */
-            MenuBottom()
         },
         floatingActionButton = {
             /*
             * Hiển thị Nút Home
              */
-            NutHome()
         },
-        floatingActionButtonPosition = FabPosition.Center,
         content = { innerPadding ->
             val paddingInPx = with(LocalDensity.current) {
                 innerPadding.calculateTopPadding().roundToPx()

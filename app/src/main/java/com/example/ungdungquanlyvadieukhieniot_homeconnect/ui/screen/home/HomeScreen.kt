@@ -68,7 +68,7 @@ fun HomeScreen(
             /*
             * Hiển thị Thanh Menu dưới cùng
              */
-            MenuBottom()
+            MenuBottom(navController)
         },
         floatingActionButton = {
             /*

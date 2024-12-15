@@ -127,21 +127,12 @@ fun DeviceDetailPhoneScreen() {
             /*
             * Hiển thị Header
              */
-            Header()
         },
         bottomBar = {
             /*
             * Hiển thị Thanh Menu dưới cùng
              */
-            MenuBottom()
         },
-        floatingActionButton = {
-            /*
-            * Hiển thị Nút Home
-             */
-            NutHome()
-        },
-        floatingActionButtonPosition = FabPosition.Center,
         containerColor = Color.LightGray,
         content = { innerPadding ->
             Box (
@@ -534,21 +525,17 @@ fun DeviceDetailTabletScreen() {
             /*
             * Hiển thị Header
              */
-            Header()
         },
         bottomBar = {
             /*
             * Hiển thị Thanh Menu dưới cùng
              */
-            MenuBottom()
         },
         floatingActionButton = {
             /*
             * Hiển thị Nút Home
              */
-            NutHome()
         },
-        floatingActionButtonPosition = FabPosition.Center,
         containerColor = Color.LightGray,
         content = { innerPadding ->
             Box (

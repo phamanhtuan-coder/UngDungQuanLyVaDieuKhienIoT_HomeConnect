@@ -40,6 +40,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.github.mikephil.charting.charts.LineChart
@@ -60,7 +62,9 @@ import com.github.mikephil.charting.data.LineDataSet
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen() {
+fun DashboardScreen(
+    navController: NavHostController
+) {
     val tabs = listOf("Phòng khách", "Phòng ngủ", "Nhà bếp")
     val selectedTab = remember { mutableStateOf(0) }
     val chartOptions = listOf("Sử dụng điện", "Nhiệt độ", "Độ ẩm")
@@ -70,16 +74,15 @@ fun DashboardScreen() {
         modifier = Modifier.fillMaxSize(),
         topBar = {
             Header(
+                navController = navController,
                 type = "Back",
                 title = "Thống kê",
-                onNotificationClick = { /* TODO */ },
-                onBackClick = { /* TODO */ }
             )
 
 
         },
         bottomBar = {
-            MenuBottom()
+            MenuBottom(navController)
         },
         content = { innerPadding ->
             Column(
@@ -258,7 +261,7 @@ fun DeviceItem(device: Device, onDetailsClick: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun DashboardScreenPreview() {
-    DashboardScreen()
+    DashboardScreen(rememberNavController())
 }
 
 // Lớp dữ liệu ví dụ

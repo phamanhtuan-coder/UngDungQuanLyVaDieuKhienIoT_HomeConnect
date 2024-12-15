@@ -51,6 +51,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.navigation.NavHostController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
@@ -114,24 +115,22 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
 //}
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
-fun AccessPointConnectionScreen() {
+fun AccessPointConnectionScreen(
+    navController: NavHostController
+) {
     val layoutConfig = rememberResponsiveLayoutConfig() // Lấy LayoutConfig
     var showDialog by remember { mutableStateOf(false) }
 
     return Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = Color.LightGray,
-        topBar = { Header() },
-        bottomBar = { MenuBottom() },
-        floatingActionButton = { NutHome() },
-        floatingActionButtonPosition = FabPosition.Center,
+        topBar = { Header(navController,"Back","Kết nối với thiết bị") },
+        bottomBar = { MenuBottom(navController) },
         content = { innerPadding ->
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize() // Chiếm toàn bộ kích thước của màn hình
-//                    .padding(bottom = layoutConfig.outerPadding) // Padding linh hoạt
                     .padding(innerPadding),
                 verticalArrangement = Arrangement.Top, // Sắp xếp các item theo chiều dọc, bắt đầu từ trên xuống.
                 horizontalAlignment = Alignment.CenterHorizontally // Căn chỉnh các item theo chiều ngang vào giữa.

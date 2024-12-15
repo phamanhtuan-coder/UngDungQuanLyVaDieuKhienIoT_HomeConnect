@@ -59,6 +59,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
+import androidx.navigation.NavHostController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 
@@ -75,9 +76,9 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBott
  * @return Scaffold Màn hình quản lý nhà
  */
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
 @Composable
 fun HouseManagementScreen(
+    navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp
@@ -90,10 +91,10 @@ fun HouseManagementScreen(
     return Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            Header("Back", "Quản lý nhà")
+            Header(navController,"Back", "Quản lý nhà")
         },
         bottomBar = {
-            MenuBottom()
+
         },
         floatingActionButton = {
             // FAB action nếu có

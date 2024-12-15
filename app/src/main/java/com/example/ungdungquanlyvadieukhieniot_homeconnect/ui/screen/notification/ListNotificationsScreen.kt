@@ -229,10 +229,12 @@ fun ListNotificationScreen() {
     return Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = Color.LightGray,
-        topBar = { Header() },
-        bottomBar = { MenuBottom() },
-        floatingActionButton = { NutHome() },
-        floatingActionButtonPosition = FabPosition.Center,
+        topBar = {
+
+        },
+        bottomBar = {
+
+        },
         content = { innerPadding ->
             Column(
                 modifier = Modifier

@@ -26,10 +26,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,6 +39,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 /**
  * Giao diện Thanh Menu Bottom (BottomAppBar)
@@ -52,20 +54,25 @@ import androidx.compose.ui.unit.sp
  * @return BottomAppBar chứa các MenuItem
  * ---------------------------------------
  */
-@Preview(showBackground = true)
+@Preview
 @Composable
-fun MenuBottom() {
-    var selectedIndex by remember { mutableStateOf(0) }
+fun MenuBottom(
+    navController: NavHostController =rememberNavController()
+) {
+    AppTheme{
+
     val items = listOf(
-        "Dashboard" to Icons.Filled.PieChart,
-        "Devices" to Icons.Filled.Devices,
-        "Home" to Icons.Filled.Home,
-        "Personal" to Icons.Filled.Person,
-        "Settings" to Icons.Filled.Settings
+        "Dashboard" to Pair(Icons.Filled.PieChart, "dashboard"),
+        "Devices" to Pair(Icons.Filled.Devices, "devices"),
+        "Home" to Pair(Icons.Filled.Home, "home"),
+        "Profile" to Pair(Icons.Filled.Person, "profile"),
+        "Settings" to Pair(Icons.Filled.Settings, "settings")
     )
     val screenWidth = LocalConfiguration.current.screenWidthDp
 
-    return BottomAppBar(
+    val currentRoute = navController.currentBackStackEntry?.destination?.route
+
+    BottomAppBar(
         tonalElevation = 4.dp,
         contentPadding = PaddingValues(16.dp),
         modifier = Modifier.height(120.dp)
@@ -75,39 +82,33 @@ fun MenuBottom() {
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.Top
         ) {
-            // Dashboard and Devices
-            items.subList(0, 2).forEachIndexed { index, item ->
+            items.forEach { item ->
+                val isSelected = currentRoute == item.second.second
                 MenuItem(
                     text = item.first,
-                    icon = item.second,
-                    isSelected = selectedIndex == index,
-                    onClick = { selectedIndex = index },
-                    isTablet = screenWidth > 600
-                )
-            }
+                    icon = item.second.first,
+                    isSelected = isSelected,
+                    onClick = {
+                        if (!isSelected) {
+                            navController.navigate(item.second.second) {
+                                popUpTo(navController.graph.findNode(item.second.second)?.id ?: navController.graph.startDestinationId) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
 
-            // Home Button
-            MenuItem(
-                text = items[2].first,
-                icon = items[2].second,
-                isSelected = selectedIndex == 2,
-                onClick = { selectedIndex = 2 },
-                isTablet = screenWidth > 600
-            )
 
-            // Personal and Settings
-            items.subList(3, 5).forEachIndexed { index, item ->
-                MenuItem(
-                    text = item.first,
-                    icon = item.second,
-                    isSelected = selectedIndex == index + 3,
-                    onClick = { selectedIndex = index + 3 },
+                        }
+                    },
                     isTablet = screenWidth > 600
                 )
             }
         }
     }
+        }
 }
+
 
 
 /**
@@ -143,8 +144,7 @@ fun MenuItem(
     val interactionSource = remember { MutableInteractionSource() }
 
     if (isTablet) {
-        // Tablet Layout:
-        return Row(
+        Row(
             modifier = Modifier
                 .clip(RoundedCornerShape(18.dp))
                 .background(
@@ -156,12 +156,11 @@ fun MenuItem(
                     interactionSource = interactionSource,
                     indication = LocalIndication.current
                 )
-                .padding(8.dp), // Optional padding
+                .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
-        )
-        {
-        Icon(
+        ) {
+            Icon(
                 imageVector = icon,
                 contentDescription = text,
                 tint = if (isSelected) MaterialTheme.colorScheme.primary else Color.Gray,
@@ -179,8 +178,7 @@ fun MenuItem(
             )
         }
     } else {
-        // Mobile Layout:
-        return Column(
+        Column(
             modifier = Modifier
                 .clip(RoundedCornerShape(18.dp))
                 .background(
@@ -193,12 +191,10 @@ fun MenuItem(
                     indication = LocalIndication.current
                 )
                 .padding(8.dp),
-            verticalArrangement = Arrangement.Top,
+            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
-        )
-        {
-            val mobileIconSize = if (isSelected) 26.dp else 22.dp
-            val mobileTextSize = if (isSelected) 14.sp else 12.sp
+        ) {
+            val mobileIconSize = if (isSelected) 30.dp else 48.dp
             Icon(
                 imageVector = icon,
                 contentDescription = text,
@@ -207,12 +203,14 @@ fun MenuItem(
                     .size(mobileIconSize)
                     .padding(4.dp)
             )
-            Text(
-                text = text,
-                color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Gray,
-                fontSize = mobileTextSize,
-                maxLines = 1
-            )
+            if (isSelected) {
+                Text(
+                    text = text,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 14.sp,
+                    maxLines = 1
+                )
+            }
         }
     }
 }

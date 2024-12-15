@@ -16,7 +16,9 @@ sealed class Screens(
     object UpdateProfile: Screens("update_profile")
     object UpdateDevice: Screens("update_device")
     object AddDevice: Screens("add_device")
-    object Device: Screens("device")
-    object Setting: Screens("setting")
+    object Devices: Screens("devices")
+
+    object Settings: Screens("settings")
+    object Dashboard: Screens("dashboard")
 
 }
