@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FabPosition
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -32,6 +33,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.HouseSel
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.SpaceCard
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.WeatherInfo
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 /** Giao diện màn hình Trang chủ (Home Screen)
  * -----------------------------------------
@@ -51,13 +53,16 @@ fun HomeScreen(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    return Scaffold(
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        Scaffold(
+            containerColor = colorScheme.background,
         modifier = modifier.fillMaxSize(),
         topBar = {
             /*
             * Hiển thị Header
              */
-            Header(navController,"Home")
+            Header(navController, "Home")
         },
         bottomBar = {
             /*
@@ -113,7 +118,7 @@ fun HomeScreen(
                     ) {
                         Text(
                             text = "Không gian",
-                            color = Color.Black,
+                            color = colorScheme.onBackground,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -151,7 +156,7 @@ fun HomeScreen(
                     ) {
                         Text(
                             text = "Thiết bị hoạt động",
-                            color = Color.Black,
+                            color = colorScheme.onBackground,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -180,6 +185,7 @@ fun HomeScreen(
 
         }
     )
+    }
 
 }
 
