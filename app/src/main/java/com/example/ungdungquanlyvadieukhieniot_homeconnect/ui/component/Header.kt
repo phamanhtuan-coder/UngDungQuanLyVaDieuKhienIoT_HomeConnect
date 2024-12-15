@@ -22,8 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import java.time.LocalTime
-
 
 /**
  * Lấy lời chào dựa vào thời gian hiện tại
@@ -78,7 +78,6 @@ fun Header(
     }
 }
 
-
 /**
  * Header cho màn hình cần nút Back
  * -----------------------------------------
@@ -99,35 +98,36 @@ fun BackHeader(
     onBackClick: () -> Unit,
     onNotificationClick: () -> Unit
 ) {
-    return TopAppBar(
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary
-        ),
-        title = {
-            Text(
-                text = title,
-                color = MaterialTheme.colorScheme.onPrimary,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold
-            )
-        },
-        navigationIcon = {
-            RoundedIconButton(
-                icon = Icons.AutoMirrored.Filled.ArrowBack,
-                description = "Back",
-                onClick = onBackClick
-            )
-        },
-        actions = {
-            RoundedIconButton(
-                icon = Icons.Filled.Notifications,
-                description = "Notifications",
-                onClick = onNotificationClick
-            )
-        }
-    )
+    AppTheme {
+        TopAppBar(
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primary
+            ),
+            title = {
+                Text(
+                    text = title,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            },
+            navigationIcon = {
+                RoundedIconButton(
+                    icon = Icons.AutoMirrored.Filled.ArrowBack,
+                    description = "Back",
+                    onClick = onBackClick
+                )
+            },
+            actions = {
+                RoundedIconButton(
+                    icon = Icons.Filled.Notifications,
+                    description = "Notifications",
+                    onClick = onNotificationClick
+                )
+            }
+        )
+    }
 }
-
 
 /**
  * Header cho màn hình Home
@@ -143,39 +143,42 @@ fun BackHeader(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeHeader(username: String, onNotificationClick: () -> Unit) {
-    return TopAppBar(
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary
-        ),
-        title = {
-            Column(
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = getGreeting(),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Text(
-                    text = username,
-                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
-                    fontSize = 14.sp
+    AppTheme {
+        TopAppBar(
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primary
+            ),
+            title = {
+                Column(
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = getGreeting(),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = username,
+                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
+                        fontSize = 14.sp
+                    )
+                }
+            },
+            actions = {
+                RoundedIconButton(
+                    icon = Icons.Filled.Notifications,
+                    description = "Notifications",
+                    onClick = onNotificationClick
                 )
             }
-        },
-        actions = {
-            RoundedIconButton(
-                icon = Icons.Filled.Notifications,
-                description = "Notifications",
-                onClick = onNotificationClick
-            )
-        }
-    )
+        )
+    }
 }
 
 @Composable
 fun RoundedIconButton(icon: ImageVector, description: String, onClick: () -> Unit) {
+    AppTheme {
     IconButton(
         modifier = Modifier
             .padding(horizontal = 8.dp)
@@ -187,6 +190,7 @@ fun RoundedIconButton(icon: ImageVector, description: String, onClick: () -> Uni
             contentDescription = description,
             tint = MaterialTheme.colorScheme.primary
         )
+    }
     }
 }
 

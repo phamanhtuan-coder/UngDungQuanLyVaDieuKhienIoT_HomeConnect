@@ -13,11 +13,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -25,7 +26,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 /**
  * Màn hình Welcome hiển thị logo và thông điệp chào mừng
@@ -34,9 +39,9 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
  * Ngày viết: 30/11/2024
  * Lần cập nhật cuối: 15/12/2024
  * -----------------------------------------
- * Input: Không có
+ * @param navController: Đối tượng điều khiển điều hướng
  *
- * Output: Column chứa logo, thông điệp chào mừng và nút truy cập
+ * @return Scaffold chứa logo, thông điệp chào mừng và các nút truy cập
  *
  * ---------------------------------------
  * Người cập nhật: Phạm Anh Tuấn
@@ -46,76 +51,90 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
  *  - Cải thiện giao diện hiển thị text và thêm nút truy cập
  */
 
-@Preview(showBackground = true)
 @Composable
-fun WelcomeScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = Color(0xFF3D8CF0)),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Logo
-        Image(
-            painter = painterResource(id = R.drawable.logo),
-            contentDescription = "Logo ứng dụng HomeConnect",
-            modifier = Modifier.size(500.dp)
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Welcome Message
-        Text(
-            text = "Chào mừng bạn đến với HomeConnect!",
-            style = TextStyle(
-                color = Color.White,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            ),
-            modifier = Modifier.padding(horizontal = 16.dp)
-        )
-
-        Spacer(modifier = Modifier.height(48.dp))
-
-        // Buttons
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+fun WelcomeScreen(
+    navController: NavHostController
+) {
+    AppTheme { // Gói trong AppTheme để đảm bảo áp dụng theme
+        Scaffold(
+            containerColor = MaterialTheme.colorScheme.primary,
         ) {
-            Button(
-                onClick = { /* TODO: Xử lý sự kiện đang98 nhập */ },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                shape = RoundedCornerShape(50),
-                modifier = Modifier.size(width = 150.dp, height = 50.dp)
+            Column(
+                modifier = Modifier
+                    .padding(it)
+                    .fillMaxSize()
+                    .background(color = MaterialTheme.colorScheme.primary),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+
+                Image(
+                    painter = painterResource(id = R.drawable.logo),
+                    contentDescription = "Logo ứng dụng HomeConnect",
+                    modifier = Modifier.size(500.dp)
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+
                 Text(
-                    text = "Đăng nhập",
+                    text = "Chào mừng bạn đến với HomeConnect!",
                     style = TextStyle(
-                        color = Color(0xFF3D8CF0),
-                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    ),
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
 
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(
+                        onClick = {
+                            navController.navigate(Screens.Login.route)
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onPrimary),
+                        shape = RoundedCornerShape(50),
+                        modifier = Modifier.size(width = 150.dp, height = 50.dp)
+                    ) {
+                        Text(
+                            text = "Đăng nhập",
+                            style = TextStyle(
+                                color = MaterialTheme.colorScheme.primary,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
                         )
-                )
-            }
+                    }
 
-            Button(
-                onClick = { /* TODO: Xử lý sự kiện đăng ký*/ },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                shape = RoundedCornerShape(50),
-                modifier = Modifier.size(width = 150.dp, height = 50.dp)
-            ) {
-                Text(
-                    text = "Đăng ký",
-                    style = TextStyle(
-                        color = Color(0xFF3D8CF0),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                )
+                    Button(
+                        onClick = { /* TODO: Xử lý sự kiện đăng ký*/ },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onPrimary),
+                        shape = RoundedCornerShape(50),
+                        modifier = Modifier.size(width = 150.dp, height = 50.dp)
+                    ) {
+                        Text(
+                            text = "Đăng ký",
+                            style = TextStyle(
+                                color = MaterialTheme.colorScheme.primary,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    }
+                }
             }
         }
     }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun WelcomeScreenPreview() {
+    WelcomeScreen(navController = rememberNavController())
 }

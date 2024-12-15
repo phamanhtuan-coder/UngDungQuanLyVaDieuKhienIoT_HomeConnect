@@ -24,6 +24,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.DeviceCard
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.HouseSelection
@@ -39,14 +41,14 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.WeatherI
  * -----------------------------------------
 
  * @param modifier Modifier mở rộng để áp dụng cho layout (đã gán giá trị mặc dịnh).
- *
+ * @param navController Đối tượng điều khiển điều hướng.
  * @return Scaffold chứa toàn bộ nội dung của màn hình Trang chủ.
  *
  * ---------------------------------------
  */
-@Preview(showBackground = true,showSystemUi = true)
 @Composable
 fun HomeScreen(
+    navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     return Scaffold(
@@ -179,4 +181,10 @@ fun HomeScreen(
         }
     )
 
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun HomeScreenPreview() {
+    HomeScreen(navController = rememberNavController())
 }

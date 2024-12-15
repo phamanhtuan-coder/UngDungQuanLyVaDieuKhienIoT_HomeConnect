@@ -5,18 +5,22 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.onboard_welcome.WelcomeScreen
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.UngDungQuanLyVaDieuKhienIoT_HomeConnectTheme
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.NavigationGraph
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        lateinit var navController: NavHostController
         installSplashScreen()
         enableEdgeToEdge()
         setContent {
-            UngDungQuanLyVaDieuKhienIoT_HomeConnectTheme {
-                WelcomeScreen()
+            AppTheme {
+                navController = rememberNavController()
+                NavigationGraph(navController)
             }
         }
     }

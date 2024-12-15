@@ -1,10 +1,11 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation
 
 sealed class Screens(
-    route: String
+    val route: String
 ){
     object Home: Screens("home")
     object Login: Screens("login")
+    object Welcome : Screens("welcome")
     object Register: Screens("register")
     object RecoverPassword: Screens("recover_password")
     object UpdatePassword: Screens("update_password")
