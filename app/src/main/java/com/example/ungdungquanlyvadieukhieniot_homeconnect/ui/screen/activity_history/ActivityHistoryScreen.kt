@@ -105,13 +105,15 @@ fun ActivityHistoryScreen() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardActivityHistory(label: String, time: String,detail:String) {
-    Box (modifier = Modifier
-        .padding(vertical = 8.dp)
-        .border(2.dp, Color.Black, RoundedCornerShape(8.dp))
+    Box(
+        modifier = Modifier
+            .padding(vertical = 8.dp)
+            .border(2.dp, Color.Black, RoundedCornerShape(8.dp))
         ) {
-        Column( modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) { Text(text = label, fontSize = 14.sp, color = Color.Gray)
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = time, fontSize = 14.sp, color = Color.Gray)

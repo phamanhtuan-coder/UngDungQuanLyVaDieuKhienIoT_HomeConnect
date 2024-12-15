@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    <style name="Theme.UngDungQuanLyVaDieuKhienIoT_HomeConnect_SplashScreen" parent="Theme.SplashScreen">
+            <item name="windowSplashScreenBackground">@color/background_blue</item>
+            <item name="windowSplashScreenAnimatedIcon">@drawable/logo_icon</item>
+            <item name="postSplashScreenTheme">@style/Theme.UngDungQuanLyVaDieuKhienIoT_HomeConnect</item>
+    </style>
     <style name="Theme.UngDungQuanLyVaDieuKhienIoT_HomeConnect" parent="android:Theme.Material.Light.NoActionBar" />
+
 </resources>

@@ -42,6 +42,7 @@ android {
 
 dependencies {
 
+    implementation("androidx.core:core-splashscreen:1.0.1")
     implementation(libs.mpandroidchart)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
