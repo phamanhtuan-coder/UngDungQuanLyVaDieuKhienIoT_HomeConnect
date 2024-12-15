@@ -57,7 +57,7 @@ fun HomeScreen(
             /*
             * Hiển thị Header
              */
-            Header("Home")
+            Header(navController,"Home")
         },
         bottomBar = {
             /*
