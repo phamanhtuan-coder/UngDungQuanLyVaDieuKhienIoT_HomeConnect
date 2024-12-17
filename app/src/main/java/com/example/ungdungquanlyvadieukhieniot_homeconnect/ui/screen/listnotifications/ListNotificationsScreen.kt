@@ -32,15 +32,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,13 +60,20 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
  * -----------------------------------------
  * Người viết: Nguyễn Thanh Sang
  * Ngày viết: 10/12/2024
- * Lần cập nhật cuối: 10/12/2024
+ * Lần cập nhật cuối: 17/12/2024
  * -----------------------------------------
  * Input:
  *
  * Output: Scaffold
  *
  * ---------------------------------------
+ */
+
+/**
+ * Người chỉnh sửa: Nguyễn Thanh Sang
+ * Ngày cập nhật: 17/12/2024
+ * Chỉnh sửa giao diện Thông Báo
+ * - Thêm thanh tìm kiếm
  */
 // Kích thước và padding
 private object NotificationStyle {
@@ -213,6 +226,7 @@ data class Notification(
 )
 
 // Demo màn hình chính
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun ListNotificationScreen() {
@@ -279,6 +293,27 @@ fun ListNotificationScreen() {
                                     color = Color.White
                                 )
                                 Spacer(modifier = Modifier.heightIn(8.dp))
+                                TextField(
+                                    value = "",
+                                    onValueChange = {},
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Default.Search,
+                                            contentDescription = "Search Icon",
+                                            tint = Color.Gray
+                                        )
+                                    },
+                                    placeholder = {
+                                        Text(text = "Tìm kiếm ....", color = Color.Gray)
+                                    },
+                                    singleLine = true,
+                                    textStyle = TextStyle(fontSize = 16.sp),
+                                    modifier = Modifier
+                                        .width(500.dp)
+                                        .clip(RoundedCornerShape(24.dp))
+                                        .padding(12.dp),
+                                )
+                                Spacer(modifier = Modifier.heightIn(16.dp))
                             }
                         }
                         // Box chứa góc lõm màu xám
@@ -307,7 +342,9 @@ fun ListNotificationScreen() {
                                     )
                                     .zIndex(2f), // Z-index cao hơn
                                 contentAlignment = Alignment.Center // Căn Row vào giữa Box
-                            ){}
+                            ){
+
+                            }
                         }
                     }
                 }
