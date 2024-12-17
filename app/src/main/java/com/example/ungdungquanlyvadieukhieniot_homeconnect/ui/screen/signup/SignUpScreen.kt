@@ -42,21 +42,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 
-// Hàm mở trình chọn ảnh
-fun openImagePicker(
-    context: Context,
-    requiredPermission: String,
-    launcher: ActivityResultLauncher<String>,
-    requestPermissionLauncher: ActivityResultLauncher<String>,
-    onError: (String) -> Unit
-) {
-    if (ContextCompat.checkSelfPermission(context, requiredPermission) == PackageManager.PERMISSION_GRANTED) {
-        launcher.launch("image/*")
-    } else {
-        requestPermissionLauncher.launch(requiredPermission)
-        onError("Cần cấp quyền truy cập")
-    }
-}
+
 
 
 
@@ -110,18 +96,6 @@ fun SignUpScreen(navController: NavHostController) {
         var errorMessage by remember { mutableStateOf("") }
 
 
-// Hàm kiểm tra và yêu cầu quyền truy cập bộ nhớ tùy theo phiên bản Android
-        val requiredPermission = when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
-                "android.permission.READ_MEDIA_VISUAL_USER_SELECTED" // Android 14+
-            }
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
-                Manifest.permission.READ_MEDIA_IMAGES // Android 13
-            }
-            else -> {
-                Manifest.permission.READ_EXTERNAL_STORAGE // Android 12 and below
-            }
-        }
 
         // Hàm chọn ảnh từ bộ nhớ
         val imagePickerLauncher =
@@ -137,17 +111,6 @@ fun SignUpScreen(navController: NavHostController) {
                 }
             }
 
-// Hàm yêu cầu quyền truy cập bộ nhớ
-
-        val requestPermissionLauncher = rememberLauncherForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted ->
-            if (isGranted) {
-                imagePickerLauncher.launch("image/*")
-            } else {
-                errorMessage = "Quyền truy cập bộ nhớ bị từ chối."
-            }
-        }
 
 
 
@@ -312,13 +275,7 @@ fun SignUpScreen(navController: NavHostController) {
 
                         OutlinedButton(
                             onClick = {
-                                openImagePicker(
-                                    context = context,
-                                    requiredPermission = requiredPermission,
-                                    launcher = imagePickerLauncher,
-                                    requestPermissionLauncher = requestPermissionLauncher,
-                                    onError = { message -> errorMessage = message }
-                                )
+
                             },
                             modifier = Modifier
                                 .align(Alignment.CenterHorizontally)
