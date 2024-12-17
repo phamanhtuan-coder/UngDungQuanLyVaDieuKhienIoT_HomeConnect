@@ -113,7 +113,7 @@ fun WelcomeScreen(
                     }
 
                     Button(
-                        onClick = { /* TODO: Xử lý sự kiện đăng ký*/ },
+                        onClick = { navController.navigate(Screens.Register.route) },
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onPrimary),
                         shape = RoundedCornerShape(50),
                         modifier = Modifier.size(width = 150.dp, height = 50.dp)

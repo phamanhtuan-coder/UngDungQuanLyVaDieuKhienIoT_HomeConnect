@@ -90,15 +90,20 @@ fun MenuBottom(
                     isSelected = isSelected,
                     onClick = {
                         if (!isSelected) {
+                            // Use a more flexible navigation strategy
                             navController.navigate(item.second.second) {
-                                popUpTo(navController.graph.findNode(item.second.second)?.id ?: navController.graph.startDestinationId) {
+                                // Preserve the existing back stack
+                                popUpTo(navController.graph.startDestinationId) {
+                                    // Crucially, we set inclusive to false
+                                    inclusive = false
+                                    // Save the state of the start destination
                                     saveState = true
                                 }
+                                // Prevent multiple instances of the same screen
                                 launchSingleTop = true
+                                // Restore state when returning to a previous screen
                                 restoreState = true
                             }
-
-
                         }
                     },
                     isTablet = screenWidth > 600
@@ -139,7 +144,7 @@ fun MenuItem(
     onClick: () -> Unit,
     isTablet: Boolean,
     textSize: TextUnit = 14.sp,
-    iconSize: Dp = 36.dp
+    iconSize: Dp = 60.dp
 ) {
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -194,7 +199,7 @@ fun MenuItem(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val mobileIconSize = if (isSelected) 30.dp else 48.dp
+            val mobileIconSize = if (isSelected) 28.dp else 50.dp
             Icon(
                 imageVector = icon,
                 contentDescription = text,

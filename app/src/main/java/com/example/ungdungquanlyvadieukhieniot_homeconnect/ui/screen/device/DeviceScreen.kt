@@ -64,6 +64,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
+import androidx.navigation.NavHostController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
@@ -88,10 +89,11 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
  * Lần cập nhật 9/12/2024
  * ---------------------------
  */
-@Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DeviceScreen() {
+fun DeviceScreen(
+    navController: NavHostController
+) {
     val configuration = LocalConfiguration.current
     val screenWidthDp = configuration.screenWidthDp.dp
     val isTablet = screenWidthDp >= 600.dp
@@ -112,6 +114,7 @@ fun DeviceScreen() {
             /*
             * Hiển thị Thanh Menu dưới cùng
              */
+            MenuBottom(navController)
         },
         floatingActionButton = {
             /*

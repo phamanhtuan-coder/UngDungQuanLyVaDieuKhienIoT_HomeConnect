@@ -9,6 +9,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.home.HomeSc
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.login.LoginScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.onboard_welcome.WelcomeScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.profile.ProfileScreen
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.signup.SignUpScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screens.DashboardScreen
 
 @Composable
@@ -28,6 +29,10 @@ fun NavigationGraph(
         composable(Screens.Login.route) {
             LoginScreen(navController)
         }
+        // Màn hình đăng ký
+        composable(Screens.Register.route) {
+            SignUpScreen(navController)
+        }
         // Màn hình Welcome
         composable(Screens.Welcome.route) {
             WelcomeScreen(navController)
@@ -46,7 +51,7 @@ fun NavigationGraph(
         }
         // Màn hình Thiết bị
         composable(Screens.Devices.route) {
-            DeviceScreen()
+            DeviceScreen(navController)
         }
     }
 }

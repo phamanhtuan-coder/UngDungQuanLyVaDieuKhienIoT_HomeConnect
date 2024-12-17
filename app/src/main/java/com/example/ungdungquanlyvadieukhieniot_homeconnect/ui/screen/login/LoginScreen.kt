@@ -27,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -81,7 +82,7 @@ fun LoginScreen(
         val colorScheme = MaterialTheme.colorScheme
 
     var passwordVisible by remember { mutableStateOf(false) }
-        Box(
+    Scaffold (
         modifier = Modifier
             .fillMaxSize()
             .background(colorScheme.background)
@@ -89,14 +90,13 @@ fun LoginScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(it)
                 .padding(horizontal = if (isTablet) 32.dp else 16.dp)
                 .verticalScroll(rememberScrollState())
                 .imePadding(),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.weight(1f))
-
             // Tiêu đề đăng nhập
             Text(
                 text = "Đăng nhập",
@@ -198,7 +198,7 @@ fun LoginScreen(
                     color = colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                TextButton(onClick = { /* TODO: Xử lý khi nhấn nút đăng ký */ }) {
+                TextButton(onClick = { navController.navigate(Screens.Register.route) }) {
                     Text(
                         text = "Đăng ký",
                         fontSize = 14.sp,
@@ -208,7 +208,6 @@ fun LoginScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.weight(1f))
         }
     }
     }
