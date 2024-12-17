@@ -121,7 +121,12 @@ fun BackHeader(
                     icon = Icons.AutoMirrored.Filled.ArrowBack,
                     description = "Back",
                     onClick = {
-                        navController.popBackStack()
+                        // Mimic Facebook-like back navigation
+                        val canGoBack = navController.previousBackStackEntry != null
+                        if (canGoBack) {
+                            // Custom back navigation that doesn't clear the entire stack
+                            navController.navigateUp()
+                        }
                     }
                 )
             },

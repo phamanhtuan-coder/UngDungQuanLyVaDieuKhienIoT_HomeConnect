@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navigation
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.DeviceScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.home.HomeScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.login.LoginScreen
@@ -16,42 +17,36 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screens.DashboardS
 fun NavigationGraph(
     navController: NavHostController
 ) {
-    NavHost(
-        navController = navController,
-        startDestination = Screens.Welcome.route
-    ){
-        // Định nghĩa các màn hình trong ứng dụng
-        // Màn hình chính (Home)
-        composable(Screens.Home.route) {
-            HomeScreen(navController)
-        }
-        // Màn hình đăng nhập
-        composable(Screens.Login.route) {
-            LoginScreen(navController)
-        }
-        // Màn hình đăng ký
-        composable(Screens.Register.route) {
-            SignUpScreen(navController)
-        }
-        // Màn hình Welcome
-        composable(Screens.Welcome.route) {
-            WelcomeScreen(navController)
-        }
-        // Màn hình cài đặt
-        composable(Screens.Settings.route) {
-            //SettingsScreen(navController)
-        }
-        // Màn hình thông tin cá nhân
-        composable(Screens.Profile.route) {
-            ProfileScreen()
-        }
-        // Màn hình Dashboard
-        composable(Screens.Dashboard.route) {
-            DashboardScreen(navController)
-        }
-        // Màn hình Thiết bị
-        composable(Screens.Devices.route) {
-            DeviceScreen(navController)
+        NavHost(
+            navController = navController,
+            startDestination = Screens.Welcome.route
+        ){
+            // Welcome screen as the initial entry point
+            composable(Screens.Welcome.route) {
+                WelcomeScreen(navController)
+            }
+
+            // Login and Signup screens
+            composable(Screens.Login.route) {
+                LoginScreen(navController)
+            }
+
+            composable(Screens.Register.route) {
+                SignUpScreen(navController)
+            }
+
+            navigation(startDestination = Screens.Home.route, route = "home_graph") {
+                composable(Screens.Home.route) {
+                    HomeScreen(navController)
+                }
+            }
+
+            navigation(startDestination = Screens.Dashboard.route, route = "dashboard_graph") {
+                composable(Screens.Dashboard.route) {
+                    DashboardScreen(navController)
+                }
+            }
+
+            // ... other nested graphs (devices, profile, settings) ...
         }
     }
-}

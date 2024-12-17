@@ -1,5 +1,6 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component
 
+import android.util.Log
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -57,61 +58,53 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 @Preview
 @Composable
 fun MenuBottom(
-    navController: NavHostController =rememberNavController()
+    navController: NavHostController = rememberNavController()
 ) {
-    AppTheme{
+    AppTheme {
+        val items = listOf(
+            "Dashboard" to Pair(Icons.Filled.PieChart, "dashboard"),
+            "Devices" to Pair(Icons.Filled.Devices, "devices"),
+            "Home" to Pair(Icons.Filled.Home, "home"),
+            "Profile" to Pair(Icons.Filled.Person, "profile"),
+            "Settings" to Pair(Icons.Filled.Settings, "settings")
+        )
+        val screenWidth = LocalConfiguration.current.screenWidthDp
 
-    val items = listOf(
-        "Dashboard" to Pair(Icons.Filled.PieChart, "dashboard"),
-        "Devices" to Pair(Icons.Filled.Devices, "devices"),
-        "Home" to Pair(Icons.Filled.Home, "home"),
-        "Profile" to Pair(Icons.Filled.Person, "profile"),
-        "Settings" to Pair(Icons.Filled.Settings, "settings")
-    )
-    val screenWidth = LocalConfiguration.current.screenWidthDp
+        // Track the last selected route
+        val currentRoute = navController.currentBackStackEntry?.destination?.route
 
-    val currentRoute = navController.currentBackStackEntry?.destination?.route
-
-    BottomAppBar(
-        tonalElevation = 4.dp,
-        contentPadding = PaddingValues(16.dp),
-        modifier = Modifier.height(120.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.Top
+        BottomAppBar(
+            tonalElevation = 4.dp,
+            contentPadding = PaddingValues(16.dp),
+            modifier = Modifier.height(120.dp)
         ) {
-            items.forEach { item ->
-                val isSelected = currentRoute == item.second.second
-                MenuItem(
-                    text = item.first,
-                    icon = item.second.first,
-                    isSelected = isSelected,
-                    onClick = {
-                        if (!isSelected) {
-                            // Use a more flexible navigation strategy
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.Top
+            ) {
+                items.forEach { item ->
+                    val isSelected = currentRoute == item.second.second
+                    MenuItem(
+                        text = item.first,
+                        icon = item.second.first,
+                        isSelected = isSelected,
+                        onClick = {
                             navController.navigate(item.second.second) {
-                                // Preserve the existing back stack
-                                popUpTo(navController.graph.startDestinationId) {
-                                    // Crucially, we set inclusive to false
-                                    inclusive = false
-                                    // Save the state of the start destination
+                                popUpTo(navController.graph.findStartDestination().id) {
                                     saveState = true
+                                    inclusive = false
                                 }
-                                // Prevent multiple instances of the same screen
                                 launchSingleTop = true
-                                // Restore state when returning to a previous screen
                                 restoreState = true
                             }
-                        }
-                    },
-                    isTablet = screenWidth > 600
-                )
+                        },
+                        isTablet = screenWidth >= 600
+                    )
+                }
             }
         }
     }
-        }
 }
 
 
@@ -175,7 +168,7 @@ fun MenuItem(
             )
             Spacer(modifier = Modifier.width(3.dp))
             Text(
-                modifier = Modifier.padding(3.dp),
+                modifier = Modifier.padding(end= 6.dp),
                 text = text,
                 color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Gray,
                 fontSize = textSize,
@@ -199,7 +192,7 @@ fun MenuItem(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val mobileIconSize = if (isSelected) 28.dp else 50.dp
+            val mobileIconSize = if (isSelected) 28.dp else 40.dp
             Icon(
                 imageVector = icon,
                 contentDescription = text,
@@ -209,10 +202,11 @@ fun MenuItem(
                     .padding(4.dp)
             )
             if (isSelected) {
+                Log.d("MenuItem", "isSelected: $isSelected")
                 Text(
                     text = text,
                     color = MaterialTheme.colorScheme.primary,
-                    fontSize = 14.sp,
+                    fontSize = 13.sp,
                     maxLines = 1
                 )
             }

@@ -170,7 +170,12 @@ fun LoginScreen(
             Button(
                 onClick = {
                     /* TODO: Xử lý khi nhấn nút đăng nhập */
-                    navController.navigate(Screens.Home.route)
+                    navController.navigate("home_graph") {
+                        // Remove welcome and login from back stack
+                        popUpTo(Screens.Welcome.route) {
+                            inclusive = true
+                        }
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth(if (isTablet) 0.8f else 0.9f)
