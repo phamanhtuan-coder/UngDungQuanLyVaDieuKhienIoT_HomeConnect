@@ -10,19 +10,50 @@ import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Upload
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,9 +68,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import coil.compose.rememberAsyncImagePainter
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
@@ -107,8 +138,10 @@ fun SignUpScreen(navController: NavHostController) {
                 phoneNumber.isBlank() || !phoneNumber.matches(Regex("^[0-9]{10,11}\$")) -> errorMessage =
                     "Số điện thoại không hợp lệ."
 
-                password.length < 8 || !password.matches(Regex(".*[A-Z].*")) && !password.matches(Regex(".*[a-z].*"))
-                || !password.matches(Regex(".*\\d.*")) || !password.matches(Regex(".*[@#$%^&+=].*")) -> errorMessage =
+                password.length < 8 || !password.matches(Regex(".*[A-Z].*")) && !password.matches(
+                    Regex(".*[a-z].*")
+                )
+                        || !password.matches(Regex(".*\\d.*")) || !password.matches(Regex(".*[@#$%^&+=].*")) -> errorMessage =
                     "Mật khẩu cần ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt."
 
                 confirmPassword != password -> errorMessage = "Mật khẩu nhập lại không khớp."
@@ -216,7 +249,7 @@ fun SignUpScreen(navController: NavHostController) {
                             Image(
                                 painter = rememberAsyncImagePainter(it),
                                 contentDescription = "Avatar Preview",
-                                contentScale = ContentScale.Crop ,
+                                contentScale = ContentScale.Crop,
                                 modifier = Modifier
                                     .size(120.dp)
                                     .clip(CircleShape)
@@ -246,6 +279,7 @@ fun SignUpScreen(navController: NavHostController) {
                         Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
                             arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
                         }
+
                         else -> {
                             arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
                         }
@@ -254,7 +288,10 @@ fun SignUpScreen(navController: NavHostController) {
                     val isPermissionGranted = remember {
                         mutableStateOf(
                             requiredPermissions.all {
-                                ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+                                ContextCompat.checkSelfPermission(
+                                    context,
+                                    it
+                                ) == PackageManager.PERMISSION_GRANTED
                             }
                         )
                     }
@@ -279,14 +316,19 @@ fun SignUpScreen(navController: NavHostController) {
                                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                                 shape = RoundedCornerShape(50)
                             ) {
-                                Text("Yêu cầu cấp quyền", color = MaterialTheme.colorScheme.onPrimary)
+                                Text(
+                                    "Yêu cầu cấp quyền",
+                                    color = MaterialTheme.colorScheme.onPrimary
+                                )
                             }
                             Spacer(modifier = Modifier.height(8.dp))
                             Button(
                                 onClick = {
-                                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                                        data = Uri.fromParts("package", context.packageName, null)
-                                    }
+                                    val intent =
+                                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                            data =
+                                                Uri.fromParts("package", context.packageName, null)
+                                        }
                                     openSettingsLauncher.launch(intent)
                                 },
                                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
@@ -383,7 +425,9 @@ fun SignUpScreen(navController: NavHostController) {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth(if (isTablet) 0.8f else 0.9f).padding(horizontal = 16.dp)
+                    modifier = Modifier
+                        .fillMaxWidth(if (isTablet) 0.8f else 0.9f)
+                        .padding(horizontal = 16.dp)
                 ) {
                     if (stage == 2) {
                         OutlinedButton(
@@ -441,9 +485,6 @@ fun SignUpScreen(navController: NavHostController) {
 
 
             }
-
-
-
 
 
         }
