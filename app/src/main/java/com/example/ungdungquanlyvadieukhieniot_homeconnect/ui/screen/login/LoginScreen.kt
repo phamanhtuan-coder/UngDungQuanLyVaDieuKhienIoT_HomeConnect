@@ -85,7 +85,8 @@ fun LoginScreen(
     Scaffold (
         modifier = Modifier
             .fillMaxSize()
-            .background(colorScheme.background)
+            .background(colorScheme.background),
+        containerColor = MaterialTheme.colorScheme.background,
     ) {
         Column(
             modifier = Modifier
@@ -123,7 +124,7 @@ fun LoginScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 modifier = Modifier
                     .fillMaxWidth(if (isTablet) 0.8f else 0.9f)
-                    .height(if (isTablet) 60.dp else 50.dp)
+                    .height(if (isTablet) 80.dp else 70.dp)
             )
 
             // Trường nhập mật khẩu
@@ -148,7 +149,7 @@ fun LoginScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 modifier = Modifier
                     .fillMaxWidth(if (isTablet) 0.8f else 0.9f)
-                    .height(if (isTablet) 60.dp else 50.dp)
+                    .height(if (isTablet) 80.dp else 70.dp)
             )
 
             // Nút quên mật khẩu

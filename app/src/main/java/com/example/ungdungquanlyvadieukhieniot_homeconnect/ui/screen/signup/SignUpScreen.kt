@@ -2,12 +2,12 @@ package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.signup
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -26,6 +26,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -36,46 +37,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import coil.compose.rememberAsyncImagePainter
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import coil.compose.rememberAsyncImagePainter
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
-
-
-
-
-
-/**
- * Màn hình đăng ký V2
- * ---------------------
- * Người viết: Phạm Xuân Nhân
- * Ngày viết: 2/12/2024
- * Lần cập nhật cuối: 15/12/2024
- * ---------------------
- * @param navController: Đối tượng điều khiển điều hướng
- *
- * -----------------------
- * Người cập nhật: Phạm Anh Tuấn
- * Ngày cập nhật: 15/12/2024
- * -----------------------
- * Nội dung cập nhật:
- *  - Thay đổi bố cục màn hình
- *  - Bổ sung chức năng chọn ảnh đại diện
- *  - Bổ sung chức năng kiểm tra thông tin nhập vào
- *  - Bổ sung chức năng hiển thị thông báo lỗi
- *  - Bổ sung chức năng chuyển đổi giữa hai bước đăng ký
- *  - Bổ sung chức năng kiểm tra quyền truy cập bộ nhớ
- *  - Bổ sung chức năng kiểm tra định dạng ảnh
- *  - Bổ sung chức năng kiểm tra thiết bị là máy tính bảng hay điện thoại
- *  - Bổ sung chức năng chuyển hướng đến màn hình chính
- */
 @SuppressLint("InlinedApi")
 @Composable
 fun SignUpScreen(navController: NavHostController) {
 
     AppTheme {
-        // Danh sách biến cần thiết
         val context = LocalContext.current
         val configuration = LocalConfiguration.current
         val isTablet = configuration.screenWidthDp >= 600
@@ -95,9 +67,20 @@ fun SignUpScreen(navController: NavHostController) {
         var stage by remember { mutableStateOf(1) }
         var errorMessage by remember { mutableStateOf("") }
 
+//        fun checkStoragePermission(): Boolean {
+//            return ContextCompat.checkSelfPermission(
+//                context,
+//                Manifest.permission.READ_EXTERNAL_STORAGE
+//            ) == PackageManager.PERMISSION_GRANTED
+//        }
+//
+//        fun openAppSettings() {
+//            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+//                data = Uri.fromParts("package", context.packageName, null)
+//            }
+//            context.startActivity(intent)
+//        }
 
-
-        // Hàm chọn ảnh từ bộ nhớ
         val imagePickerLauncher =
             rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
                 uri?.let {
@@ -112,26 +95,20 @@ fun SignUpScreen(navController: NavHostController) {
             }
 
 
-
-
-
-
-        // Hàm kiểm tra thông tin nhập vào
         fun validateInput(): Boolean {
             errorMessage = ""
             when {
-                name.isBlank() || !name.matches(Regex("^[a-zA-Z\\s]+$")) -> errorMessage =
+                name.isBlank() || !name.matches(Regex("^[a-zA-Z\\s'-]+\$")) -> errorMessage =
                     "Tên không được chứa ký tự đặc biệt hoặc số."
 
                 email.isBlank() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email)
                     .matches() -> errorMessage = "Email không hợp lệ."
 
-                phoneNumber.isBlank() || !phoneNumber.matches(Regex("^[0-9]{10,11}$")) -> errorMessage =
+                phoneNumber.isBlank() || !phoneNumber.matches(Regex("^[0-9]{10,11}\$")) -> errorMessage =
                     "Số điện thoại không hợp lệ."
 
-                password.length < 8 || !password.matches(Regex(".*[A-Z].*")) || !password.matches(
-                    Regex(".*[a-z].*")
-                ) || !password.matches(Regex(".*\\d.*")) || !password.matches(Regex(".*[@#\$%^&+=].*")) -> errorMessage =
+                password.length < 8 || !password.matches(Regex(".*[A-Z].*")) && !password.matches(Regex(".*[a-z].*"))
+                || !password.matches(Regex(".*\\d.*")) || !password.matches(Regex(".*[@#$%^&+=].*")) -> errorMessage =
                     "Mật khẩu cần ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt."
 
                 confirmPassword != password -> errorMessage = "Mật khẩu nhập lại không khớp."
@@ -140,12 +117,11 @@ fun SignUpScreen(navController: NavHostController) {
             return errorMessage.isEmpty()
         }
 
-       Scaffold (
+        Scaffold(
             modifier = Modifier
-                .padding(vertical = 32.dp)
                 .fillMaxSize()
                 .background(colorScheme.background),
-
+            containerColor = MaterialTheme.colorScheme.background,
         ) {
             Column(
                 modifier = Modifier
@@ -158,7 +134,6 @@ fun SignUpScreen(navController: NavHostController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                // Title
                 Text(
                     text = if (stage == 1) "Đăng ký - Bước 1" else "Đăng ký - Bước 2",
                     fontSize = if (isTablet) 28.sp else 24.sp,
@@ -172,7 +147,6 @@ fun SignUpScreen(navController: NavHostController) {
                 )
 
                 if (stage == 1) {
-                    // Name Input
                     OutlinedTextField(
                         shape = RoundedCornerShape(25),
                         singleLine = true,
@@ -182,10 +156,9 @@ fun SignUpScreen(navController: NavHostController) {
                         leadingIcon = { Icon(Icons.Filled.Person, contentDescription = null) },
                         modifier = Modifier
                             .fillMaxWidth(if (isTablet) 0.8f else 0.9f)
-                            .height(if (isTablet) 60.dp else 50.dp)
+                            .height(if (isTablet) 80.dp else 70.dp)
                     )
 
-                    // Email Input
                     OutlinedTextField(
                         shape = RoundedCornerShape(25),
                         singleLine = true,
@@ -196,10 +169,9 @@ fun SignUpScreen(navController: NavHostController) {
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                         modifier = Modifier
                             .fillMaxWidth(if (isTablet) 0.8f else 0.9f)
-                            .height(if (isTablet) 60.dp else 50.dp)
+                            .height(if (isTablet) 80.dp else 70.dp)
                     )
 
-                    // Phone Number Input
                     OutlinedTextField(
                         shape = RoundedCornerShape(25),
                         singleLine = true,
@@ -210,9 +182,9 @@ fun SignUpScreen(navController: NavHostController) {
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         modifier = Modifier
                             .fillMaxWidth(if (isTablet) 0.8f else 0.9f)
-                            .height(if (isTablet) 60.dp else 50.dp)
+                            .height(if (isTablet) 80.dp else 70.dp)
                     )
-                    // Address Input
+
                     OutlinedTextField(
                         shape = RoundedCornerShape(25),
                         singleLine = true,
@@ -222,13 +194,9 @@ fun SignUpScreen(navController: NavHostController) {
                         leadingIcon = { Icon(Icons.Filled.Home, contentDescription = null) },
                         modifier = Modifier
                             .fillMaxWidth(if (isTablet) 0.8f else 0.9f)
-                            .height(if (isTablet) 60.dp else 50.dp)
+                            .height(if (isTablet) 80.dp else 70.dp)
                     )
                 } else {
-
-
-                    //TODO: Sửa lại logic chọn hình ảnh
-                    // Avatar Upload
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
@@ -248,6 +216,7 @@ fun SignUpScreen(navController: NavHostController) {
                             Image(
                                 painter = rememberAsyncImagePainter(it),
                                 contentDescription = "Avatar Preview",
+                                contentScale = ContentScale.Crop ,
                                 modifier = Modifier
                                     .size(120.dp)
                                     .clip(CircleShape)
@@ -271,17 +240,70 @@ fun SignUpScreen(navController: NavHostController) {
                         }
 
                     }
-                        Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
+                    val requiredPermissions = when {
+                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
+                            arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
+                        }
+                        else -> {
+                            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+                        }
+                    }
+
+                    val isPermissionGranted = remember {
+                        mutableStateOf(
+                            requiredPermissions.all {
+                                ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+                            }
+                        )
+                    }
+
+                    val permissionLauncher = rememberLauncherForActivityResult(
+                        ActivityResultContracts.RequestMultiplePermissions()
+                    ) { permissions ->
+                        isPermissionGranted.value = permissions.all { it.value }
+                    }
+
+                    val openSettingsLauncher = rememberLauncherForActivityResult(
+                        contract = ActivityResultContracts.StartActivityForResult()
+                    ) { /* No action needed; simply opens the settings */ }
+
+                    if (!isPermissionGranted.value) {
+                        errorMessage = "Ứng dụng cần quyền truy cập bộ nhớ để chọn ảnh đại diện."
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Button(
+                                onClick = {
+                                    permissionLauncher.launch(requiredPermissions)
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                shape = RoundedCornerShape(50)
+                            ) {
+                                Text("Yêu cầu cấp quyền", color = MaterialTheme.colorScheme.onPrimary)
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Button(
+                                onClick = {
+                                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                        data = Uri.fromParts("package", context.packageName, null)
+                                    }
+                                    openSettingsLauncher.launch(intent)
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                                shape = RoundedCornerShape(50)
+                            ) {
+                                Text("Mở cài đặt", color = MaterialTheme.colorScheme.onSecondary)
+                            }
+                        }
+                    } else {
                         OutlinedButton(
                             onClick = {
-
+                                imagePickerLauncher.launch("image/*")
                             },
                             modifier = Modifier
                                 .align(Alignment.CenterHorizontally)
                                 .width(200.dp)
                                 .height(48.dp),
-
                             shape = RoundedCornerShape(8.dp),
                             border = BorderStroke(1.dp, colorScheme.primary)
                         ) {
@@ -294,68 +316,69 @@ fun SignUpScreen(navController: NavHostController) {
                             Spacer(modifier = Modifier.width(8.dp))
                             Text("Tải lên ảnh", color = colorScheme.primary, fontSize = 16.sp)
                         }
+                    }
 
 
 
 
                     // Password Input
-                        OutlinedTextField(
-                            shape = RoundedCornerShape(25),
-                            singleLine = true,
-                            value = password,
-                            onValueChange = { password = it },
-                            label = { Text("Mật khẩu") },
-                            leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
-                            trailingIcon = {
-                                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                                    Icon(
-                                        imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                        contentDescription = if (passwordVisible) "Hide password" else "Show password"
-                                    )
-                                }
-                            },
-                            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                            modifier = Modifier
-                                .fillMaxWidth(if (isTablet) 0.8f else 0.9f)
-                                .height(if (isTablet) 60.dp else 50.dp)
-                        )
+                    OutlinedTextField(
+                        shape = RoundedCornerShape(25),
+                        singleLine = true,
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text("Mật khẩu") },
+                        leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
+                        trailingIcon = {
+                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                Icon(
+                                    imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                    contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                                )
+                            }
+                        },
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        modifier = Modifier
+                            .fillMaxWidth(if (isTablet) 0.8f else 0.9f)
+                            .height(if (isTablet) 80.dp else 70.dp)
+                    )
 
-                        // Confirm Password Input
-                        OutlinedTextField(
-                            shape = RoundedCornerShape(25),
-                            singleLine = true,
-                            value = confirmPassword,
-                            onValueChange = { confirmPassword = it },
-                            label = { Text("Nhập lại mật khẩu") },
-                            leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
-                            trailingIcon = {
-                                IconButton(onClick = {
-                                    confirmPasswordVisible = !confirmPasswordVisible
-                                }) {
-                                    Icon(
-                                        imageVector = if (confirmPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                        contentDescription = if (confirmPasswordVisible) "Hide password" else "Show password"
-                                    )
-                                }
-                            },
-                            visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                            modifier = Modifier
-                                .fillMaxWidth(if (isTablet) 0.8f else 0.9f)
-                                .height(if (isTablet) 60.dp else 50.dp)
-                        )
-                    }
+                    // Confirm Password Input
+                    OutlinedTextField(
+                        shape = RoundedCornerShape(25),
+                        singleLine = true,
+                        value = confirmPassword,
+                        onValueChange = { confirmPassword = it },
+                        label = { Text("Nhập lại mật khẩu") },
+                        leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
+                        trailingIcon = {
+                            IconButton(onClick = {
+                                confirmPasswordVisible = !confirmPasswordVisible
+                            }) {
+                                Icon(
+                                    imageVector = if (confirmPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                    contentDescription = if (confirmPasswordVisible) "Hide password" else "Show password"
+                                )
+                            }
+                        },
+                        visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        modifier = Modifier
+                            .fillMaxWidth(if (isTablet) 0.8f else 0.9f)
+                            .height(if (isTablet) 80.dp else 70.dp)
+                    )
+                }
 
-                    // Error Message Display
-                    if (errorMessage.isNotBlank()) {
-                        Text(
-                            text = errorMessage,
-                            color = MaterialTheme.colorScheme.error,
-                            fontSize = 12.sp,
-                            modifier = Modifier.padding(vertical = 4.dp)
-                        )
-                    }
+                // Error Message Display
+                if (errorMessage.isNotBlank()) {
+                    Text(
+                        text = errorMessage,
+                        color = MaterialTheme.colorScheme.error,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
+                }
 
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -376,14 +399,14 @@ fun SignUpScreen(navController: NavHostController) {
                         onClick = {
                             if (stage == 1) {
                                 stage = 2
-                            } else {
-                                if (validateInput()) {
-                                    // TODO: Thay thế bằng logic đăng ký tài khoản
-                                    navController.navigate("home")
-                                }
+                                errorMessage = ""
+                            } else if (stage == 2 && validateInput()) {
+                                // TODO: Xử lý sang màn hình xác thực OTP
+                                navController.navigate(Screens.Home.route)
                             }
                         },
-                        modifier = Modifier.weight(if(stage ==2) 1f else 0.5f),
+                        enabled = (stage == 1 || (stage == 2 && validateInput())),
+                        modifier = Modifier.weight(if (stage == 2) 1f else 0.5f),
                         colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
                         shape = RoundedCornerShape(50)
                     ) {
@@ -391,20 +414,43 @@ fun SignUpScreen(navController: NavHostController) {
                     }
 
 
-                }
-
 
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-
-
+                // Chuyển tới đăng nhập
+                Row(
+                    modifier = Modifier.fillMaxWidth(if (isTablet) 0.8f else 0.9f),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Đã có tài khoản?",
+                        fontSize = 14.sp,
+                        color = colorScheme.onBackground
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    TextButton(onClick = { navController.navigate(Screens.Login.route) }) {
+                        Text(
+                            text = "Đăng nhập",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = colorScheme.primary
+                        )
+                    }
+                }
 
 
             }
 
+
+
+
+
         }
 
     }
+
+}
 
 
 

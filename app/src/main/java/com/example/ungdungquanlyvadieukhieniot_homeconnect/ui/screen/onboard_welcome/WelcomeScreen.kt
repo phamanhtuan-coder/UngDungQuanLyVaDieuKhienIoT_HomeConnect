@@ -57,7 +57,7 @@ fun WelcomeScreen(
 ) {
     AppTheme { // Gói trong AppTheme để đảm bảo áp dụng theme
         Scaffold(
-            containerColor = MaterialTheme.colorScheme.primary,
+            containerColor = MaterialTheme.colorScheme.background,
         ) {
             Column(
                 modifier = Modifier
