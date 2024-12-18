@@ -49,6 +49,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -97,20 +98,6 @@ fun SignUpScreen(navController: NavHostController) {
 
         var stage by remember { mutableStateOf(1) }
         var errorMessage by remember { mutableStateOf("") }
-
-//        fun checkStoragePermission(): Boolean {
-//            return ContextCompat.checkSelfPermission(
-//                context,
-//                Manifest.permission.READ_EXTERNAL_STORAGE
-//            ) == PackageManager.PERMISSION_GRANTED
-//        }
-//
-//        fun openAppSettings() {
-//            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-//                data = Uri.fromParts("package", context.packageName, null)
-//            }
-//            context.startActivity(intent)
-//        }
 
         val imagePickerLauncher =
             rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
@@ -188,8 +175,14 @@ fun SignUpScreen(navController: NavHostController) {
                         label = { Text("Họ tên") },
                         leadingIcon = { Icon(Icons.Filled.Person, contentDescription = null) },
                         modifier = Modifier
-                            .fillMaxWidth(if (isTablet) 0.8f else 0.9f)
-                            .height(if (isTablet) 80.dp else 70.dp)
+                            .width(if (isTablet) 500.dp else 400.dp)
+                            .height(if (isTablet) 80.dp else 70.dp),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = colorScheme.onPrimary,
+                            unfocusedContainerColor = colorScheme.onPrimary,
+                            focusedIndicatorColor = colorScheme.primary,
+                            unfocusedIndicatorColor= colorScheme.onBackground.copy(alpha = 0.5f)
+                        )
                     )
 
                     OutlinedTextField(
@@ -201,8 +194,14 @@ fun SignUpScreen(navController: NavHostController) {
                         leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                         modifier = Modifier
-                            .fillMaxWidth(if (isTablet) 0.8f else 0.9f)
-                            .height(if (isTablet) 80.dp else 70.dp)
+                            .width(if (isTablet) 500.dp else 400.dp)
+                            .height(if (isTablet) 80.dp else 70.dp),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = colorScheme.onPrimary,
+                            unfocusedContainerColor = colorScheme.onPrimary,
+                            focusedIndicatorColor = colorScheme.primary,
+                            unfocusedIndicatorColor= colorScheme.onBackground.copy(alpha = 0.5f)
+                        )
                     )
 
                     OutlinedTextField(
@@ -214,8 +213,14 @@ fun SignUpScreen(navController: NavHostController) {
                         leadingIcon = { Icon(Icons.Filled.Phone, contentDescription = null) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         modifier = Modifier
-                            .fillMaxWidth(if (isTablet) 0.8f else 0.9f)
-                            .height(if (isTablet) 80.dp else 70.dp)
+                            .width(if (isTablet) 500.dp else 400.dp)
+                            .height(if (isTablet) 80.dp else 70.dp),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = colorScheme.onPrimary,
+                            unfocusedContainerColor = colorScheme.onPrimary,
+                            focusedIndicatorColor = colorScheme.primary,
+                            unfocusedIndicatorColor= colorScheme.onBackground.copy(alpha = 0.5f)
+                        )
                     )
 
                     OutlinedTextField(
@@ -226,8 +231,14 @@ fun SignUpScreen(navController: NavHostController) {
                         label = { Text("Địa chỉ") },
                         leadingIcon = { Icon(Icons.Filled.Home, contentDescription = null) },
                         modifier = Modifier
-                            .fillMaxWidth(if (isTablet) 0.8f else 0.9f)
-                            .height(if (isTablet) 80.dp else 70.dp)
+                            .width(if (isTablet) 500.dp else 400.dp)
+                            .height(if (isTablet) 80.dp else 70.dp),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = colorScheme.onPrimary,
+                            unfocusedContainerColor = colorScheme.onPrimary,
+                            focusedIndicatorColor = colorScheme.primary,
+                            unfocusedIndicatorColor= colorScheme.onBackground.copy(alpha = 0.5f)
+                        )
                     )
                 } else {
                     Column(
@@ -382,8 +393,14 @@ fun SignUpScreen(navController: NavHostController) {
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         modifier = Modifier
-                            .fillMaxWidth(if (isTablet) 0.8f else 0.9f)
-                            .height(if (isTablet) 80.dp else 70.dp)
+                            .width(if (isTablet) 500.dp else 400.dp)
+                            .height(if (isTablet) 80.dp else 70.dp),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = colorScheme.onPrimary,
+                            unfocusedContainerColor = colorScheme.onPrimary,
+                            focusedIndicatorColor = colorScheme.primary,
+                            unfocusedIndicatorColor= colorScheme.onBackground.copy(alpha = 0.5f)
+                        )
                     )
 
                     // Confirm Password Input
@@ -407,8 +424,14 @@ fun SignUpScreen(navController: NavHostController) {
                         visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         modifier = Modifier
-                            .fillMaxWidth(if (isTablet) 0.8f else 0.9f)
-                            .height(if (isTablet) 80.dp else 70.dp)
+                            .width(if (isTablet) 500.dp else 400.dp)
+                            .height(if (isTablet) 80.dp else 70.dp),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = colorScheme.onPrimary,
+                            unfocusedContainerColor = colorScheme.onPrimary,
+                            focusedIndicatorColor = colorScheme.primary,
+                            unfocusedIndicatorColor= colorScheme.onBackground.copy(alpha = 0.5f)
+                        )
                     )
                 }
 
@@ -423,7 +446,7 @@ fun SignUpScreen(navController: NavHostController) {
                 }
 
                 Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp, alignment = Alignment.CenterHorizontally),
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth(if (isTablet) 0.8f else 0.9f)
@@ -432,7 +455,9 @@ fun SignUpScreen(navController: NavHostController) {
                     if (stage == 2) {
                         OutlinedButton(
                             onClick = { stage = 1 },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier
+                                .width(if (isTablet) 300.dp else 200.dp)
+                                .height(if (isTablet) 56.dp else 48.dp),
                         ) {
                             Text("Quay lại")
                         }
@@ -450,7 +475,9 @@ fun SignUpScreen(navController: NavHostController) {
                             }
                         },
                         enabled = (stage == 1 || (stage == 2 && validateInput())),
-                        modifier = Modifier.weight(if (stage == 2) 1f else 0.5f),
+                        modifier = Modifier.width(if (isTablet) 300.dp else 200.dp)
+                                .height(if (isTablet) 56.dp else 48.dp)
+                            .align(Alignment.CenterVertically),
                         colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
                         shape = RoundedCornerShape(50)
                     ) {

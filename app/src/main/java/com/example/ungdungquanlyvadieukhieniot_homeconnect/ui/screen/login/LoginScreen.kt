@@ -29,6 +29,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -75,146 +77,164 @@ fun LoginScreen(
     navController: NavHostController
 ) {
     AppTheme {
-    val configuration = LocalConfiguration.current
-    val isTablet = configuration.screenWidthDp >= 600
-
+        val configuration = LocalConfiguration.current
+        val isTablet = configuration.screenWidthDp >= 600
         val colorScheme = MaterialTheme.colorScheme
-
-    var passwordVisible by remember { mutableStateOf(false) }
-    Scaffold (
-        modifier = Modifier
-            .fillMaxSize()
-            .background(colorScheme.background),
-        containerColor = MaterialTheme.colorScheme.background,
-    ) {
-        Column(
+        val emailState = remember { mutableStateOf("") }
+        val passwordState = remember { mutableStateOf("") }
+        var passwordVisible by remember { mutableStateOf(false) }
+        Scaffold(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(it)
-                .padding(horizontal = if (isTablet) 32.dp else 16.dp)
-                .verticalScroll(rememberScrollState())
-                .imePadding(),
-            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .background(colorScheme.background),
+            containerColor = MaterialTheme.colorScheme.background,
         ) {
-            // Tiêu đề đăng nhập
-            Text(
-                text = "Đăng nhập",
-                fontSize = if (isTablet) 28.sp else 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = colorScheme.primary
-            )
-            Text(
-                text = "Hãy đăng nhập để tiếp tục",
-                fontSize = 14.sp,
-                color = colorScheme.onBackground.copy(alpha = 0.6f)
-            )
-
-            // Trường nhập Email
-            OutlinedTextField(
-                shape = RoundedCornerShape(25),
-                singleLine = true,
-                value = "",
-                onValueChange = {
-                    /*Todo: Xử lý sự kiện khi nhập email*/
-                },
-                label = { Text("Email") },
-                leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth(if (isTablet) 0.8f else 0.9f)
-                    .height(if (isTablet) 80.dp else 70.dp)
-            )
-
-            // Trường nhập mật khẩu
-            OutlinedTextField(
-                shape = RoundedCornerShape(25),
-                singleLine = true,
-                value = "",
-                onValueChange = {
-                    /* TODO: Xử lý sự kiện khi nhập mật khẩu */
-                },
-                label = { Text("Mật khẩu") },
-                leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
-                trailingIcon = {
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(
-                            imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                            contentDescription = if (passwordVisible) "Hide password" else "Show password"
-                        )
-                    }
-                },
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                modifier = Modifier
-                    .fillMaxWidth(if (isTablet) 0.8f else 0.9f)
-                    .height(if (isTablet) 80.dp else 70.dp)
-            )
-
-            // Nút quên mật khẩu
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(if (isTablet) 0.8f else 0.9f),
-                horizontalArrangement = Arrangement.End
+                    .fillMaxSize()
+                    .padding(it)
+                    .padding(horizontal = if (isTablet) 32.dp else 16.dp)
+                    .verticalScroll(rememberScrollState())
+                    .imePadding(),
+                verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                TextButton(onClick = { /* TODO: Xử lý khi nhấn nút quên mật khẩu */ }) {
-                    Text(
-                        text = "Quên mật khẩu?",
-                        fontSize = 14.sp,
-                        color = colorScheme.primary
-                    )
-                }
-            }
-
-            // Nút đăng nhập
-            Button(
-                onClick = {
-                    /* TODO: Xử lý khi nhấn nút đăng nhập */
-                    navController.navigate("home_graph") {
-                        // Remove welcome and login from back stack
-                        popUpTo(Screens.Welcome.route) {
-                            inclusive = true
-                        }
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth(if (isTablet) 0.8f else 0.9f)
-                    .height(if (isTablet) 56.dp else 48.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
-                shape = RoundedCornerShape(50)
-            ) {
+                // Tiêu đề đăng nhập
                 Text(
                     text = "Đăng nhập",
-                    fontSize = 16.sp,
+                    fontSize = if (isTablet) 28.sp else 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = colorScheme.onPrimary
+                    color = colorScheme.primary
                 )
-            }
-
-            // Chuyển tới đăng ký
-            Row(
-                modifier = Modifier.fillMaxWidth(if (isTablet) 0.8f else 0.9f),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
                 Text(
-                    text = "Chưa có tài khoản?",
+                    text = "Hãy đăng nhập để tiếp tục",
                     fontSize = 14.sp,
-                    color = colorScheme.onBackground
+                    color = colorScheme.onBackground.copy(alpha = 0.6f)
                 )
-                Spacer(modifier = Modifier.width(4.dp))
-                TextButton(onClick = { navController.navigate(Screens.Register.route) }) {
+
+                // Trường nhập Email
+                OutlinedTextField(
+                    shape = RoundedCornerShape(25),
+                    singleLine = true,
+                    value = emailState.value,
+                    onValueChange = { emailState.value = it },
+                    label = { Text("Email") },
+                    placeholder = { Text("Nhập email của bạn") },
+                    leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null) },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Done
+                    ),
+                    modifier =  Modifier
+                        .width(if (isTablet) 500.dp else 400.dp)
+                        .height(if (isTablet) 80.dp else 70.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = colorScheme.onPrimary,
+                        unfocusedContainerColor = colorScheme.onPrimary,
+                        focusedIndicatorColor = colorScheme.primary,
+                        unfocusedIndicatorColor= colorScheme.onBackground.copy(alpha = 0.5f)
+                    )
+                )
+
+                // Trường nhập mật khẩu
+                OutlinedTextField(
+                    shape = RoundedCornerShape(25),
+                    singleLine = true,
+                    value = passwordState.value,
+                    onValueChange = {
+                        passwordState.value = it
+                    },
+                    label = { Text("Mật khẩu") },
+                    leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
+                    trailingIcon = {
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Icon(
+                                imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                            )
+                        }
+                    },
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    modifier =  Modifier
+                        .width(if (isTablet) 500.dp else 400.dp)
+                        .height(if (isTablet) 80.dp else 70.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = colorScheme.onPrimary,
+                        unfocusedContainerColor = colorScheme.onPrimary,
+                        focusedIndicatorColor = colorScheme.primary,
+                        unfocusedIndicatorColor= colorScheme.onBackground.copy(alpha = 0.5f)
+                    )
+                )
+
+                // Nút quên mật khẩu
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(if (isTablet) 0.8f else 0.9f),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    TextButton(onClick = {
+                        navController.navigate(Screens.RecoverPassword.route)
+                    }) {
+                        Text(
+                            text = "Quên mật khẩu?",
+                            fontSize = 14.sp,
+                            color = colorScheme.primary
+                        )
+                    }
+                }
+
+                // Nút đăng nhập
+                Button(
+                    onClick = {
+                        /* TODO: Xử lý khi nhấn nút đăng nhập, kiểm tra và báo lỗi v.v*/
+                        navController.navigate("home_graph") {
+                            // Remove welcome and login from back stack
+                            popUpTo(Screens.Welcome.route) {
+                                inclusive = true
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .width(if (isTablet) 300.dp else 200.dp)
+                        .height(if (isTablet) 56.dp else 48.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
+                    shape = RoundedCornerShape(50)
+                ) {
                     Text(
-                        text = "Đăng ký",
-                        fontSize = 14.sp,
+                        text = "Đăng nhập",
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = colorScheme.primary
+                        color = colorScheme.onPrimary
                     )
                 }
-            }
 
+                // Chuyển tới đăng ký
+                Row(
+                    modifier = Modifier.fillMaxWidth(if (isTablet) 0.8f else 0.9f),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Chưa có tài khoản?",
+                        fontSize = 14.sp,
+                        color = colorScheme.onBackground
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    TextButton(onClick = { navController.navigate(Screens.Register.route) }) {
+                        Text(
+                            text = "Đăng ký",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = colorScheme.primary
+                        )
+                    }
+                }
+
+            }
         }
-    }
     }
 }
 

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -19,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -55,6 +57,8 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 fun WelcomeScreen(
     navController: NavHostController
 ) {
+    val configuration = LocalConfiguration.current
+    val isTablet = configuration.screenWidthDp >= 600
     AppTheme { // Gói trong AppTheme để đảm bảo áp dụng theme
         Scaffold(
             containerColor = MaterialTheme.colorScheme.background,
@@ -100,7 +104,8 @@ fun WelcomeScreen(
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onPrimary),
                         shape = RoundedCornerShape(50),
-                        modifier = Modifier.size(width = 150.dp, height = 50.dp)
+                        modifier = Modifier.width(if (isTablet) 300.dp else 200.dp)
+                            .height(if (isTablet) 56.dp else 48.dp)
                     ) {
                         Text(
                             text = "Đăng nhập",
@@ -116,7 +121,8 @@ fun WelcomeScreen(
                         onClick = { navController.navigate(Screens.Register.route) },
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onPrimary),
                         shape = RoundedCornerShape(50),
-                        modifier = Modifier.size(width = 150.dp, height = 50.dp)
+                        modifier = Modifier.width(if (isTablet) 300.dp else 200.dp)
+                            .height(if (isTablet) 56.dp else 48.dp)
                     ) {
                         Text(
                             text = "Đăng ký",
