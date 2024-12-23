@@ -104,7 +104,8 @@ fun WelcomeScreen(
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onPrimary),
                         shape = RoundedCornerShape(50),
-                        modifier = Modifier.width(if (isTablet) 300.dp else 200.dp)
+                        modifier = Modifier
+                            .width(if (isTablet) 300.dp else 200.dp)
                             .height(if (isTablet) 56.dp else 48.dp)
                     ) {
                         Text(
@@ -121,7 +122,8 @@ fun WelcomeScreen(
                         onClick = { navController.navigate(Screens.Register.route) },
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onPrimary),
                         shape = RoundedCornerShape(50),
-                        modifier = Modifier.width(if (isTablet) 300.dp else 200.dp)
+                        modifier = Modifier
+                            .width(if (isTablet) 300.dp else 200.dp)
                             .height(if (isTablet) 56.dp else 48.dp)
                     ) {
                         Text(

@@ -125,14 +125,14 @@ fun LoginScreen(
                         keyboardType = KeyboardType.Email,
                         imeAction = ImeAction.Done
                     ),
-                    modifier =  Modifier
+                    modifier = Modifier
                         .width(if (isTablet) 500.dp else 400.dp)
                         .height(if (isTablet) 80.dp else 70.dp),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = colorScheme.onPrimary,
                         unfocusedContainerColor = colorScheme.onPrimary,
                         focusedIndicatorColor = colorScheme.primary,
-                        unfocusedIndicatorColor= colorScheme.onBackground.copy(alpha = 0.5f)
+                        unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
                     )
                 )
 
@@ -156,26 +156,29 @@ fun LoginScreen(
                     },
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    modifier =  Modifier
+                    modifier = Modifier
                         .width(if (isTablet) 500.dp else 400.dp)
                         .height(if (isTablet) 80.dp else 70.dp),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = colorScheme.onPrimary,
                         unfocusedContainerColor = colorScheme.onPrimary,
                         focusedIndicatorColor = colorScheme.primary,
-                        unfocusedIndicatorColor= colorScheme.onBackground.copy(alpha = 0.5f)
+                        unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
                     )
                 )
 
                 // Nút quên mật khẩu
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth(if (isTablet) 0.8f else 0.9f),
+                        .width(if (isTablet) 500.dp else 400.dp)
+                        .height(if (isTablet) 80.dp else 70.dp),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Spacer(modifier = Modifier.weight(1f))
-                    TextButton(onClick = {
+                    TextButton(
+                        modifier = Modifier.weight(1f),
+                        onClick = {
                         navController.navigate(Screens.RecoverPassword.route)
                     }) {
                         Text(

@@ -1,110 +1,109 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.profile
 
+import android.Manifest
+import android.os.Build
+import android.widget.DatePicker
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddLocation
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.CheckCircleOutline
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FabPosition
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PhoneAndroid
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
+//import com.vmadalin.easypermissions.EasyPermissions
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.window.Popup
+import androidx.wear.compose.material3.DatePicker
+import coil.compose.AsyncImage
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
-
-/**
- * Giao diện màn hình Trang cá nhân (Personal Screen)
- * -----------------------------------------
- * Người viết: Nguyễn Thanh Sang
- * Ngày viết: 29/11/2024
- * Lần cập nhật cuối: 9/12/2024
- * -----------------------------------------
- * Input:
- *
- * Output: Scaffold
- * ---------------------------------------
- */
-/**
- * Sủa lại phần giao diện cho thiết bị tablet
- * ---------------------------
- * Lần cập nhật 9/12/2024
- * ---------------------------
- */
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
 @Composable
-fun ProfileScreen() {
-    val configuration = LocalConfiguration.current
-    val screenWidthDp = configuration.screenWidthDp.dp // Lấy chiều rộng màn hình theo dp
-    val isTablet = screenWidthDp >= 600.dp // Xác định thiết bị là tablet hay điện thoại
+fun ProfileScreen(
+    navController: NavHostController
+) {
+    AppTheme {
+        val configuration = LocalConfiguration.current
+        val isTablet = configuration.screenWidthDp >= 600
+        val colorScheme = MaterialTheme.colorScheme
 
-    // Điều chỉnh kích thước và phông chữ dựa trên loại thiết bị
-    val mainBoxWidth = if (isTablet) 480.dp else 350.dp
-    val mainBoxHeight = if (isTablet) 280.dp else 180.dp
-    val circleSize = if (isTablet) 130.dp else 80.dp
-    val innerCircleSize = if (isTablet) 120.dp else 70.dp
-    val topPadding = if (isTablet) 100.dp else 64.dp
-    val nameFontSize = if (isTablet) 40.sp else 25.sp
-    val emailFontSize = if (isTablet) 24.sp else 20.sp
-    val buttonWidth = if (isTablet) 260.dp else 190.dp
-    val buttonHeight = if (isTablet) 90.dp else 60.dp
-    val buttonFontSize = if (isTablet) 18.sp else 14.sp
-    val circleOffsetY = if (isTablet) (-40).dp else (-20).dp
-    val topColumnPadding = if (isTablet) 120.dp else 70.dp
-    val boxPaddingTop = if (isTablet) 24.dp else 14.dp
-    // val dropdownMenuPadding = if (isTablet) 24.dp else 14.dp (Có thể sử dụng sau)
+        val nameState = remember { mutableStateOf("Nguyễn Thanh Sang") }
+        val phoneState = remember { mutableStateOf("0123456789") }
+        val locationState = remember { mutableStateOf("TP. Hồ Chí Minh") }
+        val emailState = remember { mutableStateOf("example@gmail.com") }
+        val birthDateState = remember { mutableStateOf("01/01/1990") }
+        val imageUrl = remember { mutableStateOf("") }
+        val isVerified = remember { mutableStateOf(true) }
+        val dateCreated =  remember { mutableStateOf("01/12/2024") }
 
-    // Sử dụng Scaffold để bố trí giao diện
-    return Scaffold(
-        bottomBar = {
-            // Hiển thị Thanh Menu dưới cùng
+        var selectedDate by remember { mutableStateOf("") }
+        var showDatePicker by remember { mutableStateOf(false) }
+        val datePickerState = rememberDatePickerState()
 
-        },
-        floatingActionButton = {
-            // Hiển thị Nút Home
-        },
-        floatingActionButtonPosition = FabPosition.Center,
-        content = { innerPadding ->
-            // Cột chính chứa toàn bộ nội dung
+
+        val context = LocalContext.current
+
+        Scaffold(
+            topBar = {
+                Header(
+                    navController = navController,
+                    type = "Back",
+                    title = "Trang cá nhân"
+                )
+            },
+            bottomBar = {
+                MenuBottom(navController = navController)
+            },
+            containerColor = colorScheme.background
+        ) { padding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding) // Áp dụng padding từ Scaffold
-                    .imePadding() // Tự động thêm khoảng trống khi bàn phím xuất hiện
-                    .verticalScroll(rememberScrollState()) // Cho phép cuộn nội dung
-                    .background(color = Color.LightGray), // Màu nền
+                    .padding(padding)
+                    .verticalScroll(rememberScrollState())
+                    .background(colorScheme.background),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
@@ -113,40 +112,88 @@ fun ProfileScreen() {
                     // Hộp chính với nền trắng
                     Box(
                         modifier = Modifier
-                            .padding(top = topPadding)
-                            .size(width = mainBoxWidth, height = mainBoxHeight)
-                            .shadow(
-                                elevation = 8.dp,
-                                shape = RoundedCornerShape(12.dp),
-                                clip = false
+                            .padding(top = if (isTablet) 120.dp else 64.dp)
+                            .size(
+                                width = if (isTablet) 480.dp else 350.dp,
+                                height = if (isTablet) 280.dp else 180.dp
                             )
-                            .background(color = Color.White, shape = RoundedCornerShape(12.dp)),
+                            .shadow(
+                                elevation = 1.dp,
+                                shape = RoundedCornerShape(25),
+                                clip = false,
+                                ambientColor = colorScheme.secondary.copy(alpha = 0.2f),
+                                spotColor = colorScheme.primary.copy(alpha = 0.2f)
+                            )
+                            .background(
+                                color = colorScheme.secondary.copy(alpha = 0.2f),
+                                shape = RoundedCornerShape(25)
+                            ),
                         contentAlignment = Alignment.TopCenter
                     ) {
                         // Vòng tròn ngoài màu trắng
                         Box(
                             modifier = Modifier
-                                .size(circleSize)
-                                .offset(y = circleOffsetY)
-                                .background(color = Color.White, shape = CircleShape),
+                                .size(if (isTablet) 130.dp else 80.dp)
+                                .offset(y = if (isTablet) (-40).dp else (-20).dp)
+                                .background(color = Color.White, shape = CircleShape)
+                                .clickable {
+                                    val permissions = when {
+                                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
+                                            arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
+                                        }
+
+                                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
+                                            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+                                        }
+
+                                        else -> {
+                                            arrayOf(
+                                                Manifest.permission.READ_EXTERNAL_STORAGE,
+                                                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                                            )
+                                        }
+                                    }
+
+//                                    if (EasyPermissions.hasPermissions(context, *permissions)) {
+//                                        // TODO: Mở màn hình chọn hình ảnh từ bộ nhớ thiết bị
+//                                    } else {
+//                                        EasyPermissions.requestPermissions(
+//                                            context as androidx.fragment.app.FragmentActivity,
+//                                            "Ứng dụng cần quyền truy cập bộ nhớ để tải hình ảnh",
+//                                            123, // Mã request
+//                                            *permissions
+//                                        )
+//                                    }
+                                },
                             contentAlignment = Alignment.Center
                         ) {
-                            // Vòng tròn trong màu xám (ảnh đại diện)
-                            Box(
-                                modifier = Modifier
-                                    .size(innerCircleSize)
-                                    .background(color = Color.Gray, shape = CircleShape),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                // Chữ viết tắt tên trong vòng tròn
-                                Text(
-                                    text = "NT",
-                                    color = Color.White,
-                                    fontSize = if (isTablet) 32.sp else 16.sp,
-                                    fontWeight = FontWeight.Bold
+                            if (imageUrl.value.isBlank().not()) {
+                                AsyncImage(
+                                    model = imageUrl,
+                                    contentDescription = "Avatar",
+                                    modifier = Modifier
+                                        .size(if (isTablet) 120.dp else 70.dp)
+                                        .background(color = Color.Gray, shape = CircleShape)
                                 )
+                            } else {
+                                Box(
+                                    modifier = Modifier
+                                        .size(if (isTablet) 120.dp else 70.dp)
+                                        .background(
+                                            color = colorScheme.primary.copy(alpha = 0.8f),
+                                            shape = CircleShape
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Image(
+                                        imageVector = Icons.Default.Person,
+                                        contentDescription = "Avatar",
+                                        colorFilter = ColorFilter.tint(colorScheme.onPrimary),
+                                        modifier = Modifier.size(if (isTablet) 70.dp else 40.dp)
+                                    )
+                                }
                             }
-                            // Biểu tượng xác nhận (CheckCircle)
+
                             Box(
                                 modifier = Modifier
                                     .align(Alignment.CenterEnd)
@@ -157,7 +204,7 @@ fun ProfileScreen() {
                                 contentAlignment = Alignment.TopEnd
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.CheckCircle,
+                                    imageVector = if(isVerified.value) Icons.Default.CheckCircle else Icons.Default.CheckCircleOutline,
                                     contentDescription = "Verified",
                                     tint = Color.Green,
                                     modifier = Modifier
@@ -174,46 +221,54 @@ fun ProfileScreen() {
 
                         // Cột chứa thông tin tên và email
                         Column(
-                            modifier = Modifier.padding(top = topColumnPadding),
+                            modifier = Modifier.padding(top = if (isTablet) 120.dp else 70.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
                             // Hiển thị tên người dùng
                             Text(
-                                text = "Nguyễn Thanh Sang",
+                                text = nameState.value,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = nameFontSize,
+                                fontSize = if (isTablet) 40.sp else 25.sp,
+                                color = colorScheme.onSecondary
                             )
                             Spacer(modifier = Modifier.height(3.dp))
-                            // Hiển thị email
+                            // Hiển thị ngày tham gia
                             Row(
                                 horizontalArrangement = Arrangement.Center,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "example@gmail.com", // Nếu email dài quá thì hiện "..." phần dư ra
-                                    fontSize = emailFontSize
+                                    text = "Ngày tạo tài khoản: "+ dateCreated.value,
+                                    color = colorScheme.onSecondary,
+                                    fontSize = if (isTablet) 24.sp else 20.sp
                                 )
                             }
                             // Hộp chứa các nút
                             Box(
                                 modifier = Modifier
-                                    .padding(top = boxPaddingTop),
+                                    .padding(top = if (isTablet) 24.dp else 14.dp),
                             ) {
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .size(width = mainBoxWidth, height = buttonHeight * 2)
+                                        .size(
+                                            width = if (isTablet) 480.dp else 350.dp,
+                                            height = (if (isTablet) 90.dp else 60.dp) * 2
+                                        )
                                         .align(Alignment.Center),
                                 ) {
-                                    // Nút "Trang cá nhân"
+                                    // Nút "Đổi mât khẩu"
                                     Box(
                                         modifier = Modifier
-                                            .size(width = buttonWidth, height = buttonHeight)
-                                            .clip(CutCornerShape(topEnd = buttonHeight))
+                                            .size(
+                                                width = if (isTablet) 260.dp else 190.dp,
+                                                height = if (isTablet) 90.dp else 60.dp
+                                            )
+                                            .clip(CutCornerShape(topEnd = if (isTablet) 90.dp else 60.dp))
                                             .align(Alignment.CenterStart)
                                             .background(
-                                                Color.LightGray,
+                                                colorScheme.primary,
                                                 shape = RoundedCornerShape(
                                                     topStart = 0.dp,
                                                     topEnd = 0.dp,
@@ -224,31 +279,35 @@ fun ProfileScreen() {
                                         contentAlignment = Alignment.CenterStart
                                     ) {
                                         Button(
-                                            onClick = {},
+                                            onClick = {
+                                                   //ToDo: Xử lý khi bấm đổi mật khẩu
+                                            },
                                             modifier = Modifier.fillMaxSize(),
                                             shape = RoundedCornerShape(bottomStart = 12.dp),
                                             colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color.LightGray,
-                                                contentColor = Color.Black
+                                                containerColor = colorScheme.primary,
+                                                contentColor = colorScheme.onPrimary
                                             )
                                         ) {
                                             Text(
-                                                modifier = Modifier.padding(horizontal = if (isTablet) 50.dp else 35.dp),
-                                                text = "Trang cá nhân",
+                                                modifier = Modifier.padding(horizontal = if (isTablet) 30.dp else 20.dp),
+                                                text = "Đổi mật khẩu",
                                                 textAlign = TextAlign.Center,
-                                                color = Color.Black,
-                                                fontSize = buttonFontSize
+                                                fontSize = if (isTablet) 18.sp else 14.sp
                                             )
                                         }
                                     }
-                                    // Nút "HomeConnect"
+                                    // Nút "Đăng xuất"
                                     Box(
                                         modifier = Modifier
-                                            .size(width = buttonWidth, height = buttonHeight)
-                                            .clip(CutCornerShape(bottomStart = buttonHeight / 1.5f))
+                                            .size(
+                                                width = if (isTablet) 260.dp else 190.dp,
+                                                height = if (isTablet) 90.dp else 60.dp
+                                            )
+                                            .clip(CutCornerShape(bottomStart = (if (isTablet) 90.dp else 60.dp) / 1.5f))
                                             .align(Alignment.CenterEnd)
                                             .background(
-                                                Color.LightGray,
+                                                colorScheme.error,
                                                 shape = RoundedCornerShape(
                                                     topStart = 0.dp,
                                                     bottomStart = 0.dp,
@@ -258,22 +317,21 @@ fun ProfileScreen() {
                                         contentAlignment = Alignment.CenterEnd
                                     ) {
                                         Button(
-                                            onClick = { /* TODO: Xử lý sự kiện nút bấm */ },
+                                            onClick = { /* TODO: Xử lý sự kiện nút bấm đăng xuất */ },
                                             modifier = Modifier
                                                 .fillMaxSize()
-                                                .clip(CutCornerShape(bottomStart = buttonHeight / 1.5f)),
+                                                .clip(CutCornerShape(bottomStart = (if (isTablet) 90.dp else 60.dp) / 1.5f)),
                                             colors = ButtonDefaults.buttonColors(
-                                                containerColor = Color.LightGray,
-                                                contentColor = Color.Black
-                                            ),
+                                                containerColor = colorScheme.error,
+                                                contentColor = colorScheme.onError
+                                        ),
                                             shape = RoundedCornerShape(bottomEnd = 12.dp),
                                             elevation = ButtonDefaults.buttonElevation(0.dp)
                                         ) {
                                             Text(
-                                                text = "HomeConnect",
+                                                text = "Đăng xuất",
                                                 textAlign = TextAlign.Center,
-                                                color = Color.Black,
-                                                fontSize = buttonFontSize
+                                                fontSize = if (isTablet) 18.sp else 14.sp
                                             )
                                         }
                                     }
@@ -281,146 +339,203 @@ fun ProfileScreen() {
                             }
                         }
                     }
+                }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-                    // Tiêu đề "Thông tin cá nhân"
-                    Text(
-                        text = "Thông tin cá nhân",
-                        fontWeight = FontWeight.Bold,
+
+                // Information Fields
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = if (isTablet) 32.dp else 16.dp)
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp,Alignment.CenterVertically),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    OutlinedTextField(
+                        value = nameState.value,
+                        onValueChange = { nameState.value = it },
+                        label = { Text("Họ và tên") },
+                        shape = RoundedCornerShape(25),
+                        singleLine = true,
                         modifier = Modifier
-                            .padding()
-                            .align(Alignment.Start)
+                            .width(if (isTablet) 500.dp else 400.dp)
+                            .height(if (isTablet) 80.dp else 70.dp),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = colorScheme.onPrimary,
+                            unfocusedContainerColor = colorScheme.onPrimary,
+                            focusedIndicatorColor = colorScheme.primary,
+                            unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
+                        ),
+                        leadingIcon = { Icon(imageVector = Icons.Filled.Person, contentDescription = null) },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Next
+                        ),
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    // Biến để tính toán chiều cao cột
-                    val itemHeight = 56 // Chiều cao ước tính cho mỗi mục
-                    val maxVisibleItems = 9 // Số lượng mục tối đa hiển thị mà không cần cuộn
-                    val totalItems = 9 // Tổng số mục trong biểu mẫu
-                    val columnHeight = if (totalItems <= maxVisibleItems) {
-                        (totalItems * itemHeight)
-                    } else {
-                        (maxVisibleItems * itemHeight)
-                    }
-
-                    // Cột chứa biểu mẫu thông tin cá nhân
-                    Column(
+                    OutlinedTextField(
+                        value = phoneState.value,
+                        onValueChange = { phoneState.value = it },
+                        label = { Text("Số điện thoại") },
+                        shape = RoundedCornerShape(25),
+                        singleLine = true,
                         modifier = Modifier
-                            .size(width = mainBoxWidth, height = columnHeight.dp)
-                            .padding(bottom = if (isTablet) 35.dp else 25.dp)
-                            .shadow(
-                                elevation = 8.dp,
-                                shape = RoundedCornerShape(12.dp),
-                                clip = false
+                            .width(if (isTablet) 500.dp else 400.dp)
+                            .height(if (isTablet) 80.dp else 70.dp),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = colorScheme.onPrimary,
+                            unfocusedContainerColor = colorScheme.onPrimary,
+                            focusedIndicatorColor = colorScheme.primary,
+                            unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
+                        ),
+                        leadingIcon = { Icon (imageVector = Icons.Filled.PhoneAndroid, contentDescription = null) },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Phone,
+                            imeAction = ImeAction.Next)
+                        ,
+                    )
+
+                    OutlinedTextField(
+                        value = locationState.value,
+                        onValueChange = { locationState.value = it },
+                        label = { Text("Nơi sống hiện tại") },
+                        shape = RoundedCornerShape(25),
+                        singleLine = true,
+                        modifier = Modifier
+                            .width(if (isTablet) 500.dp else 400.dp)
+                            .height(if (isTablet) 80.dp else 70.dp),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = colorScheme.onPrimary,
+                            unfocusedContainerColor = colorScheme.onPrimary,
+                            focusedIndicatorColor = colorScheme.primary,
+                            unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
+                        ),
+                        leadingIcon = { Icon (imageVector = Icons.Filled.AddLocation, contentDescription = null) },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Next)
+                        ,
+                    )
+
+                    OutlinedTextField(
+                        value = emailState.value,
+                        onValueChange = {},
+                        label = { Text("Email") },
+                        shape = RoundedCornerShape(25),
+                        singleLine = true,
+                        readOnly = true,
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.CheckCircle,
+                                contentDescription = "Verified",
+                                tint = colorScheme.primary
                             )
-                            .background(color = Color.White, shape = RoundedCornerShape(12.dp))
-                    ) {
-                        Spacer(modifier = Modifier.height(12.dp))
+                        },
+                        modifier = Modifier
+                            .width(if (isTablet) 500.dp else 400.dp)
+                            .height(if (isTablet) 80.dp else 70.dp),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = colorScheme.onPrimary,
+                            unfocusedContainerColor = colorScheme.onPrimary,
+                            focusedIndicatorColor = colorScheme.primary,
+                            unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
+                        ),
+                        leadingIcon = { Icon (imageVector = Icons.Filled.Email, contentDescription = null) },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Email,
+                            imeAction = ImeAction.Next)
+                        ,
+                    )
 
-                        // Trường "Họ và tên"
-                        OutlinedTextField(
-                            value = "",
-                            onValueChange = { /* TODO: Xử lý thay đổi giá trị */ },
-                            label = { Text("Họ và tên") },
-                            modifier = Modifier
-                                .height(itemHeight.dp)
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp)
-                        )
 
-                        Spacer(modifier = Modifier.height(12.dp))
 
-                        // Trường "Số điện thoại"
-                        OutlinedTextField(
-                            value = "",
-                            onValueChange = { /* TODO: Xử lý thay đổi giá trị */ },
-                            label = { Text("Số điện thoại") },
-                            modifier = Modifier
-                                .height(itemHeight.dp)
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp)
-                        )
 
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        // Trường "Nơi sống hiện tại" (Dropdown)
-                        Box {
-                            OutlinedTextField(
-                                value = "",
-                                onValueChange = { /* TODO: Xử lý thay đổi giá trị */ },
-                                label = { Text("Nơi sống hiện tại") },
-                                modifier = Modifier
-                                    .height(itemHeight.dp)
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp)
-                                    .clickable { /* TODO: Mở rộng danh sách */ },
-                                readOnly = true,
-                            )
-                            // TODO: Thêm logic cho menu dropdown
-                        }
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        OutlinedTextField(
-                            value = "",
-                            onValueChange = { /* TODO: Xử lý thay đổi giá trị */ },
-                            label = { Text("Email") },
-                            modifier = Modifier
-                                .height(itemHeight.dp)
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp)
-                                .clickable { /* TODO: Mở rộng danh sách */ },
-                            readOnly = true,
-                            trailingIcon = {
+                    // Trường ngày sinh
+                    OutlinedTextField(
+                        value = selectedDate,
+                        onValueChange = { /* Not needed for read-only fields */ },
+                        label = { Text("Ngày sinh (dd/mm/yyyy)") },
+                        shape = RoundedCornerShape(25),
+                        singleLine = true,
+                        readOnly = true,
+                        trailingIcon = {
+                            IconButton(onClick = { showDatePicker = !showDatePicker }) {
                                 Icon(
-                                    imageVector = Icons.Default.CheckCircle,
-                                    contentDescription = null
+                                    imageVector = Icons.Default.DateRange,
+                                    contentDescription = "Select date"
                                 )
                             }
+                        },
+                        modifier = Modifier
+                            .width(if (isTablet) 500.dp else 400.dp)
+                            .height(if (isTablet) 80.dp else 70.dp),
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = colorScheme.onPrimary,
+                            unfocusedContainerColor = colorScheme.onPrimary,
+                            focusedIndicatorColor = colorScheme.primary,
+                            unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
+                        ),
+                        leadingIcon = { Icon(imageVector = Icons.Filled.DateRange, contentDescription = null) },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Next
                         )
+                    )
 
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        // Trường "Ngày sinh"
-                        OutlinedTextField(
-                            value = "",
-                            onValueChange = { /* TODO: Xử lý thay đổi giá trị */ },
-                            label = { Text("Ngày sinh (dd/mm/yyyy)") },
-                            modifier = Modifier
-                                .height(itemHeight.dp)
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp),
-                            trailingIcon = {
-                                Icon(
-                                    imageVector = Icons.Default.KeyboardArrowDown,
-                                    contentDescription = null
-                                )
-                            }
-                        )
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        // Nút "Lưu thông tin"
-                        Button(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp)
-                                .height(itemHeight.dp),
-                            onClick = {
-                                // TODO: Xử lý sự kiện lưu thông tin
-                            },
-                            shape = RoundedCornerShape(8.dp)
+                    if (showDatePicker) {
+                        Popup(
+                            onDismissRequest = { showDatePicker = false },
+                            alignment = Alignment.TopStart
                         ) {
-                            Text(
-                                "Lưu thông tin",
-                                fontSize = 16.sp
-                            )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .offset(y = 64.dp)
+                                    .shadow(elevation = 4.dp)
+                                    .background(colorScheme.background)
+                                    .padding(16.dp)
+                            ) {
+                                DatePicker(
+                                    state = datePickerState,
+                                    showModeToggle = false
+                                )
+                            }
                         }
                     }
+
+                   //Nếu thay dđổi ngày thì update
+                    LaunchedEffect(datePickerState.selectedDateMillis) {
+                        datePickerState.selectedDateMillis?.let { millis ->
+                            val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                            selectedDate = formatter.format(Date(millis))
+                            showDatePicker = false //Ẩn date picker
+                        }
+                    }
+
+
+
+
+
                 }
+                // Save Button
+                Button(
+                    onClick = {
+                        // TODO: Xử lý lưu thông tin
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("Lưu thông tin")
+                }
+
             }
         }
-    );
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun ProfileScreenPreview() {
+    ProfileScreen(navController = rememberNavController())
 }

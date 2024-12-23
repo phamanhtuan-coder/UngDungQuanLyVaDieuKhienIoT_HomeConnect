@@ -41,7 +41,7 @@ android {
 
 
 dependencies {
-
+    implementation (libs.easypermissions.ktx)
     implementation(libs.coil.compose)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.mpandroidchart)

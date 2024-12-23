@@ -5,10 +5,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.DeviceScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.home.HomeScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.login.LoginScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.onboard_welcome.WelcomeScreen
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.otp.OtpScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.password_recovery.PasswordRecoveryScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.profile.ProfileScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.signup.SignUpScreen
@@ -33,13 +33,18 @@ fun NavigationGraph(
             }
 
             // Recover password Screen
-            composable(Screens.RecoverPassword.route){
+            composable(Screens.RecoverPassword.route) {
                 PasswordRecoveryScreen(navController)
             }
 
             // Signup Screen
             composable(Screens.Register.route) {
                 SignUpScreen(navController)
+            }
+
+            // OTP Screen
+            composable(Screens.OTP.route) {
+                OtpScreen(navController)
             }
 
             // HomeScreen
@@ -53,6 +58,13 @@ fun NavigationGraph(
             navigation(startDestination = Screens.Dashboard.route, route = "dashboard_graph") {
                 composable(Screens.Dashboard.route) {
                     DashboardScreen(navController)
+                }
+            }
+
+            //Profile Screen
+            navigation(startDestination = Screens.Profile.route, route = "profile_graph") {
+                composable(Screens.Profile.route) {
+                    ProfileScreen(navController)
                 }
             }
 

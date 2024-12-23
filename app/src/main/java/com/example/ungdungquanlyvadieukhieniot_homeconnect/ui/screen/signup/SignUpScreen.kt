@@ -181,7 +181,7 @@ fun SignUpScreen(navController: NavHostController) {
                             focusedContainerColor = colorScheme.onPrimary,
                             unfocusedContainerColor = colorScheme.onPrimary,
                             focusedIndicatorColor = colorScheme.primary,
-                            unfocusedIndicatorColor= colorScheme.onBackground.copy(alpha = 0.5f)
+                            unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
                         )
                     )
 
@@ -200,7 +200,7 @@ fun SignUpScreen(navController: NavHostController) {
                             focusedContainerColor = colorScheme.onPrimary,
                             unfocusedContainerColor = colorScheme.onPrimary,
                             focusedIndicatorColor = colorScheme.primary,
-                            unfocusedIndicatorColor= colorScheme.onBackground.copy(alpha = 0.5f)
+                            unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
                         )
                     )
 
@@ -219,7 +219,7 @@ fun SignUpScreen(navController: NavHostController) {
                             focusedContainerColor = colorScheme.onPrimary,
                             unfocusedContainerColor = colorScheme.onPrimary,
                             focusedIndicatorColor = colorScheme.primary,
-                            unfocusedIndicatorColor= colorScheme.onBackground.copy(alpha = 0.5f)
+                            unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
                         )
                     )
 
@@ -237,7 +237,7 @@ fun SignUpScreen(navController: NavHostController) {
                             focusedContainerColor = colorScheme.onPrimary,
                             unfocusedContainerColor = colorScheme.onPrimary,
                             focusedIndicatorColor = colorScheme.primary,
-                            unfocusedIndicatorColor= colorScheme.onBackground.copy(alpha = 0.5f)
+                            unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
                         )
                     )
                 } else {
@@ -399,7 +399,7 @@ fun SignUpScreen(navController: NavHostController) {
                             focusedContainerColor = colorScheme.onPrimary,
                             unfocusedContainerColor = colorScheme.onPrimary,
                             focusedIndicatorColor = colorScheme.primary,
-                            unfocusedIndicatorColor= colorScheme.onBackground.copy(alpha = 0.5f)
+                            unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
                         )
                     )
 
@@ -430,7 +430,7 @@ fun SignUpScreen(navController: NavHostController) {
                             focusedContainerColor = colorScheme.onPrimary,
                             unfocusedContainerColor = colorScheme.onPrimary,
                             focusedIndicatorColor = colorScheme.primary,
-                            unfocusedIndicatorColor= colorScheme.onBackground.copy(alpha = 0.5f)
+                            unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
                         )
                     )
                 }
@@ -446,7 +446,10 @@ fun SignUpScreen(navController: NavHostController) {
                 }
 
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp, alignment = Alignment.CenterHorizontally),
+                    horizontalArrangement = Arrangement.spacedBy(
+                        6.dp,
+                        alignment = Alignment.CenterHorizontally
+                    ),
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth(if (isTablet) 0.8f else 0.9f)
@@ -475,8 +478,9 @@ fun SignUpScreen(navController: NavHostController) {
                             }
                         },
                         enabled = (stage == 1 || (stage == 2 && validateInput())),
-                        modifier = Modifier.width(if (isTablet) 300.dp else 200.dp)
-                                .height(if (isTablet) 56.dp else 48.dp)
+                        modifier = Modifier
+                            .width(if (isTablet) 300.dp else 200.dp)
+                            .height(if (isTablet) 56.dp else 48.dp)
                             .align(Alignment.CenterVertically),
                         colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
                         shape = RoundedCornerShape(50)

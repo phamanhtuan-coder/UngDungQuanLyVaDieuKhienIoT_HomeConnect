@@ -1,176 +1,219 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.otp
 
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
-/**
- * Màn hình Xác nhận mã OTP
- * -----------------------------------------
- * Người viết: Nguyễn Thanh Sang
- * Ngày viết: 1/12/2024
- * Lần cập nhật cuối: 3/12/2024
- * -----------------------------------------
- *
- * Mô tả:
- * - Hiển thị giao diện để người dùng nhập mã OTP được gửi qua email hoặc điện thoại.
- * - Gồm các thành phần: logo ứng dụng, tiêu đề, hướng dẫn, email hiển thị, các ô nhập mã OTP, nút xác nhận mã OTP,
- *   liên kết gửi lại mã OTP và đếm ngược thời gian.
- *
- * Input:
- * - Người dùng nhập mã OTP vào các ô nhập liệu.
- *
- * Output:
- * - Giao diện kiểm tra mã OTP hợp lệ hay không.
- * - Nút xác nhận có chiều rộng bằng với hàng chứa các ô OTP.
- */
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
-fun OTPVerificationScreen() {
-    val otpLength = 4 // Độ dài mã OTP (số ô nhập OTP)
-    val otpValue = remember { Array(otpLength) { TextFieldValue("") } } // Khởi tạo danh sách các TextFieldValue cho mỗi ô OTP
-    val focusRequesters = List(otpLength) { FocusRequester() } // Danh sách FocusRequester để quản lý focus cho từng ô OTP
-    var rowWidth by remember { mutableStateOf(0) } // Chiều rộng hàng chứa ô OTP
-    val density = LocalDensity.current.density // Mật độ điểm ảnh
+fun OtpScreen(navController: NavHostController) {
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        val configuration = LocalConfiguration.current
+        val isTablet = configuration.screenWidthDp >= 600
+        val otpLength = 6 // Độ dài mã OTP (số ô nhập OTP)
+        val otpValue =
+            remember { Array(otpLength) { TextFieldValue("") } } // Khởi tạo danh sách các TextFieldValue cho mỗi ô OTP
+        val focusRequesters =
+            List(otpLength) { FocusRequester() } // Danh sách FocusRequester để quản lý focus cho từng ô OTP
 
-    // Giao diện chính của màn hình
-    Column(
-        modifier = Modifier
-            .background(color = Color.White) // Nền trắng cho màn hình
-            .verticalScroll(rememberScrollState()) // Hỗ trợ cuộn dọc
-            .fillMaxSize(), // Chiếm toàn bộ màn hình
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Column(
-            modifier = Modifier.padding(top = 38.dp, bottom = 38.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Logo ứng dụng
-            Image(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = "Logo ứng dụng",
-                modifier = Modifier.size(100.dp) // Kích thước logo
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Tiêu đề
-            Text(
-                text = "Đăng ký",
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 20.sp
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Hướng dẫn nhập OTP
-            Text(
-                text = "Nhập mã đã được gửi đến",
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
-                fontSize = 16.sp,
-                color = Color.Gray
-            )
-            Text(
-                text = "example@gmail.com", // Email hiển thị
-                textAlign = TextAlign.Center,
-                modifier = Modifier.clickable {}, // Placeholder cho sự kiện click
-                fontSize = 16.sp,
-                color = Color.Blue
-            )
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Các ô nhập OTP
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp), // Khoảng cách giữa các ô
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.onSizeChanged { size ->
-                    rowWidth = size.width // Lưu kích thước hàng để sử dụng cho nút xác nhận
-                }
+        Scaffold(
+            containerColor = colorScheme.background
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(horizontal = if (isTablet) 32.dp else 16.dp)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
             ) {
-                repeat(otpLength) { index ->
-                    OutlinedTextField(
-                        value = otpValue[index], // Giá trị của ô OTP hiện tại
-                        onValueChange = { input ->
-                            otpValue[index] = TextFieldValue(input.text, TextRange(input.text.length)) // Cập nhật giá trị khi nhập
-                        },
-                        modifier = Modifier
-                            .size(56.dp) // Kích thước ô OTP
-                            .focusRequester(focusRequesters[index]), // Quản lý focus của ô
-                        singleLine = true, // Chỉ cho phép nhập một dòng
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp), // Góc bo tròn
-                        textStyle = androidx.compose.ui.text.TextStyle(
-                            color = Color.Black,
-                            fontSize = 23.sp,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
-                        ),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            containerColor = Color(0xFFF0F0F0), // Màu nền của ô
-                            focusedBorderColor = Color.Blue, // Màu viền khi được chọn
-                            unfocusedBorderColor = Color.Gray // Màu viền khi không được chọn
-                        ),
-                        keyboardOptions = KeyboardOptions.Default.copy(
-                            keyboardType = KeyboardType.Number // Sử dụng bàn phím số
+                // Tiêu đề
+                Text(
+                    text = "Nhập mã OTP",
+                    fontSize = if (isTablet) 28.sp else 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colorScheme.primary
+                )
+                Text(
+                    text = "Vui lòng nhập mã OTP vừa được gửi tới Email",
+                    fontSize = 14.sp,
+                    color = colorScheme.onBackground.copy(alpha = 0.6f)
+                )
+
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    repeat(otpLength) { index ->
+                        OutlinedTextField(
+                            value = otpValue[index], // Current OTP value
+                            onValueChange = {
+                                //ToDo: Xử lý khi nhập mã OTP vào đây
+                                input ->
+                                if (input.text.length <= 1) { // Limit input to one character
+                                    otpValue[index] =
+                                        TextFieldValue(input.text, TextRange(input.text.length))
+
+                                    // Move to the next field if not empty and not the last index
+                                    if (input.text.isNotEmpty() && index < otpLength - 1) {
+                                        focusRequesters[index + 1].requestFocus()
+                                    }
+
+                                    // Handle backspace and move focus back
+                                    if (input.text.isEmpty() && index > 0) {
+                                        focusRequesters[index - 1].requestFocus()
+                                    }
+                                }
+                            },
+                            modifier = Modifier
+                                .size(if (isTablet) 60.dp else 50.dp)
+                                .focusRequester(focusRequesters[index]), // Attach focusRequester
+                            singleLine = true,
+                            textStyle = MaterialTheme.typography.bodyLarge.copy(
+                                color = colorScheme.onBackground,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = if (index == otpLength - 1) ImeAction.Done else ImeAction.Next
+                            ),
+                            colors = MaterialTheme.colorScheme.run {
+                                TextFieldDefaults.colors(
+                                    focusedTextColor = onBackground,
+                                    unfocusedTextColor = onBackground,
+                                    focusedContainerColor = onPrimary,
+                                    unfocusedContainerColor = onPrimary,
+                                    focusedIndicatorColor = primary,
+                                    unfocusedIndicatorColor = onBackground.copy(alpha = 0.5f)
+                                )
+                            }
                         )
+                    }
+                }
+
+                LaunchedEffect(Unit) {
+                    focusRequesters[0].requestFocus() // Focus the first field
+                }
+
+
+
+                Text(
+                    text = "Mã OTP có hiệu lực trong 5 phút.",
+                    fontSize = 12.sp,
+                    color = colorScheme.onBackground.copy(alpha = 0.6f)
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+
+
+                // Nút xác nhận OTP
+                Button(
+                    onClick = { /* TODO: Xử lý xác nhận OTP */ },
+                    modifier = Modifier.size(
+                        width = if (isTablet) 300.dp else 200.dp,
+                        height = if (isTablet) 56.dp else 48.dp
+                    ),
+                    colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
+                    shape = MaterialTheme.shapes.large
+                ) {
+                    Text(
+                        text = "Xác nhận",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = colorScheme.onPrimary
                     )
                 }
-            }
 
-            Spacer(modifier = Modifier.height(16.dp))
+                // Nút gửi lại OTP
+                TextButton(
+                    onClick = {
 
-            // Liên kết gửi lại mã OTP
-            Text(
-                text = "Bạn không nhận được mã OTP?",
-                textAlign = TextAlign.Center,
-                fontSize = 16.sp,
-                color = Color.Gray
-            )
-            Text(
-                text = "Gửi lại mã",
-                color = Color.Blue,
-                fontSize = 16.sp,
-                modifier = Modifier.clickable {} // Placeholder cho sự kiện click
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Nút xác nhận OTP
-            Button(
-                onClick = {}, // Placeholder cho sự kiện nhấn nút
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp), // Góc bo tròn của nút
-                modifier = Modifier
-                    .width((rowWidth / density).dp) // Chiều rộng nút bằng hàng chứa ô OTP
-                    .height(48.dp) // Chiều cao nút
-            ) {
-                Text(
-                    text = "Xác nhận OTP",
-                    fontSize = 16.sp
+                    },
+                    content =
+                    {
+                        Text(
+                            text = "Gửi lại mã OTP",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = colorScheme.primary,
+                        )
+                    },
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .align(Alignment.CenterHorizontally)
                 )
+
+
+                // Chuyển tới đăng nhập
+                Row(
+                    modifier = Modifier.fillMaxWidth(if (isTablet) 0.8f else 0.9f),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Bạn muốn đăng nhập?",
+                        fontSize = 14.sp,
+                        color = colorScheme.onBackground
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    TextButton(onClick = { navController.navigate(Screens.Login.route) }) {
+                        Text(
+                            text = "Đăng nhập",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = colorScheme.primary
+                        )
+                    }
+                }
             }
         }
     }
+
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun OtpScreenPreview() {
+    OtpScreen(navController = rememberNavController())
 }
