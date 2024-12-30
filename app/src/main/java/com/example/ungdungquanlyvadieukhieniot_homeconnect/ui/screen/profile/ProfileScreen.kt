@@ -1,12 +1,23 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.profile
 
+//import com.vmadalin.easypermissions.EasyPermissions
 import android.Manifest
 import android.os.Build
-import android.widget.DatePicker
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CutCornerShape
@@ -19,10 +30,20 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.CheckCircleOutline
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PhoneAndroid
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -36,26 +57,22 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
-//import com.vmadalin.easypermissions.EasyPermissions
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.window.Popup
-import androidx.wear.compose.material3.DatePicker
-import coil.compose.AsyncImage
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -64,7 +81,7 @@ import java.util.Locale
 fun ProfileScreen(
     navController: NavHostController
 ) {
-    AppTheme {
+   AppTheme {
         val configuration = LocalConfiguration.current
         val isTablet = configuration.screenWidthDp >= 600
         val colorScheme = MaterialTheme.colorScheme
@@ -73,12 +90,11 @@ fun ProfileScreen(
         val phoneState = remember { mutableStateOf("0123456789") }
         val locationState = remember { mutableStateOf("TP. Hồ Chí Minh") }
         val emailState = remember { mutableStateOf("example@gmail.com") }
-        val birthDateState = remember { mutableStateOf("01/01/1990") }
+        var selectedDate by remember { mutableStateOf("01/01/2004") }
         val imageUrl = remember { mutableStateOf("") }
         val isVerified = remember { mutableStateOf(true) }
-        val dateCreated =  remember { mutableStateOf("01/12/2024") }
+        val dateCreated = remember { mutableStateOf("01/12/2024") }
 
-        var selectedDate by remember { mutableStateOf("") }
         var showDatePicker by remember { mutableStateOf(false) }
         val datePickerState = rememberDatePickerState()
 
@@ -204,7 +220,7 @@ fun ProfileScreen(
                                 contentAlignment = Alignment.TopEnd
                             ) {
                                 Icon(
-                                    imageVector = if(isVerified.value) Icons.Default.CheckCircle else Icons.Default.CheckCircleOutline,
+                                    imageVector = if (isVerified.value) Icons.Default.CheckCircle else Icons.Default.CheckCircleOutline,
                                     contentDescription = "Verified",
                                     tint = Color.Green,
                                     modifier = Modifier
@@ -239,7 +255,7 @@ fun ProfileScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "Ngày tạo tài khoản: "+ dateCreated.value,
+                                    text = "Ngày tạo tài khoản: " + dateCreated.value,
                                     color = colorScheme.onSecondary,
                                     fontSize = if (isTablet) 24.sp else 20.sp
                                 )
@@ -280,7 +296,7 @@ fun ProfileScreen(
                                     ) {
                                         Button(
                                             onClick = {
-                                                   //ToDo: Xử lý khi bấm đổi mật khẩu
+                                                //ToDo: Xử lý khi bấm đổi mật khẩu
                                             },
                                             modifier = Modifier.fillMaxSize(),
                                             shape = RoundedCornerShape(bottomStart = 12.dp),
@@ -324,7 +340,7 @@ fun ProfileScreen(
                                             colors = ButtonDefaults.buttonColors(
                                                 containerColor = colorScheme.error,
                                                 contentColor = colorScheme.onError
-                                        ),
+                                            ),
                                             shape = RoundedCornerShape(bottomEnd = 12.dp),
                                             elevation = ButtonDefaults.buttonElevation(0.dp)
                                         ) {
@@ -349,7 +365,7 @@ fun ProfileScreen(
                     modifier = Modifier
                         .padding(horizontal = if (isTablet) 32.dp else 16.dp)
                         .fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp,Alignment.CenterVertically),
+                    verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     OutlinedTextField(
@@ -367,7 +383,12 @@ fun ProfileScreen(
                             focusedIndicatorColor = colorScheme.primary,
                             unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
                         ),
-                        leadingIcon = { Icon(imageVector = Icons.Filled.Person, contentDescription = null) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Filled.Person,
+                                contentDescription = null
+                            )
+                        },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Text,
                             imeAction = ImeAction.Next
@@ -389,11 +410,16 @@ fun ProfileScreen(
                             focusedIndicatorColor = colorScheme.primary,
                             unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
                         ),
-                        leadingIcon = { Icon (imageVector = Icons.Filled.PhoneAndroid, contentDescription = null) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Filled.PhoneAndroid,
+                                contentDescription = null
+                            )
+                        },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Phone,
-                            imeAction = ImeAction.Next)
-                        ,
+                            imeAction = ImeAction.Next
+                        ),
                     )
 
                     OutlinedTextField(
@@ -411,11 +437,16 @@ fun ProfileScreen(
                             focusedIndicatorColor = colorScheme.primary,
                             unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
                         ),
-                        leadingIcon = { Icon (imageVector = Icons.Filled.AddLocation, contentDescription = null) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Filled.AddLocation,
+                                contentDescription = null
+                            )
+                        },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Text,
-                            imeAction = ImeAction.Next)
-                        ,
+                            imeAction = ImeAction.Next
+                        ),
                     )
 
                     OutlinedTextField(
@@ -441,29 +472,33 @@ fun ProfileScreen(
                             focusedIndicatorColor = colorScheme.primary,
                             unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
                         ),
-                        leadingIcon = { Icon (imageVector = Icons.Filled.Email, contentDescription = null) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Filled.Email,
+                                contentDescription = null
+                            )
+                        },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Email,
-                            imeAction = ImeAction.Next)
-                        ,
+                            imeAction = ImeAction.Next
+                        ),
                     )
-
-
 
 
                     // Trường ngày sinh
                     OutlinedTextField(
-                        value = selectedDate,
+                        value = selectedDate, // Chỗ này bị bug chưa load được ngày từ biến
                         onValueChange = { /* Not needed for read-only fields */ },
                         label = { Text("Ngày sinh (dd/mm/yyyy)") },
                         shape = RoundedCornerShape(25),
                         singleLine = true,
                         readOnly = true,
                         trailingIcon = {
+                            // Nút chọn ngày
                             IconButton(onClick = { showDatePicker = !showDatePicker }) {
                                 Icon(
                                     imageVector = Icons.Default.DateRange,
-                                    contentDescription = "Select date"
+                                    contentDescription = "Chọn ngày"
                                 )
                             }
                         },
@@ -476,7 +511,12 @@ fun ProfileScreen(
                             focusedIndicatorColor = colorScheme.primary,
                             unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
                         ),
-                        leadingIcon = { Icon(imageVector = Icons.Filled.DateRange, contentDescription = null) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Filled.DateRange,
+                                contentDescription = null
+                            )
+                        },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
                             imeAction = ImeAction.Next
@@ -504,7 +544,7 @@ fun ProfileScreen(
                         }
                     }
 
-                   //Nếu thay dđổi ngày thì update
+                    //Nếu thay dđổi ngày thì update
                     LaunchedEffect(datePickerState.selectedDateMillis) {
                         datePickerState.selectedDateMillis?.let { millis ->
                             val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
@@ -514,17 +554,18 @@ fun ProfileScreen(
                     }
 
 
-
-
-
                 }
                 // Save Button
                 Button(
                     onClick = {
                         // TODO: Xử lý lưu thông tin
                     },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp)
+                    modifier = Modifier
+                        .width(if (isTablet) 300.dp else 200.dp)
+                        .height(if (isTablet) 56.dp else 48.dp)
+                        .padding(top = 16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
+                    shape = RoundedCornerShape(50)
                 ) {
                     Text("Lưu thông tin")
                 }

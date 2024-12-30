@@ -90,7 +90,7 @@ fun OtpScreen(navController: NavHostController) {
                             value = otpValue[index], // Current OTP value
                             onValueChange = {
                                 //ToDo: Xử lý khi nhập mã OTP vào đây
-                                input ->
+                                    input ->
                                 if (input.text.length <= 1) { // Limit input to one character
                                     otpValue[index] =
                                         TextFieldValue(input.text, TextRange(input.text.length))

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -61,7 +62,7 @@ fun WelcomeScreen(
     val isTablet = configuration.screenWidthDp >= 600
     AppTheme { // Gói trong AppTheme để đảm bảo áp dụng theme
         Scaffold(
-            containerColor = MaterialTheme.colorScheme.background,
+            containerColor = MaterialTheme.colorScheme.primary,
         ) {
             Column(
                 modifier = Modifier
@@ -95,7 +96,9 @@ fun WelcomeScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(horizontal =if (isTablet) 32.dp else 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Button(
@@ -105,8 +108,10 @@ fun WelcomeScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onPrimary),
                         shape = RoundedCornerShape(50),
                         modifier = Modifier
+                            .weight(1f)
                             .width(if (isTablet) 300.dp else 200.dp)
                             .height(if (isTablet) 56.dp else 48.dp)
+
                     ) {
                         Text(
                             text = "Đăng nhập",
@@ -123,6 +128,7 @@ fun WelcomeScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onPrimary),
                         shape = RoundedCornerShape(50),
                         modifier = Modifier
+                            .weight(1f)
                             .width(if (isTablet) 300.dp else 200.dp)
                             .height(if (isTablet) 56.dp else 48.dp)
                     ) {
