@@ -25,7 +25,6 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -68,20 +67,17 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
  * Ngày viết: 3/12/2024
  * Lần cập nhật cuối: 9/12/2024
  * -----------------------------------------
- * Input:
+ * @param navController Đối tượng điều khiển điều hướng.
  *
- * Output: Scaffold
+ * @return Scaffold chứa giao diện màn hình Danh sách Thiết bị
  *
  * ---------------------------------------
- */
-
-/**
- * Sủa lại phần giao diện cho thiết bị tablet
+ * Nội dung cập nhật: Sủa lại phần giao diện
  * ---------------------------
- * Lần cập nhật 9/12/2024
+ * Lần cập nhật 30/12/2024
+ * Người cập nhật: Phạm Anh Tuấn
  * ---------------------------
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeviceScreen(
     navController: NavHostController
