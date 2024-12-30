@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import java.time.LocalTime
 
@@ -76,11 +77,11 @@ fun Header(
     type: String = "Home",
     title: String = "",
     username: String = "Username",
-    onNotificationClick: () -> Unit = {}
 ) {
     when (type) {
-        "Home" -> HomeHeader(navController, username, onNotificationClick)
-        "Back" -> BackHeader(navController, title, onNotificationClick)
+        "Home" -> HomeHeader(navController, username)
+        "Notification" -> NotificationHeader(navController, title)
+        "Back" -> BackHeader(navController, title)
     }
 }
 
@@ -92,7 +93,6 @@ fun Header(
  * Ngày cập nhật gần nhất: 13/12/2024
  * -----------------------------------------
  * @param title: Tiêu đề của Header
- * @param onNotificationClick: Hàm xử lý khi click vào nút Notification
  * @return TopAppBar chứa thông tin Header
  * ---------------------------------------
  */
@@ -101,7 +101,7 @@ fun Header(
 fun BackHeader(
     navController: NavHostController,
     title: String,
-    onNotificationClick: () -> Unit
+
 ) {
     AppTheme {
         TopAppBar(
@@ -134,7 +134,10 @@ fun BackHeader(
                 RoundedIconButton(
                     icon = Icons.Filled.Notifications,
                     description = "Notifications",
-                    onClick = onNotificationClick
+                    onClick = {
+                        //Todo: Lấy thông báo từ server
+                        navController.navigate(Screens.AllNotifications.route)
+                    }
                 )
             }
         )
@@ -149,14 +152,13 @@ fun BackHeader(
  * Ngày cập nhật gần nhất: 13/12/2024
  * -----------------------------------------
  * @param username: Tên người dùng
- * @param onNotificationClick: Hàm xử lý khi click vào nút Notification
  * @return TopAppBar chứa thông tin Header
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeHeader(
     navController: NavHostController,
-    username: String, onNotificationClick: () -> Unit
+    username: String,
 ) {
     AppTheme {
         TopAppBar(
@@ -184,7 +186,10 @@ fun HomeHeader(
                 RoundedIconButton(
                     icon = Icons.Filled.Notifications,
                     description = "Notifications",
-                    onClick = onNotificationClick
+                    onClick = {
+                        //Todo: Lấy thông báo từ server
+                        navController.navigate(Screens.AllNotifications.route)
+                    }
                 )
             }
         )
@@ -206,6 +211,43 @@ fun RoundedIconButton(icon: ImageVector, description: String, onClick: () -> Uni
             tint = MaterialTheme.colorScheme.primary
         )
     }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NotificationHeader(
+    navController: NavHostController,
+    title: String
+) {
+    AppTheme {
+        TopAppBar(
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primary
+            ),
+            title = {
+                Text(
+                    text = title,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            },
+            navigationIcon = {
+                RoundedIconButton(
+                    icon = Icons.AutoMirrored.Filled.ArrowBack,
+                    description = "Back",
+                    onClick = {
+                        // Mimic Facebook-like back navigation
+                        val canGoBack = navController.previousBackStackEntry != null
+                        if (canGoBack) {
+                            // Custom back navigation that doesn't clear the entire stack
+                            navController.navigateUp()
+                        }
+                    }
+                )
+            },
+        )
     }
 }
 

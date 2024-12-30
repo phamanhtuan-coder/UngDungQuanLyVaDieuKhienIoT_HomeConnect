@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.AccessPointConnectionScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.add_device.AddDeviceScreen
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.all_notifications.NotificationScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.DeviceScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.DeviceDetailScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.home.HomeScreen
@@ -94,6 +95,12 @@ fun NavigationGraph(
             //Add Device Screen
             composable(Screens.AddDevice.route) {
                 AddDeviceScreen(navController)
+            }
+
+            //All Notifications Screen
+            //Todo: Lấy dữ liệu thông báo từ server
+            composable(Screens.AllNotifications.route) {
+                NotificationScreen(navController, listOf())
             }
 
             // Todo:... other nested graphs (devices, profile, settings) ...
