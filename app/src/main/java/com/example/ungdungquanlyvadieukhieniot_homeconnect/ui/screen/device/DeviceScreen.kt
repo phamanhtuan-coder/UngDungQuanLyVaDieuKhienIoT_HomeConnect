@@ -103,7 +103,7 @@ fun DeviceScreen(
                 Header(
                     navController = navController,
                     type = "Back",
-                    title = "Trang cá nhân"
+                    title = "Danh sách thiết bị"
                 )
 
             },
