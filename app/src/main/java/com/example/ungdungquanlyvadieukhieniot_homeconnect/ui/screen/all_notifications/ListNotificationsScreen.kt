@@ -20,24 +20,27 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 
+//Todo: Bỏ các object này để làm isTablet
 private object NotificationStyle {
     val cardPadding = 8.dp
     val cardElevation = 4.dp
@@ -49,17 +52,9 @@ private object NotificationStyle {
     val buttonPadding = 16.dp
     val noNoticeIconSize = 100.dp
     val textPadding = 8.dp
-    val buttonHeight = 48.dp
 }
 
-// Màu sắc
-private object NotificationColors {
-    val backgroundColor = Color.White
-    val readIconColor = Color.Green
-    val notificationIconColor = Color.White
-    val unreadIconBackground = Color(0xFFE74C3C)
-    val grayTextColor = Color.Gray
-}
+
 
 /** Giao diện màn hình Thông Báo (ListNotificationsScreen)
  * -----------------------------------------
@@ -79,66 +74,71 @@ fun NotificationScreen(
     navController: NavHostController,
     notifications: List<Notification>
 ) {
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        containerColor = Color.LightGray,
-        topBar = {
 
-        },
-        bottomBar = {
-
-        },
-        content = { innerPadding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            ) {
-                if (notifications.isEmpty()) {
-                    EmptyNotificationScreen()
-                } else {
-                    NotificationList(notifications)
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            containerColor = colorScheme.background,
+            topBar = {
+                Header(
+                    navController = navController,
+                    type = "Back",
+                    title = "Danh sách thông báo"
+                )
+            },
+            bottomBar = {
+                MenuBottom(navController)
+            },
+            content = { innerPadding ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                ) {
+                    if (notifications.isEmpty()) {
+                        EmptyNotificationScreen()
+                    } else {
+                        NotificationList(notifications)
+                    }
                 }
             }
-        }
-    )
+        )
+    }
 }
 
 // Màn hình khi không có thông báo
 @Composable
 fun EmptyNotificationScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(NotificationStyle.buttonPadding),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Icon(
-            imageVector = Icons.Default.Notifications,
-            contentDescription = "Không có thông báo",
-            tint = NotificationColors.grayTextColor,
-            modifier = Modifier.size(NotificationStyle.noNoticeIconSize)
-        )
-        Spacer(modifier = Modifier.height(NotificationStyle.textPadding))
-        Text(
-            text = "Không có thông báo ngay bây giờ!",
-            color = NotificationColors.grayTextColor,
-            fontSize = NotificationStyle.titleFontSize,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(NotificationStyle.textPadding))
-        Text(
-            text = "Bạn đã cập nhật!",
-            color = NotificationColors.grayTextColor,
-            fontSize = NotificationStyle.descriptionFontSize
-        )
-        Spacer(modifier = Modifier.height(NotificationStyle.spacerSize))
-        Button(
-            onClick = { /* Navigate */ },
-            modifier = Modifier.height(NotificationStyle.buttonHeight)
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(NotificationStyle.buttonPadding),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Text("Xem trang tổng quan")
+            Icon(
+                imageVector = Icons.Default.Notifications,
+                contentDescription = "Không có thông báo",
+                tint = colorScheme.primary,
+                modifier = Modifier.size(NotificationStyle.noNoticeIconSize)
+            )
+            Spacer(modifier = Modifier.height(NotificationStyle.textPadding))
+            Text(
+                text = "Không có thông báo ngay bây giờ!",
+                color = colorScheme.primary,
+                fontSize = NotificationStyle.titleFontSize,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(NotificationStyle.textPadding))
+            Text(
+                text = "Hãy quay trở lại sau nhé!",
+                color = colorScheme.primary,
+                fontSize = NotificationStyle.descriptionFontSize
+            )
+
         }
     }
 }
@@ -157,63 +157,66 @@ fun NotificationList(notifications: List<Notification>) {
 // Card cho từng thông báo
 @Composable
 fun NotificationCard(notification: Notification) {
-    Card(
-        modifier = Modifier
-            .width(500.dp)
-            .padding(NotificationStyle.cardPadding)
-            .clickable { /* Handle click */ },
-        elevation = CardDefaults.cardElevation(NotificationStyle.cardElevation),
-        shape = RoundedCornerShape(NotificationStyle.cardCornerRadius),
-        colors = CardDefaults.cardColors(NotificationColors.backgroundColor)
-    ) {
-        Row(
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        Card(
             modifier = Modifier
-                .padding(NotificationStyle.spacerSize)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+                .width(500.dp)
+                .padding(NotificationStyle.cardPadding)
+                .clickable { /* Handle click */ },
+            elevation = CardDefaults.cardElevation(NotificationStyle.cardElevation),
+            shape = RoundedCornerShape(NotificationStyle.cardCornerRadius),
+            colors = CardDefaults.cardColors(colorScheme.primary)
         ) {
-            // Icon thông báo
-            Box(
+            Row(
                 modifier = Modifier
-                    .size(NotificationStyle.iconSize)
-                    .background(NotificationColors.unreadIconBackground, CircleShape),
-                contentAlignment = Alignment.Center
+                    .padding(NotificationStyle.spacerSize)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Default.Notifications,
-                    contentDescription = "Notification Icon",
-                    tint = NotificationColors.notificationIconColor
-                )
-            }
-            Spacer(modifier = Modifier.width(NotificationStyle.spacerSize))
+                // Icon thông báo
+                Box(
+                    modifier = Modifier
+                        .size(NotificationStyle.iconSize)
+                        .background(colorScheme.onPrimary, CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Notifications,
+                        contentDescription = "Notification Icon",
+                        tint = colorScheme.primary,
+                    )
+                }
+                Spacer(modifier = Modifier.width(NotificationStyle.spacerSize))
 
-            // Nội dung thông báo
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = notification.title,
-                    fontSize = NotificationStyle.titleFontSize,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = notification.description,
-                    fontSize = NotificationStyle.descriptionFontSize,
-                    color = NotificationColors.grayTextColor
-                )
-            }
+                // Nội dung thông báo
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = notification.title,
+                        fontSize = NotificationStyle.titleFontSize,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = notification.description,
+                        fontSize = NotificationStyle.descriptionFontSize,
+                        color = colorScheme.onPrimary,
+                    )
+                }
 
-            // Icon trạng thái đã đọc
-            if (notification.isRead) {
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = "Đã đọc",
-                    tint = NotificationColors.readIconColor
-                )
+                // Icon trạng thái đã đọc
+                if (notification.isRead) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Đã đọc",
+                        tint = colorScheme.onPrimary,
+                    )
+                }
             }
         }
     }
 }
 
-// Dữ liệu thông báo
+// Dữ liệu giả thông báo Todo: Thay bằng Viwemodel
 data class Notification(
     val title: String,
     val description: String,
