@@ -53,6 +53,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
@@ -68,38 +70,31 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.Weat
  * Ngày viết: 17/12/2024
  * Lần cập nhật cuối: 17/12/2024
  * -----------------------------------------
- * Input:
- *
- * Output: Scaffold
+ * @param navController: Đối tượng điều khiển dẫn hướng trong Compose Navigation
+ * @return Scaffold: Giao diện màn hình thêm thiết bị
  *
  * ---------------------------------------
  */
-@Preview
 @Composable
-fun AddDeviceScreens() {
-    return Scaffold(
+fun AddDeviceScreens(
+    navController: NavHostController
+) {
+
+    Scaffold(
         containerColor = Color.LightGray,
         topBar = {
             /*
             * Hiển thị Header
              */
-            Header()
+
         },
         bottomBar = {
             /*
             * Hiển thị Thanh Menu dưới cùng
              */
-            MenuBottom()
+
         },
-        floatingActionButton = {
-            /*
-            * Hiển thị Nút Home
-             */
-            NutHome()
-        },
-        floatingActionButtonPosition = FabPosition.Center,
         content = { innerPadding ->
-            var widgetWidth by remember { mutableStateOf(0) }
             Box (
                 modifier = Modifier
                     .fillMaxSize()
@@ -191,15 +186,6 @@ fun AddDeviceScreens() {
                                 modifier = Modifier.fillMaxSize() // Chiếm toàn bộ kích thước của Box
                             ) {
 
-
-                                // Logo ứng dụng
-                                Image(
-                                    painter = painterResource(id = R.drawable.logo), // Hình ảnh logo
-                                    contentDescription = "Logo ứng dụng", // Mô tả cho logo
-                                    modifier = Modifier.size(150.dp) // Kích thước logo (100x100dp)
-                                )
-                                Spacer(modifier = Modifier.height(16.dp)) // Khoảng cách dưới logo
-
                                 // Cột chứa các ô nhập liệu và nút gửi yêu cầu
                                 Column(
                                     modifier = Modifier
@@ -208,7 +194,9 @@ fun AddDeviceScreens() {
                                     // Ô nhập ID thiết bị
                                     OutlinedTextField(
                                         value = "", // Giá trị hiện tại (để trống)
-                                        onValueChange = {}, // Hàm xử lý khi nhập liệu (chưa triển khai)
+                                        onValueChange = {
+                                            //Todo: Xử lý thay đổi giá trị
+                                        }, // Hàm xử lý khi nhập liệu (chưa triển khai)
                                         leadingIcon = { // Biểu tượng ở bên trái ô nhập liệu
                                             Icon(Icons.Filled.Person, contentDescription = null) // Icon người dùng
                                         },
@@ -220,7 +208,9 @@ fun AddDeviceScreens() {
                                     // Ô nhập Email tài khoản
                                     OutlinedTextField(
                                         value = "", // Giá trị hiện tại (để trống)
-                                        onValueChange = {}, // Hàm xử lý khi nhập liệu (chưa triển khai)
+                                        onValueChange = {
+                                            //todo: Xử lý thay đổi giá trị
+                                        }, // Hàm xử lý khi nhập liệu (chưa triển khai)
                                         leadingIcon = { // Biểu tượng ở bên trái ô nhập liệu
                                             Icon(Icons.Default.Devices, contentDescription = null) // Icon email
                                         },
@@ -250,11 +240,11 @@ fun AddDeviceScreens() {
 
                                     // Nút gửi yêu cầu
                                     Button(
-                                        onClick = { /* TODO */ }, // Hàm xử lý khi nhấn nút (chưa triển khai)
+                                        onClick = { /* TODO: xử lý thêm thiết bị */ }, // Hàm xử lý khi nhấn nút (chưa triển khai)
                                         colors = ButtonDefaults.buttonColors(Color(0xFFFF9800)), // Màu nền nút cam
                                         modifier = Modifier.fillMaxWidth() // Chiều rộng đầy đủ
                                     ) {
-                                        Text("GỬI YÊU CẦU", color = Color.White) // Nội dung và màu chữ của nút
+                                        Text("Gửi yêu cầu", color = Color.White) // Nội dung và màu chữ của nút
                                     }
                                 }
                             }
@@ -264,4 +254,10 @@ fun AddDeviceScreens() {
             }
         }
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DefaultPreview() {
+    AddDeviceScreens(navController = rememberNavController())
 }
