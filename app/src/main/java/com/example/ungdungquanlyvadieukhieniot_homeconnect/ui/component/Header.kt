@@ -61,7 +61,6 @@ fun getGreeting(): String {
  * @param type: Loại Header (Home hoặc Back)
  * @param title: Tiêu đề của Header
  * @param username: Tên người dùng
- * @param onNotificationClick: Hàm xử lý khi click vào nút Notification
  *
  * @return TopAppBar chứa thông tin Header
  * ---------------------------------------
