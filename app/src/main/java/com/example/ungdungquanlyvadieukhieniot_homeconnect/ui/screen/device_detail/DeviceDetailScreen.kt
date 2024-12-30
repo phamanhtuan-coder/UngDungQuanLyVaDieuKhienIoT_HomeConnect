@@ -79,6 +79,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -423,7 +424,8 @@ fun DeviceDetailPhoneScreen(
                                                 }
                                                 Button(
                                                     onClick = {
-
+                                                        //Todo: Xử lý khi nhấn nút Wifi
+                                                        navController.navigate(Screens.AccessPoint.route)
                                                     },
                                                     modifier = Modifier
                                                         .size(24.dp), // Kích thước tổng thể của Button
@@ -943,7 +945,8 @@ fun DeviceDetailTabletScreen(navController: NavHostController) {
                                                 }
                                                 Button(
                                                     onClick = {
-                                                        //Todo: Màn hình kết nối wifi
+                                                        //Todo: Xử lý khi nhấn nút Wifi
+                                                        navController.navigate(Screens.AccessPoint.route)
                                                     },
                                                     modifier = Modifier
                                                         .size(36.dp), // Kích thước tổng thể của Button

@@ -18,6 +18,7 @@ sealed class Screens(
     object AddDevice: Screens("add_device")
     object Devices: Screens("devices")
     object DeviceDetail : Screens("device_detail")
+    object AccessPoint: Screens("access_point")
 
     object Settings: Screens("settings")
     object Dashboard: Screens("dashboard")
