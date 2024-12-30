@@ -1,17 +1,12 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device
 
-import android.R
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,7 +15,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
@@ -30,49 +24,43 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FabPosition
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.HouseSelection
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 
@@ -148,7 +136,7 @@ fun DeviceScreen(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(color =colorScheme.background)
+                                .background(color = colorScheme.background)
                                 .height(150.dp)
                         ) {
                             // Hộp màu xanh dương
@@ -260,9 +248,9 @@ fun DeviceScreen(
                                     .wrapContentSize(),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                SmartCard(isTablet,false)
+                                SmartCard(isTablet, false)
                                 SmartCard(isTablet)
-                                SmartCard(isTablet,false)
+                                SmartCard(isTablet, false)
                                 SmartCard(isTablet)
                             }
                         }
@@ -355,8 +343,8 @@ fun WeatherInfoItem(icon: String?, description: String, temperature: String?) {
 @Composable
 fun SmartCard(isTablet: Boolean, switchState: Boolean = true) {
     val endPadding = 32.dp
-AppTheme {
-    val colorScheme = MaterialTheme.colorScheme
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
     Card(
         modifier = Modifier
             .width(IntrinsicSize.Max)
@@ -374,11 +362,22 @@ AppTheme {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column {
-                    Text(text = "Smart Lamp", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = colorScheme.onPrimary)
-                    Text(text = "Dining Room | Tue Thu", fontSize = 12.sp, color = colorScheme.onSecondary)
+                    Text(
+                        text = "Smart Lamp",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        color = colorScheme.onPrimary
+                    )
+                    Text(
+                        text = "Dining Room | Tue Thu",
+                        fontSize = 12.sp,
+                        color = colorScheme.onSecondary
+                    )
                 }
                 Box(
-                    modifier = Modifier.padding(end = 8.dp).size(40.dp),
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .size(40.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Switch(
@@ -388,7 +387,9 @@ AppTheme {
                             Icon(
                                 imageVector = if (switchState) Icons.Filled.Check else Icons.Filled.Close,
                                 contentDescription = "On/Off Switch",
-                                tint = if (switchState) colorScheme.onPrimary else colorScheme.onSecondary.copy(alpha = 0.8f)
+                                tint = if (switchState) colorScheme.onPrimary else colorScheme.onSecondary.copy(
+                                    alpha = 0.8f
+                                )
                             )
                         },
                         colors = SwitchDefaults.colors(
@@ -484,7 +485,12 @@ fun TimeInfo(label: String, time: String) {
             horizontalAlignment = Alignment.End
         ) {
             Text(text = label, fontSize = 12.sp, color = colorScheme.onPrimary)
-            Text(text = time, fontWeight = FontWeight.Bold, fontSize = 16.sp,color = colorScheme.onPrimary)
+            Text(
+                text = time,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                color = colorScheme.onPrimary
+            )
         }
     }
 }
@@ -518,7 +524,7 @@ fun IconButtonBox(icon: String) {
     }
 }
 
-@Preview (showBackground = true, showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun DeviceScreenPreview() {
     DeviceScreen(navController = rememberNavController())
