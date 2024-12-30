@@ -18,13 +18,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -46,7 +50,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -86,12 +89,9 @@ fun DeviceScreen(
         val configuration = LocalConfiguration.current
         val screenWidthDp = configuration.screenWidthDp.dp
         val isTablet = screenWidthDp >= 600.dp
-        var selectedTabIndex by remember { mutableStateOf(0) }
+//        var selectedTabIndex by remember { mutableStateOf(0) }
 
         val colorScheme = MaterialTheme.colorScheme
-
-        // Lấy mật độ để tính px
-        val cornerRadiusPx = with(LocalDensity.current) { 16.dp.toPx() }
 
         Scaffold(
             containerColor = colorScheme.background,
@@ -113,6 +113,25 @@ fun DeviceScreen(
              */
                 MenuBottom(navController)
             },
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = {
+                        //ToDo: Chuyển tới trang thêm thiết bị
+                        navController.navigate("add_device")
+                    },
+                    content = {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = "Add Device",
+                            tint = colorScheme.primary
+                        )
+                    },
+                    containerColor = colorScheme.onPrimary,
+                    contentColor = colorScheme.primary,
+                    shape = CircleShape
+                )
+            },
+            floatingActionButtonPosition = FabPosition.End,
             content = { innerPadding ->
                 var widgetWidth by remember { mutableStateOf(0) }
                 Box(
@@ -137,7 +156,7 @@ fun DeviceScreen(
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .offset(y = -9.dp)
+                                    .offset(y = (-9).dp)
                                     .height(110.dp)
                                     .background(
                                         color = colorScheme.primary,
@@ -213,7 +232,7 @@ fun DeviceScreen(
                                 modifier = Modifier
                                     .size(24.dp) // Kích thước Box
                                     .background(
-                                        color = Color.DarkGray,
+                                        color = colorScheme.primary,
                                         shape = RoundedCornerShape(4.dp)
                                     ), // Màu nền và góc bo
                                 contentAlignment = Alignment.Center // Căn Text nằm giữa Box
