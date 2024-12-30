@@ -81,7 +81,7 @@ import java.util.Locale
 fun ProfileScreen(
     navController: NavHostController
 ) {
-   AppTheme {
+    AppTheme {
         val configuration = LocalConfiguration.current
         val isTablet = configuration.screenWidthDp >= 600
         val colorScheme = MaterialTheme.colorScheme

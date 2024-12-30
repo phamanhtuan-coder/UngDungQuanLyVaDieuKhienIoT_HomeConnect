@@ -96,9 +96,13 @@ fun WelcomeScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Row(
-                    modifier = Modifier.fillMaxWidth()
-                        .padding(horizontal =if (isTablet) 32.dp else 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = if (isTablet) 32.dp else 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(
+                        16.dp,
+                        Alignment.CenterHorizontally
+                    ),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Button(
