@@ -50,11 +50,14 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.setValue
@@ -65,9 +68,12 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.HouseSelection
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 
 /** Giao diện màn hình Device Screen
@@ -94,212 +100,44 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
 fun DeviceScreen(
     navController: NavHostController
 ) {
-    val configuration = LocalConfiguration.current
-    val screenWidthDp = configuration.screenWidthDp.dp
-    val isTablet = screenWidthDp >= 600.dp
-    var selectedTabIndex by remember { mutableStateOf(0) }
+    AppTheme {
+        val configuration = LocalConfiguration.current
+        val screenWidthDp = configuration.screenWidthDp.dp
+        val isTablet = screenWidthDp >= 600.dp
+        var selectedTabIndex by remember { mutableStateOf(0) }
 
-    // Lấy mật độ để tính px
-    val cornerRadiusPx = with(LocalDensity.current) { 16.dp.toPx() }
+        val colorScheme = MaterialTheme.colorScheme
 
-    return Scaffold(
-        containerColor = Color.LightGray,
-        topBar = {
-            /*
+        // Lấy mật độ để tính px
+        val cornerRadiusPx = with(LocalDensity.current) { 16.dp.toPx() }
+
+        Scaffold(
+            containerColor = colorScheme.background,
+            modifier = Modifier.fillMaxSize(),
+            topBar = {
+                /*
             * Hiển thị Header
              */
+                Header(
+                    navController = navController,
+                    type = "Back",
+                    title = "Trang cá nhân"
+                )
 
-        },
-        bottomBar = {
-            /*
+            },
+            bottomBar = {
+                /*
             * Hiển thị Thanh Menu dưới cùng
              */
-            MenuBottom(navController)
-        },
-        floatingActionButton = {
-            /*
-            * Hiển thị Nút Home
-             */
-        },
-        content = { innerPadding ->
-            val paddingInPx = with(LocalDensity.current) {
-                innerPadding.calculateTopPadding().roundToPx()
-            }
-            if (isTablet) {
-                Box (
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) {
-                    Column (
-                        modifier = Modifier
-                            .fillMaxSize() // Đảm bảo chiếm toàn bộ không gian
-                            .imePadding() // Tự động thêm khoảng trống khi bàn phím xuất hiện
-                            .verticalScroll(rememberScrollState()) // Cho phép cuộn
-                            .padding(innerPadding)
-                    ) {
-                        // Nội dung bên dưới
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(color = Color.LightGray)
-                                .height(150.dp)
-                        ) {
-                            // Hộp màu xanh dương
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .offset(y = -9.dp)
-                                    .height(110.dp)
-                                    .background(color = Color.Blue, shape = RoundedCornerShape(bottomStartPercent = 60))
-                                    .zIndex(1f)
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.Center,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Row(
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .fillMaxWidth()
-                                            .padding(start = 20.dp, top = 10.dp),
-                                        horizontalArrangement = Arrangement.SpaceEvenly,
-                                        verticalAlignment = Alignment.Bottom
-                                    ) {
-                                        WeatherInfoItem(
-                                            icon = "🌤", // Biểu tượng thời tiết
-                                            description = "Sunny",
-                                            temperature = null
-                                        )
-                                        WeatherInfoItem(
-                                            icon = null,
-                                            description = "Temp Outdoor",
-                                            temperature = "28°C"
-                                        )
-                                        WeatherInfoItem(
-                                            icon = null,
-                                            description = "Temp Indoor",
-                                            temperature = "22°C"
-                                        )
-                                    }
-                                    OutlinedTextField(
-                                        value = "", // Giá trị mặc định
-                                        onValueChange = { /* Read-only TextField, so no updates here */ },
-                                        placeholder = { Text("Địa chỉ", fontWeight = FontWeight.Bold, fontSize = 20.sp) },
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .padding(start = 20.dp, top = 16.dp, end = 16.dp)
-                                            .clickable { /* Handle dropdown expansion */ },
-                                        readOnly = true, // Không cho phép nhập tay
-                                        trailingIcon = {
-                                            Icon(
-                                                imageVector = Icons.Default.KeyboardArrowDown,
-                                                contentDescription = null,
-                                                modifier = Modifier.size(36.dp),
-                                                tint = Color.Blue
-                                            )
-                                        },
-                                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                                            containerColor = Color.LightGray,
-                                            focusedBorderColor = Color.LightGray, // Màu viền khi được focus
-                                            unfocusedBorderColor = Color.Black, // Màu viền khi không được focus
-                                            disabledBorderColor = Color.LightGray // Màu viền khi bị disabled
-                                        ),
-                                        shape = RoundedCornerShape(12.dp)
-                                    )
-
-                                }
-                            }
-                            // Hộp màu xanh lá cây với góc lõm
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .offset(y = 1.dp)
-                                    .padding(top = 100.dp)
-                                    .width(40.dp)
-                                    .height(40.dp)
-                            ) {
-                                // Box màu vàng (ở dưới)
-                                Box(
-                                    modifier = Modifier
-                                        .width(40.dp)
-                                        .height(40.dp)
-                                        .align(Alignment.TopEnd)
-                                        .background(color = Color.Blue)
-                                        .zIndex(1f) // Z-index thấp hơn
-                                )
-
-                                // Box màu xanh lá cây (ở trên)
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(color = Color.LightGray, shape = RoundedCornerShape(topEndPercent = 100))
-                                        .width(40.dp)
-                                        .height(40.dp)
-                                        .zIndex(2f) // Z-index cao hơn
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .clip(RoundedCornerShape(topEndPercent = 100)) // Clip nội dung ScrollableTabRow
-                                    ) {
-                                        CustomScrollableTabRow() // Đặt ScrollableTabRow vào đây
-                                    }
-                                }
-                            }
-                        }
-                        Row(
-                            modifier = Modifier
-                                .padding(8.dp),
-                            verticalAlignment = Alignment.CenterVertically // Căn giữa theo chiều dọc
-                        ) {
-                            Text(
-                                text = "Số lượng thiết bị:",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black,
-                                modifier = Modifier.padding(end = 4.dp) // Thêm khoảng cách giữa Text và Box
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .size(24.dp) // Kích thước Box
-                                    .background(color = Color.DarkGray, shape = RoundedCornerShape(4.dp)), // Màu nền và góc bo
-                                contentAlignment = Alignment.Center // Căn Text nằm giữa Box
-                            ) {
-                                Text(
-                                    text = "4",
-                                    color = Color.White, // Màu chữ
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(color = Color.LightGray),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Column (
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                SmartCard(isTablet)
-                                SmartCard(isTablet)
-                                SmartCard(isTablet)
-                                SmartCard(isTablet)
-                            }
-                        }
-                    }
-                }
-            }
-            else {
+                MenuBottom(navController)
+            },
+            content = { innerPadding ->
                 var widgetWidth by remember { mutableStateOf(0) }
-                Box (
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
                 ) {
-                    Column (
+                    Column(
                         modifier = Modifier
                             .fillMaxSize() // Đảm bảo chiếm toàn bộ không gian
                             .imePadding() // Tự động thêm khoảng trống khi bàn phím xuất hiện
@@ -310,7 +148,7 @@ fun DeviceScreen(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(color = Color.LightGray)
+                                .background(color =colorScheme.background)
                                 .height(150.dp)
                         ) {
                             // Hộp màu xanh dương
@@ -319,42 +157,25 @@ fun DeviceScreen(
                                     .fillMaxWidth()
                                     .offset(y = -9.dp)
                                     .height(110.dp)
-                                    .background(color = Color.Blue, shape = RoundedCornerShape(bottomStartPercent = 60))
-                                    .zIndex(1f)
+                                    .background(
+                                        color = colorScheme.primary,
+                                        shape = RoundedCornerShape(bottomStartPercent = 60)
+                                    )
+                                    .zIndex(1f),
+                                contentAlignment = Alignment.Center
                             ) {
-                                Box (
+                                Box(
                                     modifier = Modifier
                                         .width(300.dp)
                                         .align(Alignment.Center)
-                                ){
-                                    OutlinedTextField(
-                                        value = "", // Giá trị mặc định
-                                        onValueChange = { /* Read-only TextField, so no updates here */ },
-                                        placeholder = { Text("tp.Hồ Chí Mính", fontWeight = FontWeight.Bold, fontSize = 20.sp) },
-                                        modifier = Modifier
-                                            .width(widgetWidth.dp)
-                                            .clickable { /* Handle dropdown expansion */ },
-                                        readOnly = true, // Không cho phép nhập tay
-                                        trailingIcon = {
-                                            Icon(
-                                                imageVector = Icons.Default.KeyboardArrowDown,
-                                                contentDescription = null,
-                                                modifier = Modifier.size(36.dp),
-                                                tint = Color.Blue
-                                            )
-                                        },
-                                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                                            containerColor = Color.LightGray,
-                                            focusedBorderColor = Color.LightGray, // Màu viền khi được focus
-                                            unfocusedBorderColor = Color.Black, // Màu viền khi không được focus
-                                            disabledBorderColor = Color.LightGray // Màu viền khi bị disabled
-                                        ),
-                                        shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    HouseSelection(
+                                        houses = listOf("House 1", "House 2", "House 3"),
+                                        onManageHouseClicked = { /* TODO: Navigate */ }
                                     )
-                                    // Dropdown menu logic tương tự ở đây
                                 }
                             }
-                            // Hộp màu xanh lá cây với góc lõm
+                            // Hộp màu xanh với góc lõm
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -368,15 +189,18 @@ fun DeviceScreen(
                                         .width(40.dp)
                                         .height(40.dp)
                                         .align(Alignment.TopEnd)
-                                        .background(color = Color.Blue)
+                                        .background(color = colorScheme.primary)
                                         .zIndex(1f) // Z-index thấp hơn
                                 )
 
-                                // Box màu xanh lá cây (ở trên)
+
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .background(color = Color.LightGray, shape = RoundedCornerShape(topEndPercent = 100))
+                                        .background(
+                                            color = colorScheme.background,
+                                            shape = RoundedCornerShape(topEndPercent = 100)
+                                        )
                                         .width(40.dp)
                                         .height(40.dp)
                                         .zIndex(2f) // Z-index cao hơn
@@ -400,18 +224,21 @@ fun DeviceScreen(
                                 text = "Số lượng thiết bị:",
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.Black,
+                                color = colorScheme.onBackground,
                                 modifier = Modifier.padding(end = 4.dp) // Thêm khoảng cách giữa Text và Box
                             )
                             Box(
                                 modifier = Modifier
                                     .size(24.dp) // Kích thước Box
-                                    .background(color = Color.DarkGray, shape = RoundedCornerShape(4.dp)), // Màu nền và góc bo
+                                    .background(
+                                        color = Color.DarkGray,
+                                        shape = RoundedCornerShape(4.dp)
+                                    ), // Màu nền và góc bo
                                 contentAlignment = Alignment.Center // Căn Text nằm giữa Box
                             ) {
                                 Text(
                                     text = "4",
-                                    color = Color.White, // Màu chữ
+                                    color = colorScheme.onPrimary, // Màu chữ
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -420,10 +247,11 @@ fun DeviceScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(color = Color.LightGray),
+                                .background(color = colorScheme.background),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Column (
+                            //ToDo: Đổi thành Lazy Collumn
+                            Column(
                                 modifier = Modifier
                                     .onGloballyPositioned { coordinates ->
                                         // Lấy Width của Widget
@@ -432,51 +260,56 @@ fun DeviceScreen(
                                     .wrapContentSize(),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
+                                SmartCard(isTablet,false)
                                 SmartCard(isTablet)
-                                SmartCard(isTablet)
-                                SmartCard(isTablet)
+                                SmartCard(isTablet,false)
                                 SmartCard(isTablet)
                             }
                         }
                     }
                 }
+
+
             }
-        }
-    )
+        )
+    }
+
 }
 
 @Composable
 fun CustomScrollableTabRow() {
     var selectedTabIndex by remember { mutableStateOf(0) }
 
-
-    ScrollableTabRow(
-        selectedTabIndex = selectedTabIndex,
-        edgePadding = 8.dp,
-        modifier = Modifier
-            .background(Color.LightGray, RoundedCornerShape(16.dp)), // Nền và bo góc
-        containerColor = Color.LightGray, // Màu nền bên trong TabRow
-        indicator = { tabPositions ->
-            TabRowDefaults.Indicator(
-                Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
-                color = Color.Blue, // Màu con trỏ
-                height = 3.dp // Độ cao con trỏ
-            )
-        }
-    ) {
-        (1..10).forEach { index ->
-            Tab(
-                selected = selectedTabIndex == index - 1,
-                onClick = { selectedTabIndex = index - 1 },
-                text = {
-                    Text(
-                        "Tab $index",
-                        color = if (selectedTabIndex == index - 1) Color.Black else Color.Gray, // Đổi màu chữ
-                    )
-                },
-                selectedContentColor = Color.Black, // Màu khi được chọn
-                unselectedContentColor = Color.Gray // Màu khi không được chọn
-            )
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        ScrollableTabRow(
+            selectedTabIndex = selectedTabIndex,
+            edgePadding = 8.dp,
+            modifier = Modifier
+                .background(colorScheme.background, RoundedCornerShape(16.dp)), // Nền và bo góc
+            containerColor = colorScheme.background, // Màu nền bên trong TabRow
+            indicator = { tabPositions ->
+                SecondaryIndicator(
+                    modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+                    height = 3.dp, // Độ cao con trỏ
+                    color = colorScheme.primary // Màu con trỏ
+                )
+            }
+        ) {
+            (1..10).forEach { index ->
+                Tab(
+                    selected = selectedTabIndex == index - 1,
+                    onClick = { selectedTabIndex = index - 1 },
+                    text = {
+                        Text(
+                            "Tab $index",
+                            color = if (selectedTabIndex == index - 1) Color.Black else Color.Gray, // Đổi màu chữ
+                        )
+                    },
+                    selectedContentColor = colorScheme.onBackground, // Màu khi được chọn
+                    unselectedContentColor = colorScheme.onBackground // Màu khi không được chọn
+                )
+            }
         }
     }
 }
@@ -520,83 +353,98 @@ fun WeatherInfoItem(icon: String?, description: String, temperature: String?) {
 }
 
 @Composable
-fun SmartCard(isTablet: Boolean) {
+fun SmartCard(isTablet: Boolean, switchState: Boolean = true) {
     val endPadding = 32.dp
-
+AppTheme {
+    val colorScheme = MaterialTheme.colorScheme
     Card(
         modifier = Modifier
             .width(IntrinsicSize.Max)
             .padding(8.dp)
             .clip(RoundedCornerShape(16.dp)),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = colorScheme.primary),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Column(
             modifier = Modifier.padding(8.dp)
         ) {
-            HeaderRow()
-            Spacer(modifier = Modifier.height(8.dp))
-            ContentRow(isTablet, endPadding)
-        }
-    }
-
-}
-
-@Composable
-fun HeaderRow() {
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column {
-            Text(text = "Smart Lamp", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            Text(text = "Dining Room | Tue Thu", fontSize = 12.sp, color = Color.Gray)
-        }
-        Box(
-            modifier = Modifier.padding(end = 8.dp).size(40.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Switch(
-                checked = false,
-                onCheckedChange = {},
-                thumbContent = {
-                    Icon(
-                        imageVector = if (false) Icons.Filled.Check else Icons.Filled.Close,
-                        contentDescription = ""
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column {
+                    Text(text = "Smart Lamp", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = colorScheme.onPrimary)
+                    Text(text = "Dining Room | Tue Thu", fontSize = 12.sp, color = colorScheme.onSecondary)
+                }
+                Box(
+                    modifier = Modifier.padding(end = 8.dp).size(40.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Switch(
+                        checked = switchState,
+                        onCheckedChange = {},
+                        thumbContent = {
+                            Icon(
+                                imageVector = if (switchState) Icons.Filled.Check else Icons.Filled.Close,
+                                contentDescription = "On/Off Switch",
+                                tint = if (switchState) colorScheme.onPrimary else colorScheme.onSecondary.copy(alpha = 0.8f)
+                            )
+                        },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = colorScheme.primary,
+                            checkedTrackColor = colorScheme.onPrimary,
+                            uncheckedThumbColor = colorScheme.secondary,
+                            uncheckedTrackColor = colorScheme.onSecondary.copy(alpha = 0.8f),
+                        )
                     )
                 }
-            )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.wrapContentWidth()
+            ) {
+                DeviceInfoSection("8 pm", "8 am", endPadding)
+
+                if (isTablet) {
+                    ExtraInfoSection("Điện áp hoạt động", "5V", endPadding / 2)
+                    ExtraInfoSection("Dòng tiêu thụ", "20mA", endPadding / 2)
+                }
+
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    IconButtonBox("\uD83D\uDDD1")
+                    Spacer(modifier = Modifier.height(4.dp))
+                    IconButtonBox("\u270E")
+                }
+            }
         }
     }
 }
-
-@Composable
-fun ContentRow(isTablet: Boolean, endPadding: Dp) {
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.wrapContentWidth()
-    ) {
-        DeviceInfoSection("8 pm", "8 am", endPadding)
-
-        if (isTablet) {
-            ExtraInfoSection("Điện áp hoạt động", "5V", endPadding / 2)
-            ExtraInfoSection("Dòng tiêu thụ", "20mA", endPadding / 2)
-        }
-
-        ActionIcons()
-    }
 }
+
+
+
 
 @Composable
 fun DeviceInfoSection(fromTime: String, toTime: String, endPadding: Dp) {
-    Row(horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
-        IconBox("\uD83D\uDCA1", Color(0xFFFFE082))
-        TimeInfo("from", fromTime)
-        DividerLine(endPadding)
-        TimeInfo("to", toTime)
-        DividerLine(endPadding)
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        Row(
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconBox("\uD83D\uDCA1", colorScheme.background)
+            TimeInfo("from", fromTime)
+            DividerLine(endPadding)
+            TimeInfo("to", toTime)
+            DividerLine(endPadding)
+        }
     }
 }
 
@@ -613,18 +461,6 @@ fun ExtraInfoSection(label: String, value: String, endPadding: Dp) {
     DividerLine(endPadding)
 }
 
-@Composable
-fun ActionIcons() {
-    Column(
-        horizontalAlignment = Alignment.End,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        IconButtonBox("\uD83D\uDDD1")
-        Spacer(modifier = Modifier.height(4.dp))
-        IconButtonBox("\u270E")
-    }
-}
 
 @Composable
 fun IconBox(icon: String, color: Color) {
@@ -641,34 +477,49 @@ fun IconBox(icon: String, color: Color) {
 
 @Composable
 fun TimeInfo(label: String, time: String) {
-    Column(
-        modifier = Modifier.padding(end = 12.dp),
-        horizontalAlignment = Alignment.End
-    ) {
-        Text(text = label, fontSize = 12.sp, color = Color.Gray)
-        Text(text = time, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        Column(
+            modifier = Modifier.padding(end = 12.dp),
+            horizontalAlignment = Alignment.End
+        ) {
+            Text(text = label, fontSize = 12.sp, color = colorScheme.onPrimary)
+            Text(text = time, fontWeight = FontWeight.Bold, fontSize = 16.sp,color = colorScheme.onPrimary)
+        }
     }
 }
 
 @Composable
 fun DividerLine(endPadding: Dp) {
-    Box(
-        modifier = Modifier
-            .padding(end = endPadding)
-            .width(1.dp)
-            .height(50.dp)
-            .background(Color.Gray)
-    )
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        Box(
+            modifier = Modifier
+                .padding(end = endPadding)
+                .width(1.dp)
+                .height(50.dp)
+                .background(colorScheme.onSecondary)
+        )
+    }
 }
 
 @Composable
 fun IconButtonBox(icon: String) {
-    Box(
-        modifier = Modifier
-            .size(24.dp)
-            .background(Color.LightGray, RoundedCornerShape(4.dp)),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = icon, fontSize = 12.sp)
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        Box(
+            modifier = Modifier
+                .size(24.dp)
+                .background(colorScheme.background, RoundedCornerShape(4.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = icon, fontSize = 12.sp, color = colorScheme.onBackground)
+        }
     }
+}
+
+@Preview (showBackground = true, showSystemUi = true)
+@Composable
+fun DeviceScreenPreview() {
+    DeviceScreen(navController = rememberNavController())
 }

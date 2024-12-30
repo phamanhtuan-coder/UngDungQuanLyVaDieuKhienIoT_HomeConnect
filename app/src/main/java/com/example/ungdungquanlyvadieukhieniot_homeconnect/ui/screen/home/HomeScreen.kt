@@ -70,13 +70,6 @@ fun HomeScreen(
              */
             MenuBottom(navController)
         },
-        floatingActionButton = {
-            /*
-            * Hiển thị FAB action nếu coó
-             */
-
-        },
-        floatingActionButtonPosition = FabPosition.End,
         content = {
 
             Column(

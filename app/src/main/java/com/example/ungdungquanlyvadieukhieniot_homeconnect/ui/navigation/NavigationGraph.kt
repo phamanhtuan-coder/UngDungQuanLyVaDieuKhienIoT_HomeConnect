@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.DeviceScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.home.HomeScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.login.LoginScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.onboard_welcome.WelcomeScreen
@@ -65,6 +66,13 @@ fun NavigationGraph(
             navigation(startDestination = Screens.Profile.route, route = "profile_graph") {
                 composable(Screens.Profile.route) {
                     ProfileScreen(navController)
+                }
+            }
+
+            //Devices Screen
+            navigation(startDestination = Screens.Devices.route, route = "devices_graph") {
+                composable(Screens.Devices.route) {
+                    DeviceScreen(navController)
                 }
             }
 
