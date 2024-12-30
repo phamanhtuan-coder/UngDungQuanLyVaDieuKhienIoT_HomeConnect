@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -49,7 +48,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -248,10 +246,10 @@ fun DeviceScreen(
                                     .wrapContentSize(),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                SmartCard(isTablet, false)
-                                SmartCard(isTablet)
-                                SmartCard(isTablet, false)
-                                SmartCard(isTablet)
+                                SmartCard(isTablet, false, navController)
+                                SmartCard(isTablet, navController = navController)
+                                SmartCard(isTablet, false, navController)
+                                SmartCard(isTablet, navController = navController)
                             }
                         }
                     }
@@ -302,46 +300,9 @@ fun CustomScrollableTabRow() {
     }
 }
 
-@Composable
-fun WeatherInfoItem(icon: String?, description: String, temperature: String?) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally, // Căn giữa
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier.padding(horizontal = 8.dp)
-    ) {
-        icon?.let {
-            Text(
-                text = it,
-                fontSize = 20.sp, // Kích thước lớn cho biểu tượng
-                modifier = Modifier.padding(bottom = 4.dp)
-            )
-        }
-
-        temperature?.let {
-            Text(
-                text = it,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                modifier = Modifier.padding(top = 4.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        BasicText(
-            text = description,
-            style = TextStyle(
-                fontSize = 15.sp, // Nhỏ hơn cho mô tả
-                fontWeight = FontWeight.Normal,
-                color = Color.Gray
-            )
-        )
-    }
-}
 
 @Composable
-fun SmartCard(isTablet: Boolean, switchState: Boolean = true) {
+fun SmartCard(isTablet: Boolean, switchState: Boolean = true, navController: NavHostController) {
     val endPadding = 32.dp
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
@@ -351,7 +312,11 @@ fun SmartCard(isTablet: Boolean, switchState: Boolean = true) {
             .padding(8.dp)
             .clip(RoundedCornerShape(16.dp)),
         colors = CardDefaults.cardColors(containerColor = colorScheme.primary),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        onClick = {
+            //Todo: Xử lý chuyển tới trang chi tiết thiết bị
+            navController.navigate("device_detail")
+        }
     ) {
         Column(
             modifier = Modifier.padding(8.dp)
@@ -382,7 +347,9 @@ fun SmartCard(isTablet: Boolean, switchState: Boolean = true) {
                 ) {
                     Switch(
                         checked = switchState,
-                        onCheckedChange = {},
+                        onCheckedChange = {
+                            //Todo: Xử lý tắt mở thiết bị
+                        },
                         thumbContent = {
                             Icon(
                                 imageVector = if (switchState) Icons.Filled.Check else Icons.Filled.Close,

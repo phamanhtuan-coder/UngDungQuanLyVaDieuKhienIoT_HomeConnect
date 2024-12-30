@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.DeviceScreen
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.DeviceDetailScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.home.HomeScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.login.LoginScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.onboard_welcome.WelcomeScreen
@@ -74,6 +75,12 @@ fun NavigationGraph(
                 composable(Screens.Devices.route) {
                     DeviceScreen(navController)
                 }
+            }
+
+            //Device Detail Screen
+            //Todo: Tạm thời dẫn tới placeholder, sau này cần truyền Id của thiết bị vào để hiển thị thông tin chi tiết của thiết bị
+            composable(Screens.DeviceDetail.route) {
+                DeviceDetailScreen(navController)
             }
 
             // Todo:... other nested graphs (devices, profile, settings) ...

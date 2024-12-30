@@ -35,14 +35,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FabPosition
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -57,22 +60,26 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -98,422 +105,515 @@ import kotlinx.coroutines.launch
  * ---------------------------------------
  */
 @Composable
-fun DeviceDetailScreen() {
+fun DeviceDetailScreen(
+    navController: NavHostController
+) {
     val configuration = LocalConfiguration.current
     val screenWidthDp = configuration.screenWidthDp
 
     // Theo hướng dẫn Material Design, thường 600dp trở lên được xem là tablet
     if (screenWidthDp >= 600) {
         // Layout dành cho tablet
-        DeviceDetailTabletScreen()
+        DeviceDetailTabletScreen(navController)
     } else {
         // Layout dành cho phone
-        DeviceDetailPhoneScreen()
+        DeviceDetailPhoneScreen(navController)
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
-fun DeviceDetailPhoneScreen() {
-    var rowWidth by remember { mutableStateOf(0) }
-    var selectedTimeBegin by remember { mutableStateOf("12:00 AM") }
-    var selectedTimeEnd by remember { mutableStateOf("12:00 AM") }
-    var showDialogTimePickerBegin by remember { mutableStateOf(false) }
-    var showDialogTimePickerEnd by remember { mutableStateOf(false) }
-    var showDialog by remember { mutableStateOf(false) }
-    return Scaffold (
-        topBar = {
-            /*
+fun DeviceDetailPhoneScreen(
+    navController: NavHostController
+) {
+    AppTheme {
+        var rowWidth by remember { mutableStateOf(0) }
+        var selectedTimeBegin by remember { mutableStateOf("12:00 AM") }
+        var selectedTimeEnd by remember { mutableStateOf("12:00 AM") }
+        var showDialogTimePickerBegin by remember { mutableStateOf(false) }
+        var showDialogTimePickerEnd by remember { mutableStateOf(false) }
+        var showDialog by remember { mutableStateOf(false) }
+        var switchState by remember { mutableStateOf(true) }
+
+        val colorScheme = MaterialTheme.colorScheme
+        Scaffold(
+            topBar = {
+                /*
             * Hiển thị Header
              */
-        },
-        bottomBar = {
-            /*
+                Header(
+                    navController = navController,
+                    type = "Back",
+                    title = "Trang cá nhân"
+                )
+            },
+            bottomBar = {
+                /*
             * Hiển thị Thanh Menu dưới cùng
              */
-        },
-        containerColor = Color.LightGray,
-        content = { innerPadding ->
-            Box (
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                Column (
+                MenuBottom(navController)
+            },
+            containerColor = colorScheme.background,
+            modifier = Modifier.fillMaxSize(),
+            content = { innerPadding ->
+                Box(
                     modifier = Modifier
-                        .fillMaxSize() // Đảm bảo chiếm toàn bộ không gian
-                        .fillMaxHeight()
-                        .imePadding() // Tự động thêm khoảng trống khi bàn phím xuất hiện
-                        .verticalScroll(rememberScrollState()) // Cho phép cuộn
-                        .padding(innerPadding)
+                        .fillMaxSize()
                 ) {
-                    // Nội dung bên dưới
-                    Box(
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .background(color = Color.LightGray)
-                            .wrapContentHeight()
+                            .fillMaxSize() // Đảm bảo chiếm toàn bộ không gian
+                            .fillMaxHeight()
+                            .imePadding() // Tự động thêm khoảng trống khi bàn phím xuất hiện
+                            .verticalScroll(rememberScrollState()) // Cho phép cuộn
+                            .padding(innerPadding)
                     ) {
-                        Column {
-                            // Hộp màu xanh dương
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .wrapContentHeight()
-                                    .background(
-                                        color = Color.Blue,
-                                        shape = RoundedCornerShape(bottomStart = 40.dp)
-                                    )
-                                    .zIndex(1f)
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .clip(RoundedCornerShape(bottomStart = 40.dp)) // Làm bo tròn góc dưới bên trái của Box
-                                ) {
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxSize() // Chiếm toàn bộ kích thước của Box
-                                    ) {
-                                        // Phần đầu tiên: Hiển thị thông tin "Dining Room"
-                                        Row(
-                                            modifier = Modifier.padding(top = 8.dp, end = 12.dp) // Canh lề trên và phải
-                                        ) {
-                                            // Cột chứa các thông tin của phòng
-                                            Column(
-                                                modifier = Modifier
-                                                    .padding(
-                                                        start = 12.dp,
-                                                        end = 12.dp
-                                                    ) // Canh lề hai bên
-                                                    .fillMaxWidth() // Chiều rộng đầy đủ
-                                                    .background(color = Color.Blue) // Nền màu xanh dương
-                                                    .weight(0.2f), // Chiếm 20% trọng lượng của Row
-                                                horizontalAlignment = Alignment.Start,
-                                                verticalArrangement = Arrangement.SpaceBetween // Các thành phần cách đều nhau
-                                            ) {
-                                                Text(text = "Dining Room", color = Color.LightGray) // Tiêu đề
-                                                Spacer(modifier = Modifier.height(4.dp)) // Khoảng cách giữa các thành phần
-
-                                                // Switch bật/tắt đèn
-                                                Switch(
-                                                    checked = true, // Trạng thái mặc định của Switch là bật
-                                                    onCheckedChange = { }, // Không có logic thay đổi ở đây
-                                                    thumbContent = {
-                                                        if (true) { // Nội dung của nút trong Switch khi bật
-                                                            Icon(
-                                                                imageVector = Icons.Filled.Check,
-                                                                contentDescription = "" // Icon dấu check
-                                                            )
-                                                        } else { // Nội dung khi tắt
-                                                            Icon(
-                                                                imageVector = Icons.Filled.Close,
-                                                                contentDescription = "" // Icon dấu X
-                                                            )
-                                                        }
-                                                    }
-                                                )
-
-                                                // Hiển thị phần trăm độ sáng
-                                                Row(
-                                                    modifier = Modifier.fillMaxWidth(), // Chiều rộng đầy đủ
-                                                    horizontalArrangement = Arrangement.Start,
-                                                    verticalAlignment = Alignment.Bottom // Canh các thành phần theo đáy
-                                                ) {
-                                                    Text(
-                                                        "80", fontWeight = FontWeight.Bold, fontSize = 50.sp, color = Color.White
-                                                    ) // Số phần trăm
-                                                    Text(
-                                                        "%", fontWeight = FontWeight.Bold, fontSize = 25.sp,
-                                                        modifier = Modifier.offset(y = -8.dp), // Đẩy lên trên một chút
-                                                        color = Color.White
-                                                    )
-                                                }
-                                                Text("Brightness", color = Color.LightGray, fontSize = 20.sp) // Nhãn cho độ sáng
-                                                Spacer(modifier = Modifier.height(8.dp)) // Khoảng cách dưới cùng
-                                            }
-
-                                            // Hình ảnh đèn
-                                            Image(
-                                                painter = painterResource(id = R.drawable.lamp),
-                                                modifier = Modifier.size(150.dp), // Kích thước hình ảnh
-                                                contentDescription = "" // Mô tả cho hình ảnh
-                                            )
-                                        }
-
-                                        // Thanh trượt để điều chỉnh cường độ sáng
-                                        Column(
-                                            modifier = Modifier
-                                                .width(rowWidth.dp)
-                                                .padding(start = 12.dp, end = 12.dp)
-                                                .background(color = Color.Blue) // Nền màu xanh dương
-                                        ) {
-                                            Text("Insensity", color = Color.LightGray) // Tiêu đề cường độ sáng
-                                            Row(
-                                                modifier = Modifier
-                                                    .fillMaxWidth(),
-                                                horizontalArrangement = Arrangement.Center, // Căn giữa các thành phần
-                                                verticalAlignment = Alignment.CenterVertically // Căn giữa theo chiều dọc
-                                            ) {
-                                                Image(
-                                                    painter = painterResource(id = R.drawable.bulboff),
-                                                    modifier = Modifier
-                                                        .padding(end = 8.dp)
-                                                        .size(24.dp), // Hình ảnh bóng đèn tắt
-                                                    contentDescription = ""
-                                                )
-                                                Slider(
-                                                    value = 80f, onValueChange = {}, // Thanh trượt giá trị mặc định là 80
-                                                    steps = 50, valueRange = 0f..100f, modifier = Modifier.width(300.dp)
-                                                )
-                                                Image(
-                                                    painter = painterResource(id = R.drawable.bulb),
-                                                    modifier = Modifier
-                                                        .padding(start = 8.dp)
-                                                        .size(24.dp), // Hình ảnh bóng đèn bật
-                                                    contentDescription = ""
-                                                )
-                                            }
-                                        }
-
-                                        // Đường kẻ phân cách mỏng
-                                        Box(
-                                            modifier = Modifier
-                                                .padding(start = 12.dp, end = 12.dp)
-                                                .fillMaxWidth()
-                                                .height(1.dp)
-                                                .background(Color.LightGray) // Màu xám nhạt cho đường kẻ
-                                        )
-
-                                        // Phần hiển thị thông tin sử dụng điện
-                                        Column(
-                                            modifier = Modifier
-                                                .padding(top = 24.dp, start = 12.dp, end = 12.dp)
-                                                .fillMaxSize(), // Chiếm toàn bộ kích thước còn lại
-                                            horizontalAlignment = Alignment.Start,
-                                            verticalArrangement = Arrangement.Top
-                                        ) {
-                                            GradientSlider()
-                                        }
-                                    }
-                                }
-                            }
-                            // Hộp màu xanh lá cây với góc lõm
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .wrapContentHeight()
-                            ) {
-                                // Box màu vàng (ở dưới)
-                                Box(
-                                    modifier = Modifier
-                                        .width(40.dp)
-                                        .height(40.dp)
-                                        .align(Alignment.TopEnd)
-                                        .background(color = Color.Blue)
-                                        .zIndex(1f) // Z-index thấp hơn
-                                )
-
-                                // Box màu xanh lá cây (ở trên)
+                        // Nội dung bên dưới
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(color = colorScheme.background)
+                                .wrapContentHeight()
+                        ) {
+                            Column {
+                                // Hộp màu xanh dương
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
+                                        .wrapContentHeight()
                                         .background(
-                                            color = Color.LightGray,
-                                            shape = RoundedCornerShape(topEndPercent = 50)
+                                            color = colorScheme.primary,
+                                            shape = RoundedCornerShape(bottomStart = 40.dp)
                                         )
-                                        .width(50.dp)
-                                        .height(50.dp)
-                                        .zIndex(2f) // Z-index cao hơn
+                                        .zIndex(1f)
                                 ) {
                                     Box(
                                         modifier = Modifier
-                                            .fillMaxWidth()
-                                            .clip(RoundedCornerShape(topEndPercent = 100)) // Clip nội dung ScrollableTabRow
+                                            .fillMaxSize()
+                                            .clip(RoundedCornerShape(bottomStart = 40.dp)) // Làm bo tròn góc dưới bên trái của Box
                                     ) {
-                                        Row(
+                                        Column(
                                             modifier = Modifier
-                                                .fillMaxWidth() // Đảm bảo Row chiếm toàn bộ chiều rộng
-                                                .padding(top = 12.dp, start = 12.dp, end = 8.dp), // Khoảng cách bên trong Row
-                                            horizontalArrangement = Arrangement.SpaceBetween, // Đẩy các phần tử ra hai bên
-                                            verticalAlignment = Alignment.CenterVertically // Căn giữa theo chiều dọc
+                                                .fillMaxSize() // Chiếm toàn bộ kích thước của Box
                                         ) {
-                                            // Nội dung bên phải (Icon trong Box)
-                                            Button(
-                                                onClick = {
-                                                    showDialog = true
-                                                },
-                                                modifier = Modifier
-                                                    .size(24.dp), // Kích thước tổng thể của Button
-                                                shape = CircleShape, // Đảm bảo Button có dạng hình tròn
-                                                contentPadding = PaddingValues(0.dp) // Loại bỏ padding mặc định
+                                            // Phần đầu tiên: Hiển thị thông tin "Dining Room"
+                                            Row(
+                                                modifier = Modifier.padding(
+                                                    top = 8.dp,
+                                                    end = 12.dp
+                                                ) // Canh lề trên và phải
                                             ) {
-                                                Icon(
-                                                    imageVector = Icons.Default.Info,
-                                                    contentDescription = "Info",
-                                                    modifier = Modifier.size(24.dp) // Kích thước của Icon
-                                                )
-                                            }
-                                            Button(
-                                                onClick = {
+                                                // Cột chứa các thông tin của phòng
+                                                Column(
+                                                    modifier = Modifier
+                                                        .padding(
+                                                            start = 12.dp,
+                                                            end = 12.dp
+                                                        ) // Canh lề hai bên
+                                                        .fillMaxWidth() // Chiều rộng đầy đủ
+                                                        .background(color = colorScheme.primary) // Nền màu xanh dương
+                                                        .weight(0.2f), // Chiếm 20% trọng lượng của Row
+                                                    horizontalAlignment = Alignment.Start,
+                                                    verticalArrangement = Arrangement.SpaceBetween // Các thành phần cách đều nhau
+                                                ) {
+                                                    Text(
+                                                        text = "Dining Room",
+                                                        color = colorScheme.onPrimary // Màu chữ trắng
+                                                    ) // Tiêu đề
+                                                    Spacer(modifier = Modifier.height(4.dp)) // Khoảng cách giữa các thành phần
 
-                                                },
-                                                modifier = Modifier
-                                                    .size(24.dp), // Kích thước tổng thể của Button
-                                                shape = CircleShape, // Đảm bảo Button có dạng hình tròn
-                                                contentPadding = PaddingValues(0.dp) // Loại bỏ padding mặc định
-                                            ) {
-                                                Icon(
-                                                    imageVector = Icons.Default.Info,
-                                                    contentDescription = "Info",
-                                                    modifier = Modifier.size(24.dp) // Kích thước của Icon
+                                                    // Switch bật/tắt đèn
+                                                    Switch(
+                                                        checked = switchState,
+                                                        onCheckedChange = {
+                                                            //Todo: Xử lý tắt mở thiết bị
+                                                        },
+                                                        thumbContent = {
+                                                            Icon(
+                                                                imageVector = if (switchState) Icons.Filled.Check else Icons.Filled.Close,
+                                                                contentDescription = "On/Off Switch",
+                                                                tint = if (switchState) colorScheme.onPrimary else colorScheme.onSecondary.copy(
+                                                                    alpha = 0.8f
+                                                                )
+                                                            )
+                                                        },
+                                                        colors = SwitchDefaults.colors(
+                                                            checkedThumbColor = colorScheme.primary,
+                                                            checkedTrackColor = colorScheme.onPrimary,
+                                                            uncheckedThumbColor = colorScheme.secondary,
+                                                            uncheckedTrackColor = colorScheme.onSecondary.copy(
+                                                                alpha = 0.8f
+                                                            ),
+                                                        )
+                                                    )
+
+                                                    // Hiển thị phần trăm độ sáng
+                                                    Row(
+                                                        modifier = Modifier.fillMaxWidth(), // Chiều rộng đầy đủ
+                                                        horizontalArrangement = Arrangement.Start,
+                                                        verticalAlignment = Alignment.Bottom // Canh các thành phần theo đáy
+                                                    ) {
+                                                        Text(
+                                                            "80",
+                                                            fontWeight = FontWeight.Bold,
+                                                            fontSize = 50.sp,
+                                                            color = colorScheme.onPrimary
+                                                        ) // Số phần trăm
+                                                        Text(
+                                                            "%",
+                                                            fontWeight = FontWeight.Bold,
+                                                            fontSize = 25.sp,
+                                                            modifier = Modifier.offset(y = -8.dp), // Đẩy lên trên một chút
+                                                            color = colorScheme.onPrimary
+                                                        )
+                                                    }
+                                                    Text(
+                                                        "Brightness",
+                                                        color = colorScheme.onPrimary,
+                                                        fontSize = 20.sp
+                                                    ) // Nhãn cho độ sáng
+                                                    Spacer(modifier = Modifier.height(8.dp)) // Khoảng cách dưới cùng
+                                                }
+
+                                                // Hình ảnh đèn
+                                                Image(
+                                                    painter = painterResource(id = R.drawable.lamp),
+                                                    modifier = Modifier.size(150.dp), // Kích thước hình ảnh
+                                                    contentDescription = "",// Mô tả cho hình ảnh
+                                                    colorFilter = ColorFilter.tint(colorScheme.onPrimary) // Màu chữ trắng
                                                 )
                                             }
-                                            if (showDialog) {
-                                                AlertDialog(
-                                                    onDismissRequest = { showDialog = false }, // Đóng Dialog khi chạm ngoài
-                                                    title = { Text(text = "Thông tin thiết bị") },
-                                                    text = {
-                                                        Column {
-                                                            Text("ID Thiết bị: 001")
-                                                            Text("Tên thiết bị: Đèn LED phòng khách")
-                                                            Text("Loại thiết bị: Đèn chiếu sáng")
-                                                        }
+
+                                            // Thanh trượt để điều chỉnh cường độ sáng
+                                            Column(
+                                                modifier = Modifier
+                                                    .width(rowWidth.dp)
+                                                    .padding(start = 12.dp, end = 12.dp)
+                                                    .background(color = colorScheme.primary) // Nền màu xanh dương
+                                            ) {
+                                                Text(
+                                                    "Insensity",
+                                                    color = colorScheme.onPrimary
+                                                ) // Tiêu đề cường độ sáng
+                                                Row(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth(),
+                                                    horizontalArrangement = Arrangement.Center, // Căn giữa các thành phần
+                                                    verticalAlignment = Alignment.CenterVertically // Căn giữa theo chiều dọc
+                                                ) {
+                                                    Image(
+                                                        painter = painterResource(id = R.drawable.bulboff),
+                                                        modifier = Modifier
+                                                            .padding(end = 8.dp)
+                                                            .size(24.dp), // Hình ảnh bóng đèn tắt
+                                                        contentDescription = "",
+                                                        colorFilter = ColorFilter.tint(colorScheme.onPrimary) // Màu chữ trắng
+                                                    )
+                                                    Slider(
+                                                        value = 80f,
+                                                        onValueChange = {}, // Thanh trượt giá trị mặc định là 80
+                                                        steps = 50,
+                                                        valueRange = 0f..100f,
+                                                        modifier = Modifier.width(300.dp),
+                                                        colors = SliderDefaults.colors(
+                                                            thumbColor = colorScheme.onPrimary,
+                                                            activeTrackColor = colorScheme.onPrimary,
+                                                            activeTickColor = colorScheme.secondary,
+                                                            inactiveTrackColor = colorScheme.secondary,
+                                                            inactiveTickColor = colorScheme.onSecondary
+                                                        )
+                                                    )
+                                                    Image(
+                                                        painter = painterResource(id = R.drawable.bulb),
+                                                        modifier = Modifier
+                                                            .padding(start = 8.dp)
+                                                            .size(24.dp), // Hình ảnh bóng đèn bật
+                                                        contentDescription = "",
+                                                    )
+                                                }
+                                            }
+
+                                            // Đường kẻ phân cách mỏng
+                                            Box(
+                                                modifier = Modifier
+                                                    .padding(start = 12.dp, end = 12.dp)
+                                                    .fillMaxWidth()
+                                                    .height(1.dp)
+                                                    .background(colorScheme.onPrimary) // Màu xám nhạt cho đường kẻ
+                                            )
+
+                                            // Phần hiển thị thông tin sử dụng điện
+                                            Column(
+                                                modifier = Modifier
+                                                    .padding(
+                                                        top = 24.dp,
+                                                        start = 12.dp,
+                                                        end = 12.dp
+                                                    )
+                                                    .fillMaxSize(), // Chiếm toàn bộ kích thước còn lại
+                                                horizontalAlignment = Alignment.Start,
+                                                verticalArrangement = Arrangement.Top
+                                            ) {
+                                                GradientSlider()
+                                            }
+                                        }
+                                    }
+                                }
+                                // Hộp màu xanh lá cây với góc lõm
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .wrapContentHeight()
+                                ) {
+                                    // Box màu vàng (ở dưới)
+                                    Box(
+                                        modifier = Modifier
+                                            .width(40.dp)
+                                            .height(40.dp)
+                                            .align(Alignment.TopEnd)
+                                            .background(color = colorScheme.primary)
+                                            .zIndex(1f) // Z-index thấp hơn
+                                    )
+
+                                    // Box màu xanh lá cây (ở trên)
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .background(
+                                                color = colorScheme.background,
+                                                shape = RoundedCornerShape(topEndPercent = 50)
+                                            )
+                                            .width(50.dp)
+                                            .height(50.dp)
+                                            .zIndex(2f) // Z-index cao hơn
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clip(RoundedCornerShape(topEndPercent = 100)) // Clip nội dung ScrollableTabRow
+                                        ) {
+                                            Row(
+                                                modifier = Modifier
+                                                    .fillMaxWidth() // Đảm bảo Row chiếm toàn bộ chiều rộng
+                                                    .padding(
+                                                        top = 12.dp,
+                                                        start = 12.dp,
+                                                        end = 8.dp
+                                                    ), // Khoảng cách bên trong Row
+                                                horizontalArrangement = Arrangement.SpaceBetween, // Đẩy các phần tử ra hai bên
+                                                verticalAlignment = Alignment.CenterVertically // Căn giữa theo chiều dọc
+                                            ) {
+                                                // Nội dung bên phải (Icon trong Box)
+                                                Button(
+                                                    onClick = {
+                                                        showDialog = true
                                                     },
-                                                    confirmButton = {
-                                                        Button(onClick = { showDialog = false }) {
-                                                            Text("Đóng")
+                                                    modifier = Modifier
+                                                        .size(24.dp), // Kích thước tổng thể của Button
+                                                    shape = CircleShape, // Đảm bảo Button có dạng hình tròn
+                                                    contentPadding = PaddingValues(0.dp), // Loại bỏ padding mặc định
+                                                    colors = ButtonDefaults.buttonColors(
+                                                        containerColor = colorScheme.onPrimary,
+                                                        contentColor = colorScheme.primary
+                                                    )
+                                                ) {
+                                                    Icon(
+                                                        imageVector = Icons.Default.Info,
+                                                        contentDescription = "Info",
+                                                        modifier = Modifier.size(24.dp), // Kích thước của Icon
+                                                        tint = colorScheme.primary
+                                                    )
+                                                }
+                                                Button(
+                                                    onClick = {
+
+                                                    },
+                                                    modifier = Modifier
+                                                        .size(24.dp), // Kích thước tổng thể của Button
+                                                    shape = CircleShape, // Đảm bảo Button có dạng hình tròn
+                                                    contentPadding = PaddingValues(0.dp), // Loại bỏ padding mặc định,
+                                                    colors = ButtonDefaults.buttonColors(
+                                                        containerColor = colorScheme.onPrimary,
+                                                        contentColor = colorScheme.primary
+
+                                                    )
+                                                ) {
+                                                    Icon(
+                                                        imageVector = Icons.Default.Wifi,
+                                                        contentDescription = "Wifi",
+                                                        modifier = Modifier.size(24.dp), // Kích thước của Icon
+                                                        tint = colorScheme.primary
+
+                                                    )
+                                                }
+                                                if (showDialog) {
+                                                    AlertDialog(
+                                                        onDismissRequest = {
+                                                            showDialog = false
+                                                        }, // Đóng Dialog khi chạm ngoài
+                                                        title = { Text(text = "Thông tin thiết bị") },
+                                                        text = {
+                                                            Column {
+                                                                Text("ID Thiết bị: 001")
+                                                                Text("Tên thiết bị: Đèn LED phòng khách")
+                                                                Text("Loại thiết bị: Đèn chiếu sáng")
+                                                            }
+                                                        },
+                                                        confirmButton = {
+                                                            Button(onClick = {
+                                                                showDialog = false
+                                                            }) {
+                                                                Text("Đóng")
+                                                            }
                                                         }
-                                                    }
-                                                )
+                                                    )
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    Column (
-                        modifier = Modifier
-                            .wrapContentWidth()
-                            .onSizeChanged { size ->
-                                rowWidth = size.width // Lấy kích thước của Row
-                            },
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "Select Days",
-                            fontSize = 24.sp,
-                            color = Color.Black,
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        )
-                        Row (
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = selectedTimeBegin,
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black,
-                                modifier = Modifier
-                                    .clickable { showDialogTimePickerBegin = true }
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "To",
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black,
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = selectedTimeEnd,
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black,
-                                modifier = Modifier
-                                    .clickable { showDialogTimePickerEnd = true }
-                            )
-                        }
-
-                        if (showDialogTimePickerBegin) {
-                            Dialog(onDismissRequest = { showDialogTimePickerBegin = false }) {
-                                Box(
-                                    modifier = Modifier
-                                        .background(Color.Black, shape = RoundedCornerShape(12.dp))
-                                        .padding(16.dp)
-                                        .wrapContentSize()
-                                ) {
-                                    EndlessRollingPadlockTimePicker { hour, minute, amPm ->
-                                        selectedTimeBegin = "$hour:${minute.toString().padStart(2, '0')} $amPm"
-                                        showDialog = false // Đóng dialog sau khi chọn xong
-                                    }
-                                }
-                            }
-                        }
-                        if (showDialogTimePickerEnd) {
-                            Dialog(onDismissRequest = { showDialogTimePickerEnd = false }) {
-                                Box(
-                                    modifier = Modifier
-                                        .background(Color.Black, shape = RoundedCornerShape(12.dp))
-                                        .padding(16.dp)
-                                        .wrapContentSize()
-                                ) {
-                                    EndlessRollingPadlockTimePicker { hour, minute, amPm ->
-                                        selectedTimeEnd = "$hour:${minute.toString().padStart(2, '0')} $amPm"
-                                        showDialog = false // Đóng dialog sau khi chọn xong
-                                    }
-                                }
-                            }
-                        }
-                        DayPicker()
-
-                        Row(
+                        Column(
                             modifier = Modifier
-                                .padding(16.dp)
-                                .then(if (rowWidth != null) Modifier.width(rowWidth!!.dp) else Modifier.fillMaxWidth()),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp), // Khoảng cách giữa các nút
-                            verticalAlignment = Alignment.CenterVertically
+                                .wrapContentWidth()
+                                .onSizeChanged { size ->
+                                    rowWidth = size.width // Lấy kích thước của Row
+                                },
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
                         ) {
-                            Button(
-                                onClick = {},
-                                modifier = Modifier
-                                    .weight(1f) // Chia đều không gian
-                                    .height(48.dp) // Chiều cao cố định
+                            Text(
+                                text = "Select Time",
+                                fontSize = 24.sp,
+                                color = colorScheme.onBackground,
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            )
+                            Row(
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "LỊCH SỬ HOẠT ĐỘNG",
+                                    text = selectedTimeBegin,
+                                    fontSize = 24.sp,
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = 12.sp
+                                    color = colorScheme.onBackground,
+                                    modifier = Modifier
+                                        .clickable { showDialogTimePickerBegin = true }
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "To",
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = colorScheme.onBackground,
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = selectedTimeEnd,
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = colorScheme.onBackground,
+                                    modifier = Modifier
+                                        .clickable { showDialogTimePickerEnd = true }
                                 )
                             }
 
-                            Button(
-                                onClick = {},
+                            if (showDialogTimePickerBegin) {
+                                Dialog(onDismissRequest = { showDialogTimePickerBegin = false }) {
+                                    Box(
+                                        modifier = Modifier
+                                            .background(
+                                                colorScheme.onBackground,
+                                                shape = RoundedCornerShape(12.dp)
+                                            )
+                                            .padding(16.dp)
+                                            .wrapContentSize()
+                                    ) {
+                                        EndlessRollingPadlockTimePicker { hour, minute, amPm ->
+                                            selectedTimeBegin =
+                                                "$hour:${minute.toString().padStart(2, '0')} $amPm"
+                                            showDialog = false // Đóng dialog sau khi chọn xong
+                                        }
+                                    }
+                                }
+                            }
+                            if (showDialogTimePickerEnd) {
+                                Dialog(onDismissRequest = { showDialogTimePickerEnd = false }) {
+                                    Box(
+                                        modifier = Modifier
+                                            .background(
+                                                Color.Black,
+                                                shape = RoundedCornerShape(12.dp)
+                                            )
+                                            .padding(16.dp)
+                                            .wrapContentSize()
+                                    ) {
+                                        EndlessRollingPadlockTimePicker { hour, minute, amPm ->
+                                            selectedTimeEnd =
+                                                "$hour:${minute.toString().padStart(2, '0')} $amPm"
+                                            showDialog = false // Đóng dialog sau khi chọn xong
+                                        }
+                                    }
+                                }
+                            }
+                            DayPicker()
+
+                            Row(
                                 modifier = Modifier
-                                    .weight(1f) // Chia đều không gian
-                                    .height(48.dp) // Chiều cao cố định
+                                    .padding(16.dp)
+                                    .then(if (rowWidth != null) Modifier.width(rowWidth!!.dp) else Modifier.fillMaxWidth()),
+                                horizontalArrangement = Arrangement.spacedBy(
+                                    8.dp,
+                                    alignment = Alignment.CenterHorizontally
+                                ), // Khoảng cách giữa các nút
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(
-                                    text = "GỠ KẾT NỐI",
-                                    fontWeight = FontWeight.Bold
-                                )
+                                Button(
+                                    onClick = {
+                                        //Todo: Xử lý khi nhấn nút Lịch sử
+                                    },
+                                    modifier = Modifier
+                                        .weight(1f) // Chia đều không gian
+                                        .width(200.dp)
+                                        .height(48.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
+                                    shape = RoundedCornerShape(50)
+                                ) {
+                                    Text(
+                                        text = "Lịch sử hoạt động",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 12.sp
+                                    )
+                                }
+
+                                Button(
+                                    onClick = {
+                                        //Todo: Xử lý khi nhấn nút Gỡ kết nối
+                                    },
+                                    modifier = Modifier
+                                        .weight(1f) // Chia đều không gian
+                                        .width(200.dp)
+                                        .height(48.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
+                                    shape = RoundedCornerShape(50)
+                                ) {
+                                    Text(
+                                        text = "Gỡ kết nối",
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-    )
+        )
+    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
-fun DeviceDetailTabletScreen() {
+fun DeviceDetailTabletScreen(navController: NavHostController) {
     var rowWidth by remember { mutableStateOf<Int?>(null) }
     var selectedTimeBegin by remember { mutableStateOf("12:00 AM") }
     var selectedTimeEnd by remember { mutableStateOf("12:00 AM") }
@@ -949,43 +1049,53 @@ fun DeviceDetailTabletScreen() {
 fun GradientSlider() {
     var sliderPosition by remember { mutableStateOf(0f) } // Giá trị thanh kéo từ 0 đến 1
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Thanh Slider có nền gradient (kích thước nhỏ)
-        Box(
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(8.dp) // Điều chỉnh chiều cao của thanh Gradient
-                .drawWithCache {
-                    val gradient = Brush.horizontalGradient(
-                        colors = listOf(
-                            Color.Red,
-                            Color.Yellow,
-                            Color.Green,
-                            Color.Cyan,
-                            Color.Blue,
-                            Color.Magenta,
-                            Color.Red
-                        ),
-                        startX = 0f,
-                        endX = size.width
-                    )
-                    onDrawBehind {
-                        drawRect(brush = gradient, size = size)
-                    }
-                }
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Slider(
-                value = sliderPosition,
-                onValueChange = { sliderPosition = it },
+            // Thanh Slider có nền gradient (kích thước nhỏ)
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(8.dp) // Kích thước Slider (track bar nhỏ hơn)
-            )
+                    .height(8.dp) // Điều chỉnh chiều cao của thanh Gradient
+                    .drawWithCache {
+                        val gradient = Brush.horizontalGradient(
+                            colors = listOf(
+                                Color.Red,
+                                Color.Yellow,
+                                Color.Green,
+                                Color.Cyan,
+                                Color.Blue,
+                                Color.Magenta,
+                                Color.Red
+                            ),
+                            startX = 0f,
+                            endX = size.width
+                        )
+                        onDrawBehind {
+                            drawRect(brush = gradient, size = size)
+                        }
+                    }
+            ) {
+                Slider(
+                    value = sliderPosition,
+                    onValueChange = { sliderPosition = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(8.dp), // Kích thước Slider (track bar nhỏ hơn)
+                    colors = SliderDefaults.colors(
+                        thumbColor = colorScheme.onPrimary,
+                        activeTrackColor = colorScheme.onPrimary,
+                        activeTickColor = colorScheme.secondary,
+                        inactiveTrackColor = colorScheme.secondary,
+                        inactiveTickColor = colorScheme.onSecondary
+                    )
+                )
+            }
         }
     }
 }
@@ -1198,4 +1308,17 @@ fun DayItem(day: String, isSelected: Boolean, onDayClicked: () -> Unit) {
             textAlign = TextAlign.Center
         )
     }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun PhonePreview() {
+    DeviceDetailPhoneScreen(navController = rememberNavController())
+}
+
+
+@Preview(showBackground = true, showSystemUi = true, device = Devices.PIXEL_TABLET)
+@Composable
+fun TabletPreview() {
+    DeviceDetailTabletScreen(navController = rememberNavController())
 }
