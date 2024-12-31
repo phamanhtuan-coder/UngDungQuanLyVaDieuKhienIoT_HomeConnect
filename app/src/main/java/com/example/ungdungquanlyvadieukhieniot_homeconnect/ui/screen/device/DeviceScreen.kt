@@ -80,6 +80,10 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
  * Lần cập nhật 30/12/2024
  * Người cập nhật: Phạm Anh Tuấn
  * ---------------------------
+ * Nội dung cập nhật: Sửa lại phần giao diện
+ * ---------------------------
+ * Lần cập nhât: 31/12/24
+ * Người cập nhật: Nguyễn Thanh Sang
  */
 @Composable
 fun DeviceScreen(
@@ -167,7 +171,7 @@ fun DeviceScreen(
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .width(300.dp)
+                                        .width(if (isTablet) 550.dp else 300.dp)
                                         .align(Alignment.Center)
                                 ) {
                                     HouseSelection(
@@ -208,7 +212,6 @@ fun DeviceScreen(
                                 ) {
                                     Box(
                                         modifier = Modifier
-                                            .fillMaxWidth()
                                             .clip(RoundedCornerShape(topEndPercent = 100)) // Clip nội dung ScrollableTabRow
                                     ) {
                                         CustomScrollableTabRow() // Đặt ScrollableTabRow vào đây
@@ -433,15 +436,18 @@ fun DeviceInfoSection(fromTime: String, toTime: String, endPadding: Dp) {
 
 @Composable
 fun ExtraInfoSection(label: String, value: String, endPadding: Dp) {
-    Column(
-        modifier = Modifier.padding(end = endPadding),
-        horizontalAlignment = Alignment.End,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(text = label, fontSize = 12.sp, color = Color.Gray)
-        Text(text = value, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        Column(
+            modifier = Modifier.padding(end = endPadding),
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(text = label, fontSize = 12.sp, color = colorScheme.onPrimary)
+            Text(text = value, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        }
+        DividerLine(endPadding)
     }
-    DividerLine(endPadding)
 }
 
 
