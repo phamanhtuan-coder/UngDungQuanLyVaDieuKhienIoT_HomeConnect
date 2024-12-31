@@ -61,6 +61,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.HouseSelection
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 
@@ -89,12 +90,11 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 fun DeviceScreen(
     navController: NavHostController
 ) {
+    var selectedTabIndex by remember { mutableStateOf(0) }
     AppTheme {
         val configuration = LocalConfiguration.current
         val screenWidthDp = configuration.screenWidthDp.dp
         val isTablet = screenWidthDp >= 600.dp
-//        var selectedTabIndex by remember { mutableStateOf(0) }
-
         val colorScheme = MaterialTheme.colorScheme
 
         Scaffold(
@@ -176,7 +176,10 @@ fun DeviceScreen(
                                 ) {
                                     HouseSelection(
                                         houses = listOf("House 1", "House 2", "House 3"),
-                                        onManageHouseClicked = { /* TODO: Navigate */ }
+                                        onManageHouseClicked = {
+                                            /* TODO: Navigate */
+                                            navController.navigate(Screens.HouseManagement.route)
+                                        }
                                     )
                                 }
                             }
@@ -214,7 +217,10 @@ fun DeviceScreen(
                                         modifier = Modifier
                                             .clip(RoundedCornerShape(topEndPercent = 100)) // Clip nội dung ScrollableTabRow
                                     ) {
-                                        CustomScrollableTabRow() // Đặt ScrollableTabRow vào đây
+                                        CustomScrollableTabRow(selectedTabIndex = selectedTabIndex) { newIndex ->
+                                            selectedTabIndex =
+                                                newIndex // Update the tabIndex when a tab is clicked
+                                        }
                                     }
                                 }
                             }
@@ -281,9 +287,10 @@ fun DeviceScreen(
 }
 
 @Composable
-fun CustomScrollableTabRow() {
-    var selectedTabIndex by remember { mutableStateOf(0) }
-
+fun CustomScrollableTabRow(
+    selectedTabIndex: Int,
+    onTabSelected: (Int) -> Unit
+) {
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
         ScrollableTabRow(
@@ -303,11 +310,13 @@ fun CustomScrollableTabRow() {
             (1..10).forEach { index ->
                 Tab(
                     selected = selectedTabIndex == index - 1,
-                    onClick = { selectedTabIndex = index - 1 },
+                    onClick = {
+                        onTabSelected(index - 1) // Notify parent of the new tab selection
+                    },
                     text = {
                         Text(
                             "Tab $index",
-                            color = if (selectedTabIndex == index - 1) Color.Black else Color.Gray, // Đổi màu chữ
+                            color = if (selectedTabIndex == index - 1) colorScheme.primary else colorScheme.onBackground, // Đổi màu chữ
                         )
                     },
                     selectedContentColor = colorScheme.onBackground, // Màu khi được chọn
@@ -324,94 +333,94 @@ fun SmartCard(isTablet: Boolean, switchState: Boolean = true, navController: Nav
     val endPadding = 32.dp
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
-    Card(
-        modifier = Modifier
-            .width(IntrinsicSize.Max)
-            .padding(8.dp)
-            .clip(RoundedCornerShape(16.dp)),
-        colors = CardDefaults.cardColors(containerColor = colorScheme.primary),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        onClick = {
-            //Todo: Xử lý chuyển tới trang chi tiết thiết bị
-            navController.navigate("device_detail")
-        }
-    ) {
-        Column(
-            modifier = Modifier.padding(8.dp)
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column {
-                    Text(
-                        text = "Smart Lamp",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                        color = colorScheme.onPrimary
-                    )
-                    Text(
-                        text = "Dining Room | Tue Thu",
-                        fontSize = 12.sp,
-                        color = colorScheme.onSecondary
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .padding(end = 8.dp)
-                        .size(40.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Switch(
-                        checked = switchState,
-                        onCheckedChange = {
-                            //Todo: Xử lý tắt mở thiết bị
-                        },
-                        thumbContent = {
-                            Icon(
-                                imageVector = if (switchState) Icons.Filled.Check else Icons.Filled.Close,
-                                contentDescription = "On/Off Switch",
-                                tint = if (switchState) colorScheme.onPrimary else colorScheme.onSecondary.copy(
-                                    alpha = 0.8f
-                                )
-                            )
-                        },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = colorScheme.primary,
-                            checkedTrackColor = colorScheme.onPrimary,
-                            uncheckedThumbColor = colorScheme.secondary,
-                            uncheckedTrackColor = colorScheme.onSecondary.copy(alpha = 0.8f),
-                        )
-                    )
-                }
+        Card(
+            modifier = Modifier
+                .width(IntrinsicSize.Max)
+                .padding(8.dp)
+                .clip(RoundedCornerShape(16.dp)),
+            colors = CardDefaults.cardColors(containerColor = colorScheme.primary),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+            onClick = {
+                //Todo: Xử lý chuyển tới trang chi tiết thiết bị
+                navController.navigate("device_detail")
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.wrapContentWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(8.dp)
             ) {
-                DeviceInfoSection("8 pm", "8 am", endPadding)
-
-                if (isTablet) {
-                    ExtraInfoSection("Điện áp hoạt động", "5V", endPadding / 2)
-                    ExtraInfoSection("Dòng tiêu thụ", "20mA", endPadding / 2)
-                }
-
-                Column(
-                    horizontalAlignment = Alignment.End,
-                    verticalArrangement = Arrangement.Center,
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    IconButtonBox("\uD83D\uDDD1")
-                    Spacer(modifier = Modifier.height(4.dp))
-                    IconButtonBox("\u270E")
+                    Column {
+                        Text(
+                            text = "Smart Lamp",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                            color = colorScheme.onPrimary
+                        )
+                        Text(
+                            text = "Dining Room | Tue Thu",
+                            fontSize = 12.sp,
+                            color = colorScheme.onSecondary
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .padding(end = 8.dp)
+                            .size(40.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Switch(
+                            checked = switchState,
+                            onCheckedChange = {
+                                //Todo: Xử lý tắt mở thiết bị
+                            },
+                            thumbContent = {
+                                Icon(
+                                    imageVector = if (switchState) Icons.Filled.Check else Icons.Filled.Close,
+                                    contentDescription = "On/Off Switch",
+                                    tint = if (switchState) colorScheme.onPrimary else colorScheme.onSecondary.copy(
+                                        alpha = 0.8f
+                                    )
+                                )
+                            },
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = colorScheme.primary,
+                                checkedTrackColor = colorScheme.onPrimary,
+                                uncheckedThumbColor = colorScheme.secondary,
+                                uncheckedTrackColor = colorScheme.onSecondary.copy(alpha = 0.8f),
+                            )
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.wrapContentWidth()
+                ) {
+                    DeviceInfoSection("8 pm", "8 am", endPadding)
+
+                    if (isTablet) {
+                        ExtraInfoSection("Điện áp hoạt động", "5V", endPadding / 2)
+                        ExtraInfoSection("Dòng tiêu thụ", "20mA", endPadding / 2)
+                    }
+
+                    Column(
+                        horizontalAlignment = Alignment.End,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        IconButtonBox("\uD83D\uDDD1")
+                        Spacer(modifier = Modifier.height(4.dp))
+                        IconButtonBox("\u270E")
+                    }
                 }
             }
         }
     }
-}
 }
 
 

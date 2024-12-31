@@ -23,6 +23,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.password_re
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.profile.ProfileScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.signup.SignUpScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.wifi_connection.WifiConnectionScreen
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.space.SpaceScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screens.DashboardScreen
 
 @Composable
@@ -86,6 +87,13 @@ fun NavigationGraph(
                 }
             }
 
+            //Settings Screen
+            navigation(startDestination = Screens.Settings.route, route = "settings_graph") {
+                composable(Screens.Settings.route) {
+
+                }
+            }
+
             //Device Detail Screen
             //Todo: Tạm thời dẫn tới placeholder, sau này cần truyền Id của thiết bị vào để hiển thị thông tin chi tiết của thiết bị
             composable(Screens.DeviceDetail.route) {
@@ -141,6 +149,12 @@ fun NavigationGraph(
             composable(Screens.WifiConnection.route) {
                 WifiConnectionScreen(navController)
             }
+
+            //Spaces Screen
+            composable(Screens.Spaces.route) {
+                SpaceScreen(navController)
+            }
+
 
             // Todo:... other nested graphs (devices, profile, settings) ...
         }
