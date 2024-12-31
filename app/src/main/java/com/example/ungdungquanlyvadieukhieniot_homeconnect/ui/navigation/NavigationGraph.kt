@@ -22,6 +22,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.otp.OtpScre
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.password_recovery.PasswordRecoveryScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.profile.ProfileScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.signup.SignUpScreen
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.wifi_connection.WifiConnectionScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screens.DashboardScreen
 
 @Composable
@@ -134,6 +135,11 @@ fun NavigationGraph(
             //Todo: Lấy dữ liêu id để hiển thị chi tiết thông tin lịch sử
             composable(Screens.ActivityHistoryDetail.route) {
                 ActivityHistoryScreenDetailScreen(navController)
+            }
+
+            //Todo: Lấy dữ liêu id để vào kết nối wifi
+            composable(Screens.WifiConnection.route) {
+                WifiConnectionScreen(navController)
             }
 
             // Todo:... other nested graphs (devices, profile, settings) ...
