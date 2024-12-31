@@ -92,74 +92,10 @@ fun AddDeviceScreen(
                             .fillMaxSize() // Đảm bảo chiếm toàn bộ không gian
                             .imePadding() // Tự động thêm khoảng trống khi bàn phím xuất hiện
                             .verticalScroll(rememberScrollState()) // Cho phép cuộn
-                            .padding(innerPadding)
+                            .padding(innerPadding),
+                        verticalArrangement = Arrangement.Center, // Căn giữa theo chiều dọc
+                        horizontalAlignment = Alignment.CenterHorizontally // Căn giữa theo chiều ngang
                     ) {
-                        // Nội dung bên dưới
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(color = colorScheme.background)
-                                .height(150.dp)
-                        ) {
-                            // Hộp màu xanh dương
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .offset(y = -9.dp)
-                                    .height(110.dp)
-                                    .background(
-                                        color = colorScheme.primary,
-                                        shape = RoundedCornerShape(bottomStartPercent = 60)
-                                    )
-                                    .zIndex(1f)
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .wrapContentSize()
-                                        .align(Alignment.Center)
-                                ) {
-                                    // Tiêu đề chính
-                                    Text(
-                                        text = "Thêm thiết bị",
-                                        fontSize = 36.sp, // Cỡ chữ lớn
-                                        fontWeight = FontWeight.Bold, // Chữ đậm
-                                        color = colorScheme.onPrimary // Màu chữ trắng
-                                    )
-                                }
-                            }
-                            // Hộp màu xanh lá cây với góc lõm
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 100.dp)
-                                    .width(40.dp)
-                                    .height(40.dp)
-                            ) {
-                                // Box màu vàng (ở dưới)
-                                Box(
-                                    modifier = Modifier
-                                        .width(40.dp)
-                                        .height(40.dp)
-                                        .align(Alignment.TopEnd)
-                                        .background(color = colorScheme.primary)
-                                        .zIndex(1f) // Z-index thấp hơn
-                                )
-
-                                // Box màu xanh lá cây (ở trên)
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(
-                                            color = colorScheme.background,
-                                            shape = RoundedCornerShape(topEndPercent = 100)
-                                        )
-                                        .width(40.dp)
-                                        .height(40.dp)
-                                        .zIndex(2f) // Z-index cao hơn
-                                ) {
-                                }
-                            }
-                        }
                         Row(
                             modifier = Modifier
                                 .fillMaxSize() // Chiếm toàn bộ kích thước màn hình
@@ -277,7 +213,7 @@ fun AddDeviceScreen(
                                             shape = RoundedCornerShape(50)
                                         ) {
                                             Text(
-                                                "Gửi yêu cầu",
+                                                "Liên kết",
                                                 color = colorScheme.onPrimary,
                                             ) // Nội dung và màu chữ của nút
                                         }

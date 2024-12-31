@@ -24,6 +24,7 @@ sealed class Screens(
     object ActivityHistoryDetail : Screens("activity_history_detail")
     object WifiConnection: Screens("wifi_connection")
     object Spaces : Screens("spaces")
+    object AddSpace : Screens("add_space")
 
     object Settings: Screens("settings")
     object Dashboard: Screens("dashboard")
