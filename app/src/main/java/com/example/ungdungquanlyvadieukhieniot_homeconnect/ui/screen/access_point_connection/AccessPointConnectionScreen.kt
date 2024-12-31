@@ -257,11 +257,9 @@ fun AccessPointConnectionScreen(
                                 })
                             }
                             WiFiCard(
+                                navController,
                                 wifiName = "ABC",
                                 isConnected = true,
-                                onClick = {
-                                    //Todo: Kết nối mạng Wi-Fi với thiết bị
-                                }
                             )
                         }
                     }
@@ -297,11 +295,9 @@ fun AccessPointConnectionScreen(
                         ) {
                             for (wifiName in wifiList) {
                                 WiFiCard(
+                                    navController,
                                     wifiName = wifiName,
                                     isConnected = false,
-                                    onClick = {
-                                        //Todo: Kết nối mạng Wi-Fi với thiết bị
-                                    }
                                 )
                             }
                         }
@@ -376,9 +372,9 @@ fun AccessPointConnectionScreen(
 
 @Composable
 fun WiFiCard(
+    navController: NavHostController,
     wifiName: String, // Tên mạng Wi-Fi hiển thị
     isConnected: Boolean, // Trạng thái kết nối (true nếu đã kết nối, false nếu chưa)
-    onClick: () -> Unit // Callback khi Card được nhấn
 ) {
     // Card chứa thông tin Wi-Fi
     AppTheme {
@@ -388,7 +384,11 @@ fun WiFiCard(
                 .fillMaxWidth()
                 .padding(top = 8.dp)
                 .border(1.dp, colorScheme.onSecondary, RoundedCornerShape(8.dp))
-                .clickable { onClick() },
+                .clickable(
+                  onClick = {
+                          navController.navigate("wifi_connection")
+                  }
+                ),
             shape = RoundedCornerShape(8.dp),
             colors = CardDefaults.cardColors(containerColor = colorScheme.secondary),
             elevation = CardDefaults.cardElevation(4.dp)

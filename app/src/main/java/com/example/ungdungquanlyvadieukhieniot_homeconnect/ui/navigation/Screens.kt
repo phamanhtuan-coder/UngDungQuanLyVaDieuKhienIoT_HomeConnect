@@ -22,6 +22,7 @@ sealed class Screens(
     object HouseManagement : Screens("house_management")
     object ActivityHistory : Screens("activity_history")
     object ActivityHistoryDetail : Screens("activity_history_detail")
+    object WifiConnection: Screens("wifi_connection")
     object Spaces : Screens("spaces")
     object AddSpace : Screens("add_space")
 
