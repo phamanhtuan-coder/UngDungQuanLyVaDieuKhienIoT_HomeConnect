@@ -149,7 +149,9 @@ fun OtpScreen(navController: NavHostController) {
 
                 // Nút xác nhận OTP
                 Button(
-                    onClick = { /* TODO: Xử lý xác nhận OTP */ },
+                    onClick = {/* TODO: Xử lý xác nhận OTP */
+                        navController.navigate("new_password")
+                    },
                     modifier = Modifier.size(
                         width = if (isTablet) 300.dp else 200.dp,
                         height = if (isTablet) 56.dp else 48.dp
