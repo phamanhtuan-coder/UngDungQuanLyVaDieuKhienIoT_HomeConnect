@@ -13,8 +13,6 @@ sealed class Screens(
     object OTP: Screens("otp")
     object PasswordAuth: Screens("password_auth")
     object Profile: Screens("profile")
-    object UpdateProfile: Screens("update_profile")
-    object UpdateDevice: Screens("update_device")
     object AddDevice: Screens("add_device")
     object Devices: Screens("devices")
     object DeviceDetail : Screens("device_detail")
@@ -24,6 +22,7 @@ sealed class Screens(
     object HouseManagement : Screens("house_management")
     object ActivityHistory : Screens("activity_history")
     object ActivityHistoryDetail : Screens("activity_history_detail")
+    object Spaces: Screens("spaces")
 
     object Settings: Screens("settings")
     object Dashboard: Screens("dashboard")

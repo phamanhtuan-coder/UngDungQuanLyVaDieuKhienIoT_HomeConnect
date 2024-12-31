@@ -116,7 +116,9 @@ fun HomeScreen(
                             fontWeight = FontWeight.Bold
                         )
                         TextButton(
-                            onClick = { /* TODO: Navigate */ },
+                            onClick = {
+                                navController.navigate(Screens.Spaces.route)
+                            },
                             colors = ButtonDefaults.textButtonColors(
                                 contentColor = Color.Blue
                             )

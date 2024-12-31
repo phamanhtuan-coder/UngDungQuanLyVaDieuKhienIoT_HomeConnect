@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 
 /**
@@ -53,67 +55,72 @@ fun SpaceCard(
     deviceCount: Int = 2
 
 ) {
-  return Card(
-        modifier = Modifier
-            .padding(8.dp)
-            .size(160.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .shadow(4.dp, RoundedCornerShape(12.dp)),
-        colors =  CardDefaults. cardColors(
-            containerColor = Color(0xFFF5F5F5),
-            contentColor = Color.Black
-        ),
-        content = {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(12.dp),
-                verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        Card(
+            modifier = Modifier
+                .padding(8.dp)
+                .size(160.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .shadow(4.dp, RoundedCornerShape(12.dp)),
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFFF5F5F5),
+                contentColor = Color.Black
+            ),
+            content = {
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = if(temperature>=30) Color(0xFFE91E63) else if ( temperature <=10) Color(0xFF2196F3) else Color(0xFF4CAF50),
-                            shape = RoundedCornerShape(16.dp)
-                        )
-                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                        .fillMaxSize()
+                        .padding(12.dp),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = if (temperature >= 30) Color(0xFFE91E63) else if (temperature <= 10) Color(
+                                    0xFF2196F3
+                                ) else Color(0xFF4CAF50),
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                            .padding(horizontal = 12.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = "$temperature °C",
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = Color(0xFF2196F3),
+                        modifier = Modifier
+                            .size(48.dp)
+                            .padding(8.dp)
+                    )
+
+
                     Text(
-                        text = "$temperature °C",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
+                        text = spaceName,
+                        color = Color.Black,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
+                        text = "$deviceCount Devices Connected",
+                        color = Color.Gray,
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center
                     )
                 }
-
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = Color(0xFF2196F3),
-                    modifier = Modifier
-                        .size(48.dp)
-                        .padding(8.dp)
-                )
-
-
-                Text(
-                    text = spaceName,
-                    color = Color.Black,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    text = "$deviceCount Devices Connected",
-                    color = Color.Gray,
-                    fontSize = 14.sp,
-                    textAlign = TextAlign.Center
-                )
             }
-        }
-    )
+        )
+    }
 }
