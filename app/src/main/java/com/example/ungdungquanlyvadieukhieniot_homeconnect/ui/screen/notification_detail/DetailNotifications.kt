@@ -17,7 +17,9 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -33,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -58,7 +61,10 @@ fun DetailNotification(
 ) {
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
-        val titleNotification = remember { mutableStateOf("Tên thông báo") }
+        val deviceName = remember { mutableStateOf("Tên thiết bị") }
+        val spaceName = remember { mutableStateOf("Tên không gian") }
+        val timeStamp = remember { mutableStateOf("30/12/2024 12:30 AM") }
+        val message = remember { mutableStateOf("Nội dung thông báo.") }
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             containerColor = colorScheme.background,
@@ -106,14 +112,13 @@ fun DetailNotification(
                                             .fillMaxWidth()
                                             .padding(12.dp) // Padding ngoài cùng
                                     ) {
-                                        // Tiêu đề "TÊN THÔNG BÁO" nằm giữa toàn màn hình
                                         Box(
                                             modifier = Modifier
                                                 .fillMaxWidth(),
                                             contentAlignment = Alignment.Center // Căn giữa nội dung trong Box
                                         ) {
                                             Text(
-                                                text = titleNotification.value,
+                                                text = deviceName.value,
                                                 fontSize = 32.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 color = colorScheme.onPrimary
@@ -130,21 +135,22 @@ fun DetailNotification(
                                         ) {
                                             // Hàng chứa biểu tượng và tên sự kiện
                                             Row(
+                                                horizontalArrangement = Arrangement.spacedBy(8.dp),
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
                                                 Icon(
-                                                    imageVector = Icons.Filled.DateRange,
-                                                    contentDescription = "Calendar Icon",
-                                                    tint = Color.Black
+                                                    imageVector = Icons.Filled.LocationOn,
+                                                    contentDescription = "Location",
+                                                    tint = colorScheme.onPrimary
                                                 )
                                                 Spacer(modifier = Modifier.width(4.dp))
 
-                                                // Tên sự kiện
+                                                // Tên vị trí
                                                 Text(
-                                                    text = "QCITE Festival",
+                                                    text = spaceName.value,
                                                     fontSize = 18.sp,
                                                     fontWeight = FontWeight.Bold,
-                                                    color = Color.Black
+                                                    color = colorScheme.onPrimary
                                                 )
                                             }
 
@@ -156,29 +162,22 @@ fun DetailNotification(
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
                                                 // Ngày
+                                                Icon(
+                                                    imageVector = Icons.Filled.AccessTime,
+                                                    contentDescription = "Time",
+                                                    tint = colorScheme.onPrimary
+                                                )
+                                                Spacer(modifier = Modifier.width(4.dp))
                                                 Text(
-                                                    text = "March 11, 2024",
+                                                    text = timeStamp.value,
                                                     fontSize = 14.sp,
-                                                    color = Color.Gray
+                                                    color =colorScheme.onPrimary
                                                 )
 
-                                                // Dấu chấm ngăn cách
-                                                Text(
-                                                    text = "•",
-                                                    fontSize = 14.sp,
-                                                    color = Color.Gray
-                                                )
 
-                                                // Số sự kiện
-                                                Text(
-                                                    text = "5 Events",
-                                                    fontSize = 14.sp,
-                                                    color = Color.Gray
-                                                )
                                             }
                                         }
 
-                                        Spacer(modifier = Modifier.height(8.dp))
                                     }
                                 }
                                 // Box chứa góc lõm màu xám
@@ -192,7 +191,7 @@ fun DetailNotification(
                                         modifier = Modifier
                                             .size(24.dp)
                                             .align(Alignment.TopEnd)
-                                            .background(color = Color.Blue)
+                                            .background(color = colorScheme.primary)
                                             .zIndex(1f)  // Z-index thấp hơn
                                     )
 
@@ -202,12 +201,14 @@ fun DetailNotification(
                                             .fillMaxWidth()
                                             .height(24.dp)
                                             .background(
-                                                color = Color.LightGray,
+                                                color = colorScheme.background,
                                                 shape = RoundedCornerShape(topEndPercent = 50)
                                             )
                                             .zIndex(2f), // Z-index cao hơn
                                         contentAlignment = Alignment.Center // Căn Row vào giữa Box
-                                    ) {}
+                                    ) {
+
+                                    }
                                 }
                             }
                         }
@@ -216,7 +217,7 @@ fun DetailNotification(
                             verticalArrangement = Arrangement.Top
                         ) {
                             NotificationDetailScreen(
-                                content = "Nội dung thông báo chi tiết sẽ được hiển thị tại đây. Người dùng có thể đọc thông báo và lựa chọn xóa nếu cần thiết.",
+                                content = message.value,
                             )
                         }
                     }
@@ -230,48 +231,58 @@ fun DetailNotification(
 fun NotificationDetailScreen(
     content: String,
 ) {
-    Column (
-        modifier = Modifier
-            .width(500.dp)
-            .background(Color.LightGray)
-            .padding(16.dp)
-    ) {
-        // Hộp chứa nội dung thông báo
-        Box(
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .border(1.dp, Color(0xFFFFA000), shape = RoundedCornerShape(8.dp))
-                .padding(12.dp)
-        ) {
-            // Hiển thị nội dung thông báo
-            Text(
-                text = content,
-                fontSize = 16.sp,
-                color = Color.Gray,
-                textAlign = TextAlign.Start
-            )
-        }
+                .width(500.dp)
+                .background(colorScheme.background)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Nút "XÓA THÔNG BÁO"
-        Button(
-            onClick = {  },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp),
-            shape = RoundedCornerShape(8.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFFFFA000) // Màu nút xóa
-            )
         ) {
-            Text(
-                text = "XÓA THÔNG BÁO",
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                color = Color.Black
-            )
+            // Hộp chứa nội dung thông báo
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .border(1.dp, colorScheme.onBackground, shape = RoundedCornerShape(8.dp))
+                    .padding(12.dp)
+            ) {
+                // Hiển thị nội dung thông báo
+                Text(
+                    text = content,
+                    fontSize = 16.sp,
+                    color = colorScheme.onBackground,
+                    softWrap = true,
+                    lineHeight = TextUnit.Unspecified,
+                    textAlign = TextAlign.Start
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Nút "XÓA THÔNG BÁO"
+            Button(
+                onClick = {
+                    //Todo: Xử lý xóa thông báo
+                },
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(48.dp),
+                shape = RoundedCornerShape(50),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorScheme.error// Màu nút xóa
+                )
+            ) {
+                Text(
+                    text = "Xóa thông báo",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = colorScheme.onError
+                )
+            }
         }
     }
 }
