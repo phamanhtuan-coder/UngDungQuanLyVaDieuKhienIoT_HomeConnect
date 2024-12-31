@@ -173,8 +173,9 @@ fun CardSettings(icon: ImageVector, title: String, onClick: () -> Unit) {
 
     Row(
         modifier = Modifier
-            .fillMaxWidth()
             .clickable { onClick() }
+            .width(if (isTablet()) 500.dp else 400.dp)
+            .height(if (isTablet()) 80.dp else 70.dp)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

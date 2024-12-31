@@ -21,6 +21,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.onboard_wel
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.otp.OtpScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.password_recovery.PasswordRecoveryScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.profile.ProfileScreen
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.settings.SettingsScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.signup.SignUpScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.wifi_connection.WifiConnectionScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.space.SpaceScreen
@@ -90,7 +91,7 @@ fun NavigationGraph(
             //Settings Screen
             navigation(startDestination = Screens.Settings.route, route = "settings_graph") {
                 composable(Screens.Settings.route) {
-
+                    SettingsScreen(navController)
                 }
             }
 
