@@ -25,8 +25,6 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -34,10 +32,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,7 +46,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 
@@ -100,7 +93,7 @@ fun NotificationScreen(
                     if (notifications.isEmpty()) {
                         EmptyNotificationScreen()
                     } else {
-                        NotificationList(notifications)
+                        NotificationList(notifications, navController)
                     }
                 }
             }
@@ -146,7 +139,7 @@ fun EmptyNotificationScreen() {
 
 // Danh sách các thông báo
 @Composable
-fun NotificationList(notifications: List<Notification>) {
+fun NotificationList(notifications: List<Notification>, navController: NavHostController) {
     AppTheme {
         val colorScheme= MaterialTheme.colorScheme
         Column(
@@ -256,7 +249,10 @@ fun NotificationList(notifications: List<Notification>) {
             ) {
                 // Kiểm tra và truyền đúng danh sách
                 items(notifications) { notification ->
-                    NotificationCard(notification) // Hiển thị từng Card
+                    NotificationCard(
+                        notification,
+                        navController = navController
+                    ) // Hiển thị từng Card
                 }
             }
         }
@@ -265,14 +261,17 @@ fun NotificationList(notifications: List<Notification>) {
 
 // Card cho từng thông báo
 @Composable
-fun NotificationCard(notification: Notification) {
+fun NotificationCard(notification: Notification, navController: NavHostController) {
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
         Card(
             modifier = Modifier
                 .width(500.dp)
                 .padding(NotificationStyle.cardPadding)
-                .clickable { /* Handle click */ },
+                .clickable {
+                    //Todo: Lấy id thông báo để đi tới chi tiết thông báo
+                    navController.navigate("notification_detail")
+                },
             elevation = CardDefaults.cardElevation(NotificationStyle.cardElevation),
             shape = RoundedCornerShape(NotificationStyle.cardCornerRadius),
             colors = CardDefaults.cardColors(colorScheme.primary)
