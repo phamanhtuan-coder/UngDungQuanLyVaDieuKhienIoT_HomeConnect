@@ -71,7 +71,6 @@ fun AddSpaceScreen(
                     ) {
 
 
-
                         Row(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -115,7 +114,9 @@ fun AddSpaceScreen(
                                                 focusedContainerColor = colorScheme.onPrimary,
                                                 unfocusedContainerColor = colorScheme.onPrimary,
                                                 focusedIndicatorColor = colorScheme.primary,
-                                                unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
+                                                unfocusedIndicatorColor = colorScheme.onBackground.copy(
+                                                    alpha = 0.5f
+                                                )
                                             )
                                         )
                                         Spacer(modifier = Modifier.height(8.dp))
@@ -139,7 +140,9 @@ fun AddSpaceScreen(
                                                 focusedContainerColor = colorScheme.onPrimary,
                                                 unfocusedContainerColor = colorScheme.onPrimary,
                                                 focusedIndicatorColor = colorScheme.primary,
-                                                unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
+                                                unfocusedIndicatorColor = colorScheme.onBackground.copy(
+                                                    alpha = 0.5f
+                                                )
                                             ),
                                             trailingIcon = {
                                                 Icon(
@@ -178,5 +181,5 @@ fun AddSpaceScreen(
 @Preview(showBackground = true)
 @Composable
 fun AddSpaceScreenPreview() {
-    AddSpaceScreen(navController =rememberNavController())
+    AddSpaceScreen(navController = rememberNavController())
 }

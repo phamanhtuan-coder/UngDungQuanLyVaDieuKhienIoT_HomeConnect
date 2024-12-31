@@ -12,8 +12,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -112,7 +115,8 @@ fun PasswordRecoveryScreen(navController: NavHostController) {
                         unfocusedContainerColor = colorScheme.onPrimary,
                         focusedIndicatorColor = colorScheme.primary,
                         unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
-                    )
+                    ),
+                    leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null) },
                 )
                 Spacer(modifier = Modifier.height(24.dp))
 
