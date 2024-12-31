@@ -100,6 +100,11 @@ import kotlinx.coroutines.launch
  * -----------------------------------------
  * Chỉnh sửa giao diện
  * ---------------------------------------
+ *
+ * Người cập nhật: Nguyễn Thanh Sang
+ * Ngày viết: 31/12/2024
+ * ---------------------
+ * Thêm phần navigation
  */
 @Composable
 fun DeviceDetailScreen(
@@ -572,6 +577,7 @@ fun DeviceDetailPhoneScreen(
                                 Button(
                                     onClick = {
                                         //Todo: Xử lý khi nhấn nút Lịch sử
+                                        navController.navigate(Screens.ActivityHistory.route)
                                     },
                                     modifier = Modifier
                                         .weight(1f) // Chia đều không gian
@@ -1094,6 +1100,7 @@ fun DeviceDetailTabletScreen(navController: NavHostController) {
                                     Button(
                                         onClick = {
                                             //Todo: Xử lý khi nhấn nút lịch sử hoạt động
+                                            navController.navigate(Screens.ActivityHistory.route)
                                         },
                                         modifier = Modifier
                                             .weight(1f) // Chia đều không gian
