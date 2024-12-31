@@ -104,11 +104,13 @@ fun NavigationGraph(
             //All Notifications Screen
             //Todo: Lấy dữ liệu thông báo từ server
             composable(Screens.AllNotifications.route) {
-                NotificationScreen(navController, listOf(
-                    Notification("New Feature Alert!", "We've introduced new features.", false),
-                    Notification("System Update", "Your app has been updated.", true),
-                    Notification("Reminder", "Your meeting is scheduled at 3 PM.", false)
-                ))
+                NotificationScreen(
+                    navController, listOf(
+                        Notification("New Feature Alert!", "We've introduced new features.", false),
+                        Notification("System Update", "Your app has been updated.", true),
+                        Notification("Reminder", "Your meeting is scheduled at 3 PM.", false)
+                    )
+                )
             }
 
             //House Management Screen
