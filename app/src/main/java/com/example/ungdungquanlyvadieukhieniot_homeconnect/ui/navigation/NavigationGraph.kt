@@ -17,6 +17,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_deta
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.home.HomeScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.house_management.HouseManagementScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.login.LoginScreen
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.new_password.NewPasswordScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.notification_detail.DetailNotification
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.onboard_welcome.WelcomeScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.otp.OtpScreen
@@ -163,6 +164,10 @@ fun NavigationGraph(
                 AddSpaceScreen(navController)
             }
 
+            //Todo: Lấy dữ liêu id để vào kết nối wifi
+            composable(Screens.NewPassword.route) {
+                NewPasswordScreen(navController)
+            }
             //Password Authentication Screen
             composable(Screens.PasswordAuth.route) {
                 PasswordAuthenticationScreen(navController)
