@@ -71,6 +71,8 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.WarningDialog
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -97,7 +99,21 @@ fun ProfileScreen(
 
         var showDatePicker by remember { mutableStateOf(false) }
         val datePickerState = rememberDatePickerState()
+        var showAlertDialog by remember { mutableStateOf(false) }
 
+        if (showAlertDialog) {
+            WarningDialog(
+                title = "Cảnh báo",
+                text = "Hành động này sẽ đăng xuất bạn ra khỏi ứng dụng. Bạn có chắc chắn không?",
+                onConfirm = {
+                    //Todo: Đăng xuất
+                    navController.navigate(Screens.Welcome.route) {
+                        popUpTo(Screens.Welcome.route) { inclusive = true }
+                    }
+                },
+                onDismiss = { showAlertDialog = false }
+            )
+        }
 
         val context = LocalContext.current
 
@@ -333,7 +349,10 @@ fun ProfileScreen(
                                         contentAlignment = Alignment.CenterEnd
                                     ) {
                                         Button(
-                                            onClick = { /* TODO: Xử lý sự kiện nút bấm đăng xuất */ },
+                                            onClick = {
+                                            /* TODO: Xử lý sự kiện nút bấm đăng xuất */
+                                                showAlertDialog = true
+                                            },
                                             modifier = Modifier
                                                 .fillMaxSize()
                                                 .clip(CutCornerShape(bottomStart = (if (isTablet) 90.dp else 60.dp) / 1.5f)),

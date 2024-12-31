@@ -56,6 +56,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.HouseSelection
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.WarningDialog
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
@@ -301,47 +302,14 @@ fun SpaceCard(
         var showAlertDialog by remember { mutableStateOf(false) }
 
         if (showAlertDialog) {
-            AlertDialog(
-                containerColor = colorScheme.background,
-                titleContentColor = colorScheme.error,
-                textContentColor = colorScheme.onBackground,
-                onDismissRequest = {
+            WarningDialog(
+                title = "Cảnh báo",
+                text = "Hành động này sẽ tắt/mở toàn bộ thiết bị trong phòng $roomName. Bạn có chắc chắn không?",
+                onConfirm = {
+                    onSwitchToggled(switchState)
                     showAlertDialog = false
                 },
-                title = { Text("Cảnh báo") },
-                text = {
-                    Text(
-                        text = "Hành động này sẽ tắt/mở toàn bộ thiết bị trong phòng $roomName. Bạn có chắc chắn không?"
-                    )
-                },
-                confirmButton = {
-                    TextButton(
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = colorScheme.onError,
-                            containerColor = colorScheme.error
-                        ),
-                        onClick = {
-                            onSwitchToggled(switchState)
-                            showAlertDialog = false
-                        }
-                    ) {
-                        Text("Xác nhận")
-                    }
-                },
-                dismissButton = {
-                    TextButton(
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = colorScheme.onPrimary,
-                            containerColor = colorScheme.primary
-                        ),
-                        onClick = {
-                            showAlertDialog =
-                                false // Chỉ đóng hộp thoại mà không thay đổi trạng thái
-                        }
-                    ) {
-                        Text("Hủy")
-                    }
-                }
+                onDismiss = { showAlertDialog = false }
             )
         }
         Box(
