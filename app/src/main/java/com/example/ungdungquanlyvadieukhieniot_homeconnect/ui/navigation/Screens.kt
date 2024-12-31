@@ -22,6 +22,7 @@ sealed class Screens(
     object AllNotifications : Screens("all_notifications")
     object HouseManagement : Screens("house_management")
     object ActivityHistory : Screens("activity_history")
+    object ActivityHistoryDetail : Screens("activity_history_detail")
 
     object Settings: Screens("settings")
     object Dashboard: Screens("dashboard")

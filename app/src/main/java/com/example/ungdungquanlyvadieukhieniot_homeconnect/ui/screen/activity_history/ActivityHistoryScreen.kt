@@ -4,6 +4,7 @@ package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.activity_h
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -116,7 +117,7 @@ fun ActivityHistoryScreen(
                             verticalArrangement = if (isLandscape) Arrangement.Center else Arrangement.SpaceBetween
                         ) {
                             items(5) {
-                                CardActivityHistory(label = "Hoạt động 1", time = "12/10/2024", detail = "Đèn sáng" )
+                                CardActivityHistory(navController = navController,label = "Hoạt động 1", time = "12/10/2024", detail = "Đèn sáng" )
                             }
                         }
                     }
@@ -128,13 +129,17 @@ fun ActivityHistoryScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CardActivityHistory(label: String, time: String,detail:String) {
+fun CardActivityHistory(navController: NavHostController,label: String, time: String,detail:String) {
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
         Box(
-
             modifier = Modifier
                 .padding(vertical = 8.dp)
+                .clickable(
+                    onClick = {
+                        navController.navigate("activity_history_detail")
+                    }
+                )
                 .background(colorScheme.secondary, RoundedCornerShape(8.dp) )
                 .border(2.dp, colorScheme.onBackground, RoundedCornerShape(8.dp))
             ) {

@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.AccessPointConnectionScreen
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.activity_detail.ActivityHistoryScreenDetailScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.activity_history.ActivityHistoryScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.add_device.AddDeviceScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.all_notifications.NotificationScreen
@@ -114,6 +115,11 @@ fun NavigationGraph(
             //Todo: Lấy dữ liêu id để hiển thị thông tin lịch sử
             composable(Screens.ActivityHistory.route) {
                 ActivityHistoryScreen(navController)
+            }
+
+            //Todo: Lấy dữ liêu id để hiển thị chi tiết thông tin lịch sử
+            composable(Screens.ActivityHistoryDetail.route) {
+                ActivityHistoryScreenDetailScreen(navController)
             }
 
             // Todo:... other nested graphs (devices, profile, settings) ...
