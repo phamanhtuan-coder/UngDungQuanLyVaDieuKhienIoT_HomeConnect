@@ -23,6 +23,7 @@ sealed class Screens(
     object ActivityHistory : Screens("activity_history")
     object ActivityHistoryDetail : Screens("activity_history_detail")
     object Spaces : Screens("spaces")
+    object AddSpace : Screens("add_space")
 
     object Settings: Screens("settings")
     object Dashboard: Screens("dashboard")

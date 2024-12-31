@@ -9,6 +9,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_poin
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.activity_detail.ActivityHistoryScreenDetailScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.activity_history.ActivityHistoryScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.add_device.AddDeviceScreen
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.add_space.AddSpaceScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.all_notifications.Notification
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.all_notifications.NotificationScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.DeviceScreen
@@ -147,6 +148,11 @@ fun NavigationGraph(
             //Spaces Screen
             composable(Screens.Spaces.route) {
                 SpaceScreen(navController)
+            }
+
+            //Add Space Screen
+            composable(Screens.AddSpace.route) {
+                AddSpaceScreen(navController)
             }
 
 

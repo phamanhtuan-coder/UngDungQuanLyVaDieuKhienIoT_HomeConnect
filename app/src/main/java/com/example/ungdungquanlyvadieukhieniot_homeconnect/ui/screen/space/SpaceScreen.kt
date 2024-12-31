@@ -110,7 +110,7 @@ fun SpaceScreen(
                 FloatingActionButton(
                     onClick = {
                         //ToDo: Chuyển tới trang thêm thiết bị
-                        navController.navigate("add_space")
+                        navController.navigate(Screens.AddSpace.route)
                     },
                     content = {
                         Icon(
