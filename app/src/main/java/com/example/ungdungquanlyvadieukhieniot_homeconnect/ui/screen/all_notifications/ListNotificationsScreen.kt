@@ -100,7 +100,7 @@ fun NotificationScreen(
                     if (notifications.isEmpty()) {
                         EmptyNotificationScreen()
                     } else {
-                        NotificationList(notifications)
+                        NotificationList(notifications, navController)
                     }
                 }
             }
@@ -146,7 +146,7 @@ fun EmptyNotificationScreen() {
 
 // Danh sách các thông báo
 @Composable
-fun NotificationList(notifications: List<Notification>) {
+fun NotificationList(notifications: List<Notification>, navController: NavHostController) {
     AppTheme {
         val colorScheme= MaterialTheme.colorScheme
         Column(
@@ -256,7 +256,7 @@ fun NotificationList(notifications: List<Notification>) {
             ) {
                 // Kiểm tra và truyền đúng danh sách
                 items(notifications) { notification ->
-                    NotificationCard(notification) // Hiển thị từng Card
+                    NotificationCard(notification, navController = navController) // Hiển thị từng Card
                 }
             }
         }
@@ -265,14 +265,17 @@ fun NotificationList(notifications: List<Notification>) {
 
 // Card cho từng thông báo
 @Composable
-fun NotificationCard(notification: Notification) {
+fun NotificationCard(notification: Notification, navController: NavHostController) {
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
         Card(
             modifier = Modifier
                 .width(500.dp)
                 .padding(NotificationStyle.cardPadding)
-                .clickable { /* Handle click */ },
+                .clickable {
+                    //Todo: Lấy id thông báo để đi tới chi tiết thông báo
+                    navController.navigate("notification_detail")
+                },
             elevation = CardDefaults.cardElevation(NotificationStyle.cardElevation),
             shape = RoundedCornerShape(NotificationStyle.cardCornerRadius),
             colors = CardDefaults.cardColors(colorScheme.primary)

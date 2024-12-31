@@ -8,12 +8,14 @@ import androidx.navigation.navigation
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.AccessPointConnectionScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.activity_history.ActivityHistoryScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.add_device.AddDeviceScreen
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.all_notifications.Notification
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.all_notifications.NotificationScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.DeviceScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.DeviceDetailScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.home.HomeScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.house_management.HouseManagementScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.login.LoginScreen
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.notification_detail.DetailNotification
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.onboard_welcome.WelcomeScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.otp.OtpScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.password_recovery.PasswordRecoveryScreen
@@ -102,7 +104,11 @@ fun NavigationGraph(
             //All Notifications Screen
             //Todo: Lấy dữ liệu thông báo từ server
             composable(Screens.AllNotifications.route) {
-                NotificationScreen(navController, listOf())
+                NotificationScreen(navController, listOf(
+                    Notification("New Feature Alert!", "We've introduced new features.", false),
+                    Notification("System Update", "Your app has been updated.", true),
+                    Notification("Reminder", "Your meeting is scheduled at 3 PM.", false)
+                ))
             }
 
             //House Management Screen
@@ -114,6 +120,12 @@ fun NavigationGraph(
             //Todo: Lấy dữ liêu id để hiển thị thông tin lịch sử
             composable(Screens.ActivityHistory.route) {
                 ActivityHistoryScreen(navController)
+            }
+
+            //Notification Detail Screen
+            //Todo: Lấy id notification để hiển thị thông tin chi tiết
+            composable(Screens.NotificationDetail.route) {
+                DetailNotification(navController)
             }
 
             // Todo:... other nested graphs (devices, profile, settings) ...
