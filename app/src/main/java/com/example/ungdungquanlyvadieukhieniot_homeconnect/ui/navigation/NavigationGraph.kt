@@ -20,12 +20,13 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.login.Login
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.notification_detail.DetailNotification
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.onboard_welcome.WelcomeScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.otp.OtpScreen
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.password_authentication.PasswordAuthenticationScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.password_recovery.PasswordRecoveryScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.profile.ProfileScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.settings.SettingsScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.signup.SignUpScreen
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.wifi_connection.WifiConnectionScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.space.SpaceScreen
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.wifi_connection.WifiConnectionScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screens.DashboardScreen
 
 @Composable
@@ -160,6 +161,11 @@ fun NavigationGraph(
             //Add Space Screen
             composable(Screens.AddSpace.route) {
                 AddSpaceScreen(navController)
+            }
+
+            //Password Authentication Screen
+            composable(Screens.PasswordAuth.route) {
+                PasswordAuthenticationScreen(navController)
             }
 
 

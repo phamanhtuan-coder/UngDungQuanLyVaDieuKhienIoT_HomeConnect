@@ -1,126 +1,168 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.password_authentication
 
-import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
-/** Giao diện màn hình Xác Thực Mật Khẩu (Password authentication Screen)
- * -----------------------------------------
+/**
+ * Màn hình Xác thực mật khẩu
+ * ----------------------------
  * Người viết: Phạm Xuân Nhân
  * Ngày viết: 04/12/2024
- * Lần cập nhật cuối: 05/12/2024
- * -----------------------------------------
- * Input: Không có
- *
- * Output: Column chứa các thành phần giao diện của màn hình Xác Thực Mật Khẩu
+ * Lần cập nhật cuối: 31/12/2024
+ * ----------------------------
+ * @param navController: Đối tượng điều khiển điều hướng
+ * @return Scaffold chứa toàn bộ nội dung màn hình xác thực mật khẩu
  */
 
-//Sai thiết kế màn hình
-@Preview(showBackground = true)
 @Composable
-fun Passwordauthentication() {
-    val configuration = LocalConfiguration.current
-    val screenWidthDp = configuration.screenWidthDp.dp
+fun PasswordAuthenticationScreen(navController: NavHostController) {
+    //Todo: bổ sung logic và bổ sung navigation khi di chuyển
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        val passwordState = remember { mutableStateOf("") }
+        var passwordVisible by remember { mutableStateOf(false) }
+        val configuration = LocalConfiguration.current
+        val isTablet = configuration.screenWidthDp >= 600
 
-    // Xác định xem nếu chúng ta đang ở chế độ ngang
-    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-
-    //  kích thước phản hồi
-    val horizontalPadding = when {
-        screenWidthDp < 360.dp -> 8.dp
-        screenWidthDp < 600.dp -> 16.dp
-        else -> 32.dp
-    }
-
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White),
-
-        )
-    {
-        Box(modifier = Modifier.align(Alignment.Center)) {
+        Scaffold(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colorScheme.background),
+            containerColor = colorScheme.background
+        ) { paddingValues ->
             Column(
                 modifier = Modifier
-                    .padding(horizontal = horizontalPadding)
-                    .verticalScroll(rememberScrollState())
-                    .heightIn(max = 800.dp)
-                    .widthIn(max = 600.dp),
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(horizontal = if (isTablet) 32.dp else 16.dp)
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = if (isLandscape) Arrangement.Center else Arrangement.SpaceBetween
+                verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
             ) {
+
+                // Tiêu đề
                 Text(
-                    text = "Xác Thực Mật Khẩu",
-                    fontSize = 20.sp,
+                    text = "Xác thực mật khẩu",
+                    fontSize = if (isTablet) 28.sp else 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = colorScheme.primary
                 )
-                Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "hãy nhập mật khẩu xác thực.",
+                    text = "Vui lòng nhập mật khẩu để tiếp tục.",
                     fontSize = 14.sp,
-                    color = Color.Gray,
-                    textAlign = TextAlign.Center
+                    color = colorScheme.onBackground.copy(alpha = 0.6f)
+                )
+
+                // Trường nhập mật khẩu
+                OutlinedTextField(
+                    value = passwordState.value,
+                    onValueChange = { passwordState.value = it },
+                    label = { Text("Mật khẩu") },
+                    placeholder = { Text("Nhập mật khẩu của bạn") },
+                    singleLine = true,
+                    leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
+                    trailingIcon = {
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Icon(
+                                imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                            )
+                        }
+                    },
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    modifier = Modifier
+                        .width(if (isTablet) 500.dp else 400.dp)
+                        .height(if (isTablet) 80.dp else 70.dp),
+                    shape = RoundedCornerShape(25),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = colorScheme.onPrimary,
+                        unfocusedContainerColor = colorScheme.onPrimary,
+                        focusedIndicatorColor = colorScheme.primary,
+                        unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
+                    )
                 )
                 Spacer(modifier = Modifier.height(24.dp))
-                //EMAIL
-                OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
-                    label = { Text("Mật khẩu") },
-                    leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = "Lock Icon") },
-                    visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
-                )
-                Spacer(modifier = Modifier.height(16.dp))
 
-                // Nút gửi xác thực
+                // Nút xác thực mật khẩu
                 Button(
-                    onClick = { },
-                    modifier = Modifier.fillMaxWidth()
+                    onClick = {
+                        /* TODO: Xử lý xác thực mật khẩu */
+                    },
+                    modifier = Modifier
+                        .width(if (isTablet) 300.dp else 200.dp)
+                        .height(if (isTablet) 56.dp else 48.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
+                    shape = RoundedCornerShape(50)
                 ) {
-                    Text("Xác thực")
+                    Text(
+                        text = "Xác thực",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = colorScheme.onPrimary
+                    )
                 }
-                Spacer(modifier = Modifier.height(16.dp))
 
-                TextButton(onClick = { }) {
-                    Text("⬅ Quay lại")
+                // Nút quay lại màn hình trước đó
+                TextButton(onClick = {
+                    navController.popBackStack()
+                }) {
+                    Text(
+                        text = "Quay lại",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = colorScheme.primary
+                    )
                 }
             }
         }
     }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun PasswordAuthenticationScreenPreview() {
+    PasswordAuthenticationScreen(navController = rememberNavController())
 }
