@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -52,6 +54,13 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
  *
  * Nội dung cập nhật:
  *  - Cải thiện giao diện hiển thị text và thêm nút truy cập
+ *
+ *  --------------------------------------
+ *  Người cập nhật: Nguyễn Thanh Sang
+ *  Ngày cập nhật: 31/12/2024
+ *
+ *  Nội dung cập nhật:
+ *   - Cho phép cuộn
  */
 
 @Composable
@@ -68,7 +77,8 @@ fun WelcomeScreen(
                 modifier = Modifier
                     .padding(it)
                     .fillMaxSize()
-                    .background(color = MaterialTheme.colorScheme.primary),
+                    .background(color = MaterialTheme.colorScheme.primary)
+                    .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
