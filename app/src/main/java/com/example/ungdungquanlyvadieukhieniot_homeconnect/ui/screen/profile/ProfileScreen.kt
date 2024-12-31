@@ -350,7 +350,7 @@ fun ProfileScreen(
                                     ) {
                                         Button(
                                             onClick = {
-                                            /* TODO: Xử lý sự kiện nút bấm đăng xuất */
+                                                /* TODO: Xử lý sự kiện nút bấm đăng xuất */
                                                 showAlertDialog = true
                                             },
                                             modifier = Modifier
