@@ -32,6 +32,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.HouseSel
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.SpaceCard
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.WeatherInfo
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 /** Giao diện màn hình Trang chủ (Home Screen)
@@ -97,7 +98,7 @@ fun HomeScreen(
                     ) {
                         HouseSelection(
                             houses = listOf("House 1", "House 2", "House 3"),
-                            onManageHouseClicked = { /* TODO: Navigate */ }
+                            onManageHouseClicked = { navController.navigate(Screens.HouseManagement.route) }
                         )
                     }
 

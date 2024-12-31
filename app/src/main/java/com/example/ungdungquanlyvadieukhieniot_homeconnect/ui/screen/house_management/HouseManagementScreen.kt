@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -36,11 +37,13 @@ import androidx.compose.material.icons.filled.Villa
 import androidx.compose.material.icons.filled.Work
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -55,13 +58,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.navigation.NavHostController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 
 /**
@@ -87,28 +90,28 @@ fun HouseManagementScreen(
     val isPopupVisible = remember { mutableStateOf(false) }
     val isEditing = remember { mutableStateOf(false) }
     val editingData = remember { mutableStateOf(HouseData()) }
-
-    return Scaffold(
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        Scaffold(
         modifier = modifier.fillMaxSize(),
+            containerColor = colorScheme.background,
         topBar = {
-            Header(navController,"Back", "Quản lý nhà")
+            Header(navController, "Back", "Quản lý nhà")
         },
         bottomBar = {
-
+            MenuBottom(navController)
         },
-        floatingActionButton = {
-            // FAB action nếu có
-        },
-        floatingActionButtonPosition = FabPosition.End,
         content = {
             Column(
                 modifier = Modifier
                     .padding(it)
                     .fillMaxSize()
                     .padding(16.dp)
-                    .verticalScroll(rememberScrollState()),
+                    .verticalScroll(rememberScrollState())
+                    .background(colorScheme.background),
 
-            ) {
+
+                ) {
                 Text(
                     text = "Danh sách nhà",
                     fontSize = 20.sp,
@@ -116,7 +119,8 @@ fun HouseManagementScreen(
                     modifier = Modifier
                         .padding(bottom = 16.dp)
                         .fillMaxWidth(),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    color = colorScheme.onBackground
                 )
                 LazyColumn(
                     modifier = Modifier
@@ -144,11 +148,15 @@ fun HouseManagementScreen(
                         },
                         modifier = Modifier
                             .padding(top = 16.dp, end = if (isTablet) 60.dp else 16.dp)
-                            .align(Alignment.CenterEnd)
+                            .width(if (isTablet) 300.dp else 200.dp)
+                            .height(if (isTablet) 56.dp else 48.dp)
+                            .align(Alignment.CenterEnd),
+                        colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
+                        shape = RoundedCornerShape(50)
                     ) {
                         Text(
                             text = "Thêm nhà",
-                            color = Color.White,
+                            color = colorScheme.onPrimary,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -170,6 +178,7 @@ fun HouseManagementScreen(
         }
     )
 }
+}
 
 /**
  * Hiển thị card thông tin nhà
@@ -185,50 +194,59 @@ fun HouseManagementScreen(
  */
 @Composable
 fun CardHouse(isTablet: Boolean, onEdit: (String, String, String) -> Unit) {
-    Box(
-        modifier = Modifier.fillMaxWidth(),
-        contentAlignment = Alignment.Center
-    ) {
-        return Card(
-            modifier = Modifier
-                .widthIn(max = if (isTablet) 600.dp else 400.dp)
-                .padding(8.dp),
-            shape = RoundedCornerShape(12.dp)
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
         ) {
-            Row(
+            Card(
                 modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .widthIn(max = if (isTablet) 600.dp else 400.dp)
+                    .padding(8.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = colorScheme.primary,
+                    contentColor = colorScheme.onPrimary
+                )
             ) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Home,
-                        contentDescription = null,
-                        tint = Color(0xFF2196F3),
-                        modifier = Modifier.padding(end = 16.dp)
-                    )
-                    Text(
-                        text = "House 1",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-                IconButton(
-                    onClick = { onEdit("House 1", "Address 1", "Home") }
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                        contentDescription = null,
-                        tint = Color(0xFF2196F3)
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Home,
+                            contentDescription = null,
+                            tint = colorScheme.onPrimary,
+                            modifier = Modifier.padding(end = 16.dp)
+                        )
+                        Text(
+                            text = "House 1",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = colorScheme.onPrimary
+                        )
+                    }
+                    IconButton(
+                        onClick = { onEdit("House 1", "Address 1", "Home") }
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                            contentDescription = null,
+                            tint = colorScheme.onPrimary
+                        )
+                    }
                 }
             }
         }
     }
+
 }
 
 
@@ -278,26 +296,55 @@ fun AddHousePopup(
         Color.Red, Color.Green, Color.Blue, Color.Yellow, Color.Cyan,
         Color.Magenta, Color.Gray, Color.Black, Color.White, Color(0xFF2196F3)
     )
-
-    return AlertDialog(
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        AlertDialog(
+            containerColor = colorScheme.background,
+            titleContentColor = colorScheme.onBackground,
+            textContentColor = colorScheme.onBackground,
         onDismissRequest = { onDismiss() },
         confirmButton = {
             Button(onClick = {
-                onAddOrUpdateHouse(houseName.value, houseAddress.value, selectedIcon.value, selectedColor.value)
-            }) {
-                Text(if (isEditing) "Lưu" else "Thêm nhà")
+                onAddOrUpdateHouse(
+                    houseName.value,
+                    houseAddress.value,
+                    selectedIcon.value,
+                    selectedColor.value
+                )
+            },
+
+                modifier = Modifier
+                    .width(if (isTablet) 200.dp else 100.dp)
+                    .height(if (isTablet) 56.dp else 48.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
+                shape = RoundedCornerShape(50)
+            ) {
+                Text(
+                    if (isEditing) "Lưu" else "Thêm",
+                    color = colorScheme.onPrimary,
+                    fontSize = 12.sp
+                )
             }
         },
         dismissButton = {
-            Button(onClick = { onDismiss() }) {
-                Text("Hủy")
+            Button(
+                onClick = { onDismiss() },
+                modifier = Modifier
+                    .width(if (isTablet) 200.dp else 100.dp)
+                    .height(if (isTablet) 56.dp else 48.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = colorScheme.error),
+                shape = RoundedCornerShape(50)
+
+            ) {
+                Text("Hủy", color = colorScheme.onError, fontSize = 12.sp)
             }
         },
         title = {
             Text(
                 text = if (isEditing) "Chỉnh sửa nhà" else "Thêm nhà mới",
                 fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
+                fontSize = 20.sp,
+                color = colorScheme.onBackground
             )
         },
         text = {
@@ -347,7 +394,7 @@ fun AddHousePopup(
                                     .background(color, CircleShape)
                                     .border(
                                         width = if (selectedColor.value == color) 1.dp else 0.dp,
-                                        color = if (selectedColor.value == color) Color.Black else Color.Transparent,
+                                        color = if (selectedColor.value == color) colorScheme.primary else Color.Transparent,
                                         shape = CircleShape
                                     )
                                     .clickable { selectedColor.value = color }
@@ -359,6 +406,7 @@ fun AddHousePopup(
         }
 
     )
+}
 }
 
 /**
@@ -379,25 +427,36 @@ fun IconPicker(
     icons: List<Pair<ImageVector, String>>,
     selectedIcon: MutableState<String>
 ) {
-    return Column(
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+            .padding(8.dp)
+            .background(colorScheme.background),
+            verticalArrangement = Arrangement.spacedBy(
+                8.dp,
+                alignment = Alignment.CenterVertically
+            ),
+            horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = "Chọn biểu tượng:",
             fontWeight = FontWeight.Medium,
             fontSize = 16.sp,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 8.dp),
+            color = colorScheme.onBackground
         )
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(colorScheme.background),
             content = {
                 items(icons.size) { index ->
                     Column(
+                        verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
                             .padding(8.dp)
@@ -408,22 +467,24 @@ fun IconPicker(
                         Icon(
                             imageVector = icons[index].first,
                             contentDescription = null,
-                            tint = if (selectedIcon.value == icons[index].second) Color(0xFF2196F3) else Color.Gray,
-                            modifier = Modifier.size(40.dp)
+                            tint = if (selectedIcon.value == icons[index].second) colorScheme.primary else colorScheme.onBackground,
+                            modifier = Modifier.size(36.dp)
                         )
                         Text(
                             text = icons[index].second,
-                            fontSize = 14.sp
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.Center,
                         )
                     }
                 }
             }
         )
     }
+    }
 }
 
 
-//Tạm thời, sau này sẽ thay bằng viewmodel
+//Todo: Tạm thời, sau này sẽ thay bằng viewmodel
 data class HouseData(
     val name: String = "",
     val address: String = "",
