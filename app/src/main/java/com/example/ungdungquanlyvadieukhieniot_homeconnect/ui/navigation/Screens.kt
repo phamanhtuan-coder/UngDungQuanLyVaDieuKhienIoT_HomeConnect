@@ -20,7 +20,7 @@ sealed class Screens(
     object DeviceDetail : Screens("device_detail")
     object AccessPoint: Screens("access_point")
     object AllNotifications : Screens("all_notifications")
-    object HouseManagement: Screens("house_management")
+    object HouseManagement : Screens("house_management")
 
     object Settings: Screens("settings")
     object Dashboard: Screens("dashboard")

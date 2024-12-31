@@ -20,7 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -41,7 +40,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 /** Giao diện màn hình Chi tiết thông báo (DetailNotification)
@@ -89,7 +87,7 @@ fun DetailNotification(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .wrapContentHeight() // Chiều cao vừa đủ với nội dung bên trong
-                                .background(color =colorScheme.background)
+                                .background(color = colorScheme.background)
                         ) {
                             // Cột chứa các phần tử con
                             Column {
@@ -278,7 +276,7 @@ fun NotificationDetailScreen(
     }
 }
 
-@Preview(showBackground = true,showSystemUi = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun NotificationDetailPreview() {
     DetailNotification(navController = rememberNavController())

@@ -41,7 +41,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -59,7 +58,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
@@ -92,11 +90,11 @@ fun HouseManagementScreen(
     val isPopupVisible = remember { mutableStateOf(false) }
     val isEditing = remember { mutableStateOf(false) }
     val editingData = remember { mutableStateOf(HouseData()) }
-AppTheme {
-    val colorScheme= MaterialTheme.colorScheme
-    Scaffold(
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        Scaffold(
         modifier = modifier.fillMaxSize(),
-        containerColor = colorScheme.background,
+            containerColor = colorScheme.background,
         topBar = {
             Header(navController, "Back", "Quản lý nhà")
         },
@@ -208,7 +206,7 @@ fun CardHouse(isTablet: Boolean, onEdit: (String, String, String) -> Unit) {
                     .padding(8.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(
-                   containerColor = colorScheme.primary,
+                    containerColor = colorScheme.primary,
                     contentColor = colorScheme.onPrimary
                 )
             ) {
@@ -298,12 +296,12 @@ fun AddHousePopup(
         Color.Red, Color.Green, Color.Blue, Color.Yellow, Color.Cyan,
         Color.Magenta, Color.Gray, Color.Black, Color.White, Color(0xFF2196F3)
     )
-AppTheme {
-    val colorScheme = MaterialTheme.colorScheme
-    AlertDialog(
-        containerColor = colorScheme.background,
-        titleContentColor = colorScheme.onBackground,
-        textContentColor = colorScheme.onBackground,
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        AlertDialog(
+            containerColor = colorScheme.background,
+            titleContentColor = colorScheme.onBackground,
+            textContentColor = colorScheme.onBackground,
         onDismissRequest = { onDismiss() },
         confirmButton = {
             Button(onClick = {
@@ -320,12 +318,17 @@ AppTheme {
                     .height(if (isTablet) 56.dp else 48.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
                 shape = RoundedCornerShape(50)
-                ) {
-                Text(if (isEditing) "Lưu" else "Thêm", color = colorScheme.onPrimary, fontSize = 12.sp)
+            ) {
+                Text(
+                    if (isEditing) "Lưu" else "Thêm",
+                    color = colorScheme.onPrimary,
+                    fontSize = 12.sp
+                )
             }
         },
         dismissButton = {
-            Button(onClick = { onDismiss() },
+            Button(
+                onClick = { onDismiss() },
                 modifier = Modifier
                     .width(if (isTablet) 200.dp else 100.dp)
                     .height(if (isTablet) 56.dp else 48.dp),
@@ -424,15 +427,18 @@ fun IconPicker(
     icons: List<Pair<ImageVector, String>>,
     selectedIcon: MutableState<String>
 ) {
-    AppTheme{
+    AppTheme {
         val colorScheme = MaterialTheme.colorScheme
-    Column(
+        Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
             .background(colorScheme.background),
-        verticalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.CenterVertically),
-        horizontalAlignment = Alignment.CenterHorizontally
+            verticalArrangement = Arrangement.spacedBy(
+                8.dp,
+                alignment = Alignment.CenterVertically
+            ),
+            horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = "Chọn biểu tượng:",
@@ -444,7 +450,9 @@ fun IconPicker(
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
-            modifier = Modifier.fillMaxWidth().background(colorScheme.background),
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(colorScheme.background),
             content = {
                 items(icons.size) { index ->
                     Column(
