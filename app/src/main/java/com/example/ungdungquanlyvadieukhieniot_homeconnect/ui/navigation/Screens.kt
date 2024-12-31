@@ -22,7 +22,7 @@ sealed class Screens(
     object HouseManagement : Screens("house_management")
     object ActivityHistory : Screens("activity_history")
     object ActivityHistoryDetail : Screens("activity_history_detail")
-    object Spaces: Screens("spaces")
+    object Spaces : Screens("spaces")
 
     object Settings: Screens("settings")
     object Dashboard: Screens("dashboard")

@@ -218,7 +218,8 @@ fun DeviceScreen(
                                             .clip(RoundedCornerShape(topEndPercent = 100)) // Clip nội dung ScrollableTabRow
                                     ) {
                                         CustomScrollableTabRow(selectedTabIndex = selectedTabIndex) { newIndex ->
-                                            selectedTabIndex = newIndex // Update the tabIndex when a tab is clicked
+                                            selectedTabIndex =
+                                                newIndex // Update the tabIndex when a tab is clicked
                                         }
                                     }
                                 }

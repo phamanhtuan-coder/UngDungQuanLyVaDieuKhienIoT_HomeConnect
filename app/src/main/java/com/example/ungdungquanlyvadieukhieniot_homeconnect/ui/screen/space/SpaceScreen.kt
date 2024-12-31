@@ -166,7 +166,7 @@ fun SpaceScreen(
                                     HouseSelection(
                                         houses = listOf("House 1", "House 2", "House 3"),
                                         onManageHouseClicked = {
-                                        /* TODO: Navigate */
+                                            /* TODO: Navigate */
                                             navController.navigate(Screens.HouseManagement.route)
                                         }
                                     )
@@ -294,7 +294,7 @@ fun SpaceCard(
     onSwitchToggled: (Boolean) -> Unit
 ) {
 
-    AppTheme{
+    AppTheme {
         val colorScheme = MaterialTheme.colorScheme
 
         var switchState by remember { mutableStateOf(isAllDevicesOn) }
@@ -335,7 +335,8 @@ fun SpaceCard(
                             containerColor = colorScheme.primary
                         ),
                         onClick = {
-                            showAlertDialog = false // Chỉ đóng hộp thoại mà không thay đổi trạng thái
+                            showAlertDialog =
+                                false // Chỉ đóng hộp thoại mà không thay đổi trạng thái
                         }
                     ) {
                         Text("Hủy")
@@ -343,95 +344,98 @@ fun SpaceCard(
                 }
             )
         }
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = if (isTablet) 24.dp else 16.dp, vertical = 8.dp)
-            .background(color = colorScheme.secondary, shape = RoundedCornerShape(16.dp))
-            .padding(16.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = if (isTablet) 24.dp else 16.dp, vertical = 8.dp)
+                .background(color = colorScheme.secondary, shape = RoundedCornerShape(16.dp))
+                .padding(16.dp)
         ) {
-            // Room Icon
-            Box(
-                modifier = Modifier
-                    .size(if (isTablet) 80.dp else 60.dp)
-                    .background(color = colorScheme.onPrimary, shape = CircleShape),
-                contentAlignment = Alignment.Center
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = roomName.first().toString(), // Display the first letter of the room name
-                    color = colorScheme.primary,
-                    fontSize = if (isTablet) 32.sp else 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            // Room Details
-            Column(
-                modifier = Modifier
-                    .padding(start = 16.dp)
-                    .weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text(
-                    text = roomName,
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontSize = if (isTablet) 20.sp else 16.sp,
+                // Room Icon
+                Box(
+                    modifier = Modifier
+                        .size(if (isTablet) 80.dp else 60.dp)
+                        .background(color = colorScheme.onPrimary, shape = CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = roomName.first()
+                            .toString(), // Display the first letter of the room name
+                        color = colorScheme.primary,
+                        fontSize = if (isTablet) 32.sp else 24.sp,
                         fontWeight = FontWeight.Bold
-                    ),
-                    color = colorScheme.onSecondary
-                )
-              Row(
-                  verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.Start
-              ) {
-                  Text(
-                      text = "Nhiệt độ: ",
-                      style = MaterialTheme.typography.bodyMedium,
-                      color = colorScheme.onSecondary
-                  )
-                  Text(
-                      text= "$temperature °C",
-                      style = MaterialTheme.typography.bodyMedium,
-                      fontWeight = FontWeight.Bold,
-                      color = if(temperature>=30) Color(0xFFE91E63) else if ( temperature <=10) Color(0xFF2196F3) else Color(0xFF4CAF50)
-                  )
-              }
-                Text(
-                    text = "Thiết bị: $activeDevices/$totalDevices đang hoạt động",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = colorScheme.onSecondary
+                    )
+                }
+
+                // Room Details
+                Column(
+                    modifier = Modifier
+                        .padding(start = 16.dp)
+                        .weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = roomName,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontSize = if (isTablet) 20.sp else 16.sp,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = colorScheme.onSecondary
+                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        Text(
+                            text = "Nhiệt độ: ",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = colorScheme.onSecondary
+                        )
+                        Text(
+                            text = "$temperature °C",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = if (temperature >= 30) Color(0xFFE91E63) else if (temperature <= 10) Color(
+                                0xFF2196F3
+                            ) else Color(0xFF4CAF50)
+                        )
+                    }
+                    Text(
+                        text = "Thiết bị: $activeDevices/$totalDevices đang hoạt động",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colorScheme.onSecondary
+                    )
+                }
+
+                Switch(
+                    checked = isAllDevicesOn,
+                    onCheckedChange = { newState ->
+                        switchState = newState
+                        showAlertDialog = true
+                    },
+                    thumbContent = {
+                        Icon(
+                            imageVector = if (isAllDevicesOn) Icons.Filled.Check else Icons.Filled.Close,
+                            contentDescription = "On/Off Switch",
+                            tint = if (isAllDevicesOn) colorScheme.onPrimary else colorScheme.onSecondary.copy(
+                                alpha = 0.8f
+                            )
+                        )
+                    },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = colorScheme.primary,
+                        checkedTrackColor = colorScheme.onPrimary,
+                        uncheckedThumbColor = colorScheme.secondary,
+                        uncheckedTrackColor = colorScheme.onSecondary.copy(alpha = 0.8f),
+                    )
                 )
             }
-
-            Switch(
-                checked = isAllDevicesOn,
-                onCheckedChange = { newState ->
-                    switchState = newState
-                    showAlertDialog = true
-                },
-                thumbContent = {
-                    Icon(
-                        imageVector = if (isAllDevicesOn) Icons.Filled.Check else Icons.Filled.Close,
-                        contentDescription = "On/Off Switch",
-                        tint = if (isAllDevicesOn) colorScheme.onPrimary else colorScheme.onSecondary.copy(
-                            alpha = 0.8f
-                        )
-                    )
-                },
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = colorScheme.primary,
-                    checkedTrackColor = colorScheme.onPrimary,
-                    uncheckedThumbColor = colorScheme.secondary,
-                    uncheckedTrackColor = colorScheme.onSecondary.copy(alpha = 0.8f),
-                )
-            )
         }
     }
-        }
 }
 
 
