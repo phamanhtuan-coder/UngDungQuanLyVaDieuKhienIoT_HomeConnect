@@ -22,9 +22,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,186 +37,195 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 /** Giao diện màn hình Chi tiết thông báo (DetailNotification)
  * -----------------------------------------
  * Người viết: Nguyễn Thanh Sang
  * Ngày viết: 10/12/2024
- * Lần cập nhật cuối: 11/12/2024
+ * Lần cập nhật cuối: 31/12/2024
  * -----------------------------------------
- * Input:
- *
- * Output: Scaffold
- *
+ * @param navController Đối tượng điều khiển điều hướng.
+ * @return Scaffold chứa toàn bộ nội dung
  * ---------------------------------------
  */
-
-@Preview
 @Composable
-fun DetailNotification() {
-    return Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        containerColor = Color.LightGray,
-        topBar = {
-
-        },
-        bottomBar = {
-
-        },
-        content = { innerPadding ->
-            LazyColumn (
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(innerPadding),
+fun DetailNotification(
+    navController: NavHostController
+) {
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        val titleNotification = remember { mutableStateOf("Tên thông báo") }
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            containerColor = colorScheme.background,
+            topBar = {
+                Header(
+                    type = "Notification",
+                    title = "Chi tiết thông báo",
+                    navController = navController
+                )
+            },
+            bottomBar = {
+                MenuBottom(navController = navController)
+            },
+            content = { innerPadding ->
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(innerPadding),
 //                    .padding(bottom = layoutConfig.outerPadding) // Padding linh hoạt
-                verticalArrangement = Arrangement.Top, // Sắp xếp các item theo chiều dọc, bắt đầu từ trên xuống.
-                horizontalAlignment = Alignment.CenterHorizontally // Căn chỉnh các item theo chiều ngang vào giữa.
-            ) {
-                item{
-                    // Box lớn chứa phần tiêu đề và các thành phần bên trong
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight() // Chiều cao vừa đủ với nội dung bên trong
-                            .background(color = Color.LightGray)
-                    ) {
-                        // Cột chứa các phần tử con
-                        Column {
-                            // Hộp màu xanh dương bo tròn góc dưới bên trái
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth() // Chiếm toàn bộ chiều rộng
-                                    .wrapContentHeight() // Chiều cao vừa đủ với nội dung
-                                    .background(
-                                        color = Color.Blue,
-                                        shape = RoundedCornerShape(bottomStart = 40.dp)
-                                    )
-                            ) {
-                                Column(
+                    verticalArrangement = Arrangement.Top, // Sắp xếp các item theo chiều dọc, bắt đầu từ trên xuống.
+                    horizontalAlignment = Alignment.CenterHorizontally // Căn chỉnh các item theo chiều ngang vào giữa.
+                ) {
+                    item {
+                        // Box lớn chứa phần tiêu đề và các thành phần bên trong
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight() // Chiều cao vừa đủ với nội dung bên trong
+                                .background(color =colorScheme.background)
+                        ) {
+                            // Cột chứa các phần tử con
+                            Column {
+                                // Hộp màu xanh dương bo tròn góc dưới bên trái
+                                Box(
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(12.dp) // Padding ngoài cùng
-                                ) {
-                                    // Tiêu đề "TÊN THÔNG BÁO" nằm giữa toàn màn hình
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth(),
-                                        contentAlignment = Alignment.Center // Căn giữa nội dung trong Box
-                                    ) {
-                                        Text(
-                                            text = "TÊN THÔNG BÁO",
-                                            fontSize = 32.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color.Black
+                                        .fillMaxWidth() // Chiếm toàn bộ chiều rộng
+                                        .wrapContentHeight() // Chiều cao vừa đủ với nội dung
+                                        .background(
+                                            color = colorScheme.primary,
+                                            shape = RoundedCornerShape(bottomStart = 40.dp)
                                         )
-                                    }
-
-                                    Spacer(modifier = Modifier.height(16.dp))
-
-                                    // Hàng chứa tiêu đề và thông tin ngày giờ nằm bên trái
+                                ) {
                                     Column(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(start = 12.dp) // Padding bên trái cho phần ngày giờ
+                                            .padding(12.dp) // Padding ngoài cùng
                                     ) {
-                                        // Hàng chứa biểu tượng và tên sự kiện
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically
+                                        // Tiêu đề "TÊN THÔNG BÁO" nằm giữa toàn màn hình
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth(),
+                                            contentAlignment = Alignment.Center // Căn giữa nội dung trong Box
                                         ) {
-                                            Icon(
-                                                imageVector = Icons.Filled.DateRange,
-                                                contentDescription = "Calendar Icon",
-                                                tint = Color.Black
-                                            )
-                                            Spacer(modifier = Modifier.width(4.dp))
-
-                                            // Tên sự kiện
                                             Text(
-                                                text = "QCITE Festival",
-                                                fontSize = 18.sp,
+                                                text = titleNotification.value,
+                                                fontSize = 32.sp,
                                                 fontWeight = FontWeight.Bold,
-                                                color = Color.Black
+                                                color = colorScheme.onPrimary
                                             )
                                         }
 
-                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Spacer(modifier = Modifier.height(16.dp))
 
-                                        // Hàng chứa ngày, số sự kiện và ngăn cách bằng dấu chấm
-                                        Row(
-                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                            verticalAlignment = Alignment.CenterVertically
+                                        // Hàng chứa tiêu đề và thông tin ngày giờ nằm bên trái
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(start = 12.dp) // Padding bên trái cho phần ngày giờ
                                         ) {
-                                            // Ngày
-                                            Text(
-                                                text = "March 11, 2024",
-                                                fontSize = 14.sp,
-                                                color = Color.Gray
-                                            )
+                                            // Hàng chứa biểu tượng và tên sự kiện
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Filled.DateRange,
+                                                    contentDescription = "Calendar Icon",
+                                                    tint = Color.Black
+                                                )
+                                                Spacer(modifier = Modifier.width(4.dp))
 
-                                            // Dấu chấm ngăn cách
-                                            Text(
-                                                text = "•",
-                                                fontSize = 14.sp,
-                                                color = Color.Gray
-                                            )
+                                                // Tên sự kiện
+                                                Text(
+                                                    text = "QCITE Festival",
+                                                    fontSize = 18.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = Color.Black
+                                                )
+                                            }
 
-                                            // Số sự kiện
-                                            Text(
-                                                text = "5 Events",
-                                                fontSize = 14.sp,
-                                                color = Color.Gray
-                                            )
+                                            Spacer(modifier = Modifier.height(4.dp))
+
+                                            // Hàng chứa ngày, số sự kiện và ngăn cách bằng dấu chấm
+                                            Row(
+                                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                // Ngày
+                                                Text(
+                                                    text = "March 11, 2024",
+                                                    fontSize = 14.sp,
+                                                    color = Color.Gray
+                                                )
+
+                                                // Dấu chấm ngăn cách
+                                                Text(
+                                                    text = "•",
+                                                    fontSize = 14.sp,
+                                                    color = Color.Gray
+                                                )
+
+                                                // Số sự kiện
+                                                Text(
+                                                    text = "5 Events",
+                                                    fontSize = 14.sp,
+                                                    color = Color.Gray
+                                                )
+                                            }
                                         }
+
+                                        Spacer(modifier = Modifier.height(8.dp))
                                     }
-
-                                    Spacer(modifier = Modifier.height(8.dp))
                                 }
-                            }
-                            // Box chứa góc lõm màu xám
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .wrapContentHeight() // Chiều cao linh hoạt theo LayoutConfig
-                            ) {
-                                // Box màu vàng nhỏ nằm trên góc phải
-                                Box(
-                                    modifier = Modifier
-                                        .size(24.dp)
-                                        .align(Alignment.TopEnd)
-                                        .background(color = Color.Blue)
-                                        .zIndex(1f)  // Z-index thấp hơn
-                                )
-
-                                // Box màu xám bo tròn góc lõm trên cùng bên phải
+                                // Box chứa góc lõm màu xám
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(24.dp)
-                                        .background(
-                                            color = Color.LightGray,
-                                            shape = RoundedCornerShape(topEndPercent = 50)
-                                        )
-                                        .zIndex(2f), // Z-index cao hơn
-                                    contentAlignment = Alignment.Center // Căn Row vào giữa Box
-                                ){}
+                                        .wrapContentHeight() // Chiều cao linh hoạt theo LayoutConfig
+                                ) {
+                                    // Box màu vàng nhỏ nằm trên góc phải
+                                    Box(
+                                        modifier = Modifier
+                                            .size(24.dp)
+                                            .align(Alignment.TopEnd)
+                                            .background(color = Color.Blue)
+                                            .zIndex(1f)  // Z-index thấp hơn
+                                    )
+
+                                    // Box màu xám bo tròn góc lõm trên cùng bên phải
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(24.dp)
+                                            .background(
+                                                color = Color.LightGray,
+                                                shape = RoundedCornerShape(topEndPercent = 50)
+                                            )
+                                            .zIndex(2f), // Z-index cao hơn
+                                        contentAlignment = Alignment.Center // Căn Row vào giữa Box
+                                    ) {}
+                                }
                             }
                         }
-                    }
-                    Column (
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Top
-                    ) {
-                        NotificationDetailScreen(
-                            content = "Nội dung thông báo chi tiết sẽ được hiển thị tại đây. Người dùng có thể đọc thông báo và lựa chọn xóa nếu cần thiết.",
-                        )
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Top
+                        ) {
+                            NotificationDetailScreen(
+                                content = "Nội dung thông báo chi tiết sẽ được hiển thị tại đây. Người dùng có thể đọc thông báo và lựa chọn xóa nếu cần thiết.",
+                            )
+                        }
                     }
                 }
             }
-        }
-    )
+        )
+    }
 }
 
 @Composable
@@ -264,4 +276,10 @@ fun NotificationDetailScreen(
             )
         }
     }
+}
+
+@Preview(showBackground = true,showSystemUi = true)
+@Composable
+fun NotificationDetailPreview() {
+    DetailNotification(navController = rememberNavController())
 }

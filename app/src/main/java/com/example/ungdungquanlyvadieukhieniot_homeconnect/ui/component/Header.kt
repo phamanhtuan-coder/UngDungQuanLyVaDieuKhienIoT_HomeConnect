@@ -61,7 +61,6 @@ fun getGreeting(): String {
  * @param type: Loại Header (Home hoặc Back)
  * @param title: Tiêu đề của Header
  * @param username: Tên người dùng
- *
  * @return TopAppBar chứa thông tin Header
  * ---------------------------------------
  * Người cập nhật: Phạm Anh Tuấn

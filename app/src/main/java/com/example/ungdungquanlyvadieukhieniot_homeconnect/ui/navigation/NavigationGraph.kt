@@ -11,6 +11,8 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.all_notific
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.DeviceScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.DeviceDetailScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.home.HomeScreen
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.house_management.HouseData
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.house_management.HouseManagementScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.login.LoginScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.onboard_welcome.WelcomeScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.otp.OtpScreen
@@ -101,6 +103,11 @@ fun NavigationGraph(
             //Todo: Lấy dữ liệu thông báo từ server
             composable(Screens.AllNotifications.route) {
                 NotificationScreen(navController, listOf())
+            }
+
+            //House Management Screen
+            composable(Screens.HouseManagement.route) {
+                HouseManagementScreen(navController )
             }
 
             // Todo:... other nested graphs (devices, profile, settings) ...
