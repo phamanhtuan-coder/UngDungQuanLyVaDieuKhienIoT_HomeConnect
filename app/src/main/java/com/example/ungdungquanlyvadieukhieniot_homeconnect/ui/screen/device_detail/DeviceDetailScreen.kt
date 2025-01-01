@@ -1236,15 +1236,14 @@ fun EndlessRollingPadlockTimePicker(
 
         Box(
             modifier = modifier
-                .height(130.dp)
+                .wrapContentHeight()
                 .background(colorScheme.background, shape = RoundedCornerShape(16.dp))
                 .border(2.dp, Color.Gray, RoundedCornerShape(16.dp))
                 .padding(4.dp),
             contentAlignment = Alignment.Center
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+
             ) {
                 // Cột giờ
                 RollingColumn(
@@ -1255,15 +1254,33 @@ fun EndlessRollingPadlockTimePicker(
                 )
 
                 // Dấu :
-                Text(
-                    text = ":",
-                    fontSize = 42.sp,
-                    color = colorScheme.onBackground,
-                    modifier = Modifier
-                        .wrapContentSize()// Chiều rộng cố định
-                        .padding(horizontal = 4.dp),
-                    textAlign = TextAlign.Center
-                )
+                LazyColumn(
+                    modifier = modifier
+                        .height(140.dp) // Chiều cao đồng bộ
+                        .background(colorScheme.background.copy(alpha = 0.8f)),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    item{
+                        Box(
+                            modifier = Modifier
+                                .wrapContentWidth()
+                                .offset(y = 5.dp)
+                                .height(50.dp), // Chiều cao cố định
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = ":",
+                                fontSize = 36.sp,
+                                color = colorScheme.onBackground,
+                                modifier = Modifier
+                                    .wrapContentSize()// Chiều rộng cố định
+                                    .padding(horizontal = 4.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
 
                 // Cột phút
                 RollingColumn(
@@ -1338,25 +1355,35 @@ fun <T> RollingColumn(
 ) {
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
+        // Snap behavior để giữ mục ở trung tâm khi cuộn
+        val snappingBehavior = rememberSnapFlingBehavior(state)
 
         LazyColumn(
             state = state,
+            flingBehavior = snappingBehavior, // Thêm hiệu ứng snap
             modifier = modifier
-                .height(140.dp)
+                .height(140.dp) // Chiều cao đồng bộ
                 .background(colorScheme.background.copy(alpha = 0.8f)),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             items(items.size * 100) { index ->
                 val item = items[index % items.size]
-                val isSelected = index == state.firstVisibleItemIndex + 1
-                Text(
-                    text = label(item),
-                    fontSize = if (isSelected) fontSize else fontSize * 0.8f, // Giảm font size cho mục không được chọn
-                    color = colorScheme.onBackground.copy(alpha = if (isSelected) 1f else 0.4f),
+                // Xác định mục được chọn
+                val isSelected = (index == state.firstVisibleItemIndex + 1)
+                Box(
                     modifier = Modifier
-                        .padding(vertical = if (isSelected) 6.dp else 4.dp)
-                )
+                        .fillMaxWidth()
+                        .height(50.dp), // Chiều cao cố định
+                    contentAlignment = Alignment.Center,
+                ) {Text(
+                        text = label(item),
+                        fontSize = if (isSelected) fontSize else fontSize * 0.8f, // Giảm font size cho mục không được chọn
+                        color = colorScheme.onBackground.copy(alpha = if (isSelected) 1f else 0.4f),
+                        modifier = Modifier
+                            .padding(vertical = if (isSelected) 6.dp else 4.dp)
+                    )
+                }
             }
         }
     }
