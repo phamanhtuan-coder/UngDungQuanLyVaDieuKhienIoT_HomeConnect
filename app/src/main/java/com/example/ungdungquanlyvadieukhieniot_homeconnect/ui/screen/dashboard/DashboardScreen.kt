@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,7 +45,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
@@ -153,33 +156,64 @@ fun DashboardScreen(
 // Biểu đồ dùng thư viện MPAndroidChart
 @Composable
 fun MpAndroidChart(title: String, data: List<Float>, labels: List<String>) {
-    val entries = data.mapIndexed { index, value -> Entry(index.toFloat(), value) }
-    val dataSet = LineDataSet(entries, title).apply {
-        color = android.graphics.Color.BLUE
-        valueTextColor = android.graphics.Color.BLACK
-        lineWidth = 2f
-    }
-    val lineData = LineData(dataSet)
-
-    AndroidView(
-        factory = { context ->
-            LineChart(context).apply {
-                this.data = lineData
-                description.text = title
-                invalidate() // Redraw chart
-            }
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(200.dp)
-            .padding(horizontal = 16.dp),
-        update = { chart ->
-            //Cập nhật dữ liệu khi data thay đổi
-            chart.data = lineData
-            chart.description.text = title
-            chart.invalidate() // Trigger redraw
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        val entries = data.mapIndexed { index, value -> Entry(index.toFloat(), value) }
+        val dataSet = LineDataSet(entries, title).apply {
+            color = android.graphics.Color.BLUE
+            valueTextColor = colorScheme.onBackground.toArgb()
+            lineWidth = 4f
         }
-    )
+        val lineData = LineData(dataSet)
+
+        AndroidView(
+            factory = { context ->
+                LineChart(context).apply {
+                    this.data = lineData
+                    description.text = title
+
+                    // Cấu hình trục X
+                    xAxis.apply {
+                        textColor = colorScheme.onBackground.toArgb() // Màu chữ trên trục X
+                        textSize = 12f // Kích thước chữ trên trục X
+                        position = XAxis.XAxisPosition.BOTTOM // Hiển thị trục X bên dưới
+                        setDrawGridLines(false) // Ẩn các đường lưới dọc
+                    }
+
+                    // Cấu hình trục Y trái
+                    axisLeft.apply {
+                        textColor = colorScheme.onBackground.toArgb() // Màu chữ trên trục Y trái
+                        textSize = 12f // Kích thước chữ trên trục Y trái
+                    }
+
+                    // Cấu hình trục Y phải (nếu cần)
+                    axisRight.apply {
+                        textColor = colorScheme.onBackground.toArgb() // Màu chữ trên trục Y phải
+                        textSize = 12f // Kích thước chữ trên trục Y phải
+                    }
+
+                    // Cấu hình Legend
+                    legend.apply {
+                        textColor = colorScheme.onBackground.toArgb() // Màu chữ của Legend
+                        textSize = 14f // Kích thước chữ
+                        formSize = 10f // Kích thước của hình
+                    }
+
+                    invalidate() // Redraw chart
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .padding(horizontal = 16.dp),
+            update = { chart ->
+                //Cập nhật dữ liệu khi data thay đổi
+                chart.data = lineData
+                chart.description.text = title
+                chart.invalidate() // Trigger redraw
+            }
+        )
+    }
 }
 
 
