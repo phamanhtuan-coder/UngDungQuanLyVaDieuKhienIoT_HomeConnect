@@ -129,7 +129,8 @@ fun AddDeviceScreen(
                                                 ) // Icon người dùng
                                             },
                                             shape = RoundedCornerShape(25),
-                                            label = { Text("ID Thiết bị") }, // Nhãn cho ô nhập liệu
+                                            singleLine = true,
+                                            placeholder = { Text("ID Thiết bị") }, // Nhãn cho ô nhập liệu
                                             modifier = Modifier
                                                 .width(if (isTablet) 500.dp else 400.dp)
                                                 .height(if (isTablet) 80.dp else 70.dp),
@@ -153,8 +154,9 @@ fun AddDeviceScreen(
                                                     contentDescription = null
                                                 ) // Icon
                                             },
+                                            singleLine = true,
                                             shape = RoundedCornerShape(25),
-                                            label = { Text("Tên thiết bị") }, // Nhãn cho ô nhập liệu
+                                            placeholder = { Text("Tên thiết bị") }, // Nhãn cho ô nhập liệu
                                             modifier = Modifier
                                                 .width(if (isTablet) 500.dp else 400.dp)
                                                 .height(if (isTablet) 80.dp else 70.dp),
@@ -175,9 +177,10 @@ fun AddDeviceScreen(
                                                     contentDescription = null
                                                 )
                                             },
+                                            singleLine = true,
                                             shape = RoundedCornerShape(25),
                                             onValueChange = { /* TODO: Xử lý thay đổi giá trị */ },
-                                            label = { Text("Chon phòng") },
+                                            placeholder = { Text("Chon phòng") },
                                             modifier = Modifier
                                                 .width(if (isTablet) 500.dp else 400.dp)
                                                 .height(if (isTablet) 80.dp else 70.dp),
