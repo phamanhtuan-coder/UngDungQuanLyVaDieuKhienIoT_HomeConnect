@@ -25,6 +25,7 @@ sealed class Screens(
     object WifiConnection: Screens("wifi_connection")
     object Spaces : Screens("spaces")
     object AddSpace : Screens("add_space")
+    object FireAlarmDetail : Screens("fire_alarm_detail")
 
     object Settings: Screens("settings")
     object Dashboard: Screens("dashboard")
