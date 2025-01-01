@@ -94,7 +94,7 @@ fun WifiConnectionScreen(
             modifier = Modifier.fillMaxSize(),
             containerColor = colorScheme.background,
             topBar = {
-                Header(navController, "Back", "Kết nối với thiết bị")
+                Header(navController, "Back", "Kết nối wifi")
             },
             bottomBar = {
                 MenuBottom(navController)
