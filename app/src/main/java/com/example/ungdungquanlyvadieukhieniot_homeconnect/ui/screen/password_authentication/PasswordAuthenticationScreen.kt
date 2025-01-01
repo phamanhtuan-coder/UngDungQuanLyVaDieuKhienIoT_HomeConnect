@@ -99,7 +99,6 @@ fun PasswordAuthenticationScreen(navController: NavHostController) {
                 OutlinedTextField(
                     value = passwordState.value,
                     onValueChange = { passwordState.value = it },
-                    label = { Text("Mật khẩu") },
                     placeholder = { Text("Nhập mật khẩu của bạn") },
                     singleLine = true,
                     leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
