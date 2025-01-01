@@ -392,7 +392,7 @@ fun ProfileScreen(
                     OutlinedTextField(
                         value = nameState.value,
                         onValueChange = { nameState.value = it },
-                        label = { Text("Họ và tên") },
+                        placeholder = { Text("Họ và tên") },
                         shape = RoundedCornerShape(25),
                         singleLine = true,
                         modifier = Modifier
@@ -419,7 +419,7 @@ fun ProfileScreen(
                     OutlinedTextField(
                         value = phoneState.value,
                         onValueChange = { phoneState.value = it },
-                        label = { Text("Số điện thoại") },
+                        placeholder = { Text("Số điện thoại") },
                         shape = RoundedCornerShape(25),
                         singleLine = true,
                         modifier = Modifier
@@ -446,7 +446,7 @@ fun ProfileScreen(
                     OutlinedTextField(
                         value = locationState.value,
                         onValueChange = { locationState.value = it },
-                        label = { Text("Nơi sống hiện tại") },
+                        placeholder = { Text("Nơi sống hiện tại") },
                         shape = RoundedCornerShape(25),
                         singleLine = true,
                         modifier = Modifier
@@ -473,7 +473,7 @@ fun ProfileScreen(
                     OutlinedTextField(
                         value = emailState.value,
                         onValueChange = {},
-                        label = { Text("Email") },
+                        placeholder = { Text("Email") },
                         shape = RoundedCornerShape(25),
                         singleLine = true,
                         readOnly = true,
@@ -510,7 +510,7 @@ fun ProfileScreen(
                     OutlinedTextField(
                         value = selectedDate, // Chỗ này bị bug chưa load được ngày từ biến
                         onValueChange = { /* Not needed for read-only fields */ },
-                        label = { Text("Ngày sinh (dd/mm/yyyy)") },
+                        placeholder = { Text("Ngày sinh (dd/mm/yyyy)") },
                         shape = RoundedCornerShape(25),
                         singleLine = true,
                         readOnly = true,
