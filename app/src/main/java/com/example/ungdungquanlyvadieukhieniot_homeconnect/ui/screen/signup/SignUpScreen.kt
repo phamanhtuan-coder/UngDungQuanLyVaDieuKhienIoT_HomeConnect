@@ -172,7 +172,7 @@ fun SignUpScreen(navController: NavHostController) {
                         singleLine = true,
                         value = name,
                         onValueChange = { name = it },
-                        label = { Text("Họ tên") },
+                        placeholder = { Text("Họ tên") },
                         leadingIcon = { Icon(Icons.Filled.Person, contentDescription = null) },
                         modifier = Modifier
                             .width(if (isTablet) 500.dp else 400.dp)
@@ -190,7 +190,7 @@ fun SignUpScreen(navController: NavHostController) {
                         singleLine = true,
                         value = email,
                         onValueChange = { email = it },
-                        label = { Text("Email") },
+                        placeholder = { Text("Email") },
                         leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                         modifier = Modifier
@@ -209,7 +209,7 @@ fun SignUpScreen(navController: NavHostController) {
                         singleLine = true,
                         value = phoneNumber,
                         onValueChange = { phoneNumber = it },
-                        label = { Text("Số điện thoại") },
+                        placeholder = { Text("Số điện thoại") },
                         leadingIcon = { Icon(Icons.Filled.Phone, contentDescription = null) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         modifier = Modifier
@@ -228,7 +228,7 @@ fun SignUpScreen(navController: NavHostController) {
                         singleLine = true,
                         value = address,
                         onValueChange = { address = it },
-                        label = { Text("Địa chỉ") },
+                        placeholder = { Text("Địa chỉ") },
                         leadingIcon = { Icon(Icons.Filled.Home, contentDescription = null) },
                         modifier = Modifier
                             .width(if (isTablet) 500.dp else 400.dp)
