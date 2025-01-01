@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -29,6 +30,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,9 +49,13 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail_for_fire_alarm.FireAlarmDetailScreen
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 /** Giao diện màn hình Access Point Connection Screen (AccessPointConnectionScreen
  * -----------------------------------------
@@ -104,216 +110,244 @@ fun rememberResponsiveLayoutConfig(): LayoutConfig {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
-fun DeviceSharingListScreen() {
-    val layoutConfig = rememberResponsiveLayoutConfig() // Lấy LayoutConfig
-    var showDialog by remember { mutableStateOf(false) }
-
-    return Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        containerColor = Color.LightGray,
-        topBar = {
-
-        },
-        bottomBar = {
-
-        },
-        content = { innerPadding ->
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize() // Chiếm toàn bộ kích thước của màn hình
-//                    .padding(bottom = layoutConfig.outerPadding) // Padding linh hoạt
-                    .padding(innerPadding),
-                verticalArrangement = Arrangement.Top, // Sắp xếp các item theo chiều dọc, bắt đầu từ trên xuống.
-                horizontalAlignment = Alignment.CenterHorizontally // Căn chỉnh các item theo chiều ngang vào giữa.
-            ) {
-                // Tiêu đề
-                item {
-                    // Box lớn chứa phần tiêu đề và các thành phần bên trong
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight() // Chiều cao vừa đủ với nội dung bên trong
-                            .background(color = Color.LightGray)
-                    ) {
-                        // Cột chứa các phần tử con
-                        Column {
-                            // Hộp màu xanh dương bo tròn góc dưới bên trái
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth() // Chiếm toàn bộ chiều rộng
-                                    .wrapContentHeight() // Chiều cao vừa đủ với nội dung
-                                    .background(
-                                        color = Color.Blue,
-                                        shape = RoundedCornerShape(bottomStart = 40.dp)
-                                    )
-                            ) {
-                                if (isTablet()) {
-                                    // Cột chứa văn bản tiêu đề và các TextField
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth() // Chiếm toàn bộ chiều rộng
-                                            .padding(
-                                                horizontal = layoutConfig.outerPadding, // Padding ngang linh hoạt
-                                                vertical = layoutConfig.textFieldSpacing // Padding dọc linh hoạt
-                                            ),
-                                        horizontalAlignment = Alignment.CenterHorizontally // Căn giữa các phần tử con theo chiều ngang
-                                    ) {
-                                        // Văn bản tiêu đề "TÀI KHOẢN ĐÃ ĐƯỢC CHIA SẼ"
-                                        Text(
-                                            "TÀI KHOẢN ĐÃ ĐƯỢC CHIA SẼ",
-                                            fontSize = layoutConfig.headingFontSize, // Font size linh hoạt
-                                            color = Color.White
-                                        )
-                                    }
-                                } else {
-                                    // Cột chứa văn bản tiêu đề và các TextField
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth() // Chiếm toàn bộ chiều rộng
-                                            .padding(
-                                                horizontal = layoutConfig.outerPadding, // Padding ngang linh hoạt
-                                                vertical = layoutConfig.textFieldSpacing // Padding dọc linh hoạt
-                                            ),
-                                        horizontalAlignment = Alignment.CenterHorizontally // Căn giữa các phần tử con theo chiều ngang
-                                    ) {
-
-                                        // Văn bản tiêu đề "TÀI KHOẢN ĐÃ"
-                                        Text(
-                                            "TÀI KHOẢN ĐÃ",
-                                            fontSize = layoutConfig.headingFontSize, // Font size linh hoạt
-                                            color = Color.White
-                                        )
-                                        // Văn bản tiêu đề "ĐƯỢC CHIA SẼ"
-                                        Text(
-                                            "ĐƯỢC CHIA SẼ",
-                                            fontSize = layoutConfig.headingFontSize, // Font size linh hoạt
-                                            color = Color.White
-                                        )
-                                    }
-                                }
-                            }
-                            // Box chứa góc lõm màu xám
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(layoutConfig.cornerBoxSize * 0.9f) // Chiều cao linh hoạt theo LayoutConfig
-                            ) {
-                                // Box màu vàng nhỏ nằm trên góc phải
+fun DeviceSharingListScreen(
+    navController: NavHostController
+) {
+    AppTheme {
+        val layoutConfig = rememberResponsiveLayoutConfig() // Lấy LayoutConfig
+        var showDialog by remember { mutableStateOf(false) }
+        val colorScheme = MaterialTheme.colorScheme
+        Scaffold(
+            topBar = {
+                /*
+            * Hiển thị Header
+             */
+                Header(
+                    navController = navController,
+                    type = "Back",
+                    title = "Chi tiết thiết bị"
+                )
+            },
+            bottomBar = {
+                /*
+            * Hiển thị Thanh Menu dưới cùng
+             */
+                MenuBottom(navController)
+            },
+            containerColor = colorScheme.background,
+            modifier = Modifier.fillMaxSize(),
+            content = { innerPadding ->
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize() // Chiếm toàn bộ kích thước của màn hình
+    //                    .padding(bottom = layoutConfig.outerPadding) // Padding linh hoạt
+                        .padding(innerPadding),
+                    verticalArrangement = Arrangement.Top, // Sắp xếp các item theo chiều dọc, bắt đầu từ trên xuống.
+                    horizontalAlignment = Alignment.CenterHorizontally // Căn chỉnh các item theo chiều ngang vào giữa.
+                ) {
+                    // Tiêu đề
+                    item {
+                        // Box lớn chứa phần tiêu đề và các thành phần bên trong
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight() // Chiều cao vừa đủ với nội dung bên trong
+                                .background(color = colorScheme.background)
+                        ) {
+                            // Cột chứa các phần tử con
+                            Column {
+                                // Hộp màu xanh dương bo tròn góc dưới bên trái
                                 Box(
                                     modifier = Modifier
-                                        .size(layoutConfig.cornerBoxSize)
-                                        .align(Alignment.TopEnd)
-                                        .background(color = Color.Blue)
-                                        .zIndex(1f)  // Z-index thấp hơn
-                                )
+                                        .fillMaxWidth() // Chiếm toàn bộ chiều rộng
+                                        .wrapContentHeight() // Chiều cao vừa đủ với nội dung
+                                        .background(
+                                            color = colorScheme.primary,
+                                            shape = RoundedCornerShape(bottomStart = 40.dp)
+                                        )
+                                ) {
+                                    if (isTablet()) {
+                                        // Cột chứa văn bản tiêu đề và các TextField
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth() // Chiếm toàn bộ chiều rộng
+                                                .padding(
+                                                    horizontal = layoutConfig.outerPadding, // Padding ngang linh hoạt
+                                                    vertical = layoutConfig.textFieldSpacing // Padding dọc linh hoạt
+                                                ),
+                                            horizontalAlignment = Alignment.CenterHorizontally // Căn giữa các phần tử con theo chiều ngang
+                                        ) {
+                                            // Văn bản tiêu đề "TÀI KHOẢN ĐÃ ĐƯỢC CHIA SẼ"
+                                            Text(
+                                                "TÀI KHOẢN ĐÃ ĐƯỢC CHIA SẼ",
+                                                fontSize = layoutConfig.headingFontSize, // Font size linh hoạt
+                                                color = colorScheme.onPrimary
+                                            )
+                                        }
+                                    } else {
+                                        // Cột chứa văn bản tiêu đề và các TextField
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth() // Chiếm toàn bộ chiều rộng
+                                                .padding(
+                                                    horizontal = layoutConfig.outerPadding, // Padding ngang linh hoạt
+                                                    vertical = layoutConfig.textFieldSpacing // Padding dọc linh hoạt
+                                                ),
+                                            horizontalAlignment = Alignment.CenterHorizontally // Căn giữa các phần tử con theo chiều ngang
+                                        ) {
 
-                                // Box màu xám bo tròn góc lõm trên cùng bên phải
+                                            // Văn bản tiêu đề "TÀI KHOẢN ĐÃ"
+                                            Text(
+                                                "TÀI KHOẢN ĐÃ",
+                                                fontSize = layoutConfig.headingFontSize, // Font size linh hoạt
+                                                color = colorScheme.onPrimary
+                                            )
+                                            // Văn bản tiêu đề "ĐƯỢC CHIA SẼ"
+                                            Text(
+                                                "ĐƯỢC CHIA SẼ",
+                                                fontSize = layoutConfig.headingFontSize, // Font size linh hoạt
+                                                color = colorScheme.onPrimary
+                                            )
+                                        }
+                                    }
+                                }
+                                // Box chứa góc lõm màu xám
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .background(
-                                            color = Color.LightGray,
-                                            shape = RoundedCornerShape(topEndPercent = layoutConfig.cornerBoxRadius)
-                                        )
-                                        .height(layoutConfig.cornerBoxSize) // Chiều cao linh hoạt
-                                        .zIndex(2f), // Z-index cao hơn
-                                    contentAlignment = Alignment.Center // Căn Row vào giữa Box
+                                        .height(layoutConfig.cornerBoxSize * 0.9f) // Chiều cao linh hoạt theo LayoutConfig
                                 ) {
-                                    Row(
+                                    // Box màu vàng nhỏ nằm trên góc phải
+                                    Box(
                                         modifier = Modifier
-                                            .padding(horizontal = layoutConfig.outerPadding)
-                                            .width(layoutConfig.contentWidth),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
+                                            .size(layoutConfig.cornerBoxSize)
+                                            .align(Alignment.TopEnd)
+                                            .background(color = colorScheme.primary)
+                                            .zIndex(1f)  // Z-index thấp hơn
+                                    )
+
+                                    // Box màu xám bo tròn góc lõm trên cùng bên phải
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .background(
+                                                color = colorScheme.background,
+                                                shape = RoundedCornerShape(topEndPercent = layoutConfig.cornerBoxRadius)
+                                            )
+                                            .height(layoutConfig.cornerBoxSize) // Chiều cao linh hoạt
+                                            .zIndex(2f), // Z-index cao hơn
+                                        contentAlignment = Alignment.Center // Căn Row vào giữa Box
                                     ) {
-
-                                        // Nội dung bên phải (Icon trong Box)
-                                        Button(
-                                            onClick = {
-                                                showDialog = true
-                                            },
+                                        Row(
                                             modifier = Modifier
-                                                .size(36.dp), // Kích thước tổng thể của Button
-                                            shape = CircleShape, // Đảm bảo Button có dạng hình tròn
-                                            contentPadding = PaddingValues(0.dp) // Loại bỏ padding mặc định
+                                                .fillMaxWidth() // Đảm bảo Row chiếm toàn bộ chiều rộng
+                                                .padding(
+                                                    top = 12.dp,
+                                                    start = 12.dp,
+                                                    end = 8.dp
+                                                ), // Khoảng cách bên trong Row
+                                            horizontalArrangement = Arrangement.SpaceBetween, // Đẩy các phần tử ra hai bên
+                                            verticalAlignment = Alignment.CenterVertically // Căn giữa theo chiều dọc
                                         ) {
-                                            Icon(
-                                                imageVector = Icons.Default.Delete,
-                                                contentDescription = "Clear",
-                                                tint = Color.Black,
-                                                modifier = Modifier.size(24.dp) // Icon kích thước từ layoutConfig
-                                            )
-                                        }
+                                            // Nội dung bên phải (Icon trong Box)
+                                            Button(
+                                                onClick = {
+                                                    showDialog = true
+                                                },
+                                                modifier = Modifier
+                                                    .size(24.dp), // Kích thước tổng thể của Button
+                                                shape = CircleShape, // Đảm bảo Button có dạng hình tròn
+                                                contentPadding = PaddingValues(0.dp), // Loại bỏ padding mặc định
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = colorScheme.onPrimary,
+                                                    contentColor = colorScheme.primary
+                                                )
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Delete,
+                                                    contentDescription = "Delete",
+                                                    modifier = Modifier.size(24.dp), // Kích thước của Icon
+                                                    tint = colorScheme.primary
+                                                )
+                                            }
 
-                                        // Nội dung bên phải (Icon trong Box)
-                                        Button(
-                                            onClick = {
-                                                showDialog = true
-                                            },
-                                            modifier = Modifier
-                                                .size(36.dp), // Kích thước tổng thể của Button
-                                            shape = CircleShape, // Đảm bảo Button có dạng hình tròn
-                                            contentPadding = PaddingValues(0.dp) // Loại bỏ padding mặc định
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.Add,
-                                                contentDescription = "Add",
-                                                tint = Color.Black,
-                                                modifier = Modifier.size(24.dp) // Icon kích thước từ layoutConfig
-                                            )
+                                            Button(
+                                                onClick = {
+                                                    showDialog = true
+                                                },
+                                                modifier = Modifier
+                                                    .size(24.dp), // Kích thước tổng thể của Button
+                                                shape = CircleShape, // Đảm bảo Button có dạng hình tròn
+                                                contentPadding = PaddingValues(0.dp), // Loại bỏ padding mặc định
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = colorScheme.onPrimary,
+                                                    contentColor = colorScheme.primary
+                                                )
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Add,
+                                                    contentDescription = "Add",
+                                                    modifier = Modifier.size(24.dp), // Kích thước của Icon
+                                                    tint = colorScheme.primary
+                                                )
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                }
 
-                // Công tắc Wi-Fi
-                item {
-                    // Cột chứa nội dung công tắc Wi-Fi
-                    Column (
-                        modifier = Modifier
-                            .wrapContentHeight()
-                            .padding(horizontal = layoutConfig.outerPadding) // Padding ngang linh hoạt theo LayoutConfig
-                            .width(layoutConfig.contentWidth),               // Độ rộng linh hoạt theo LayoutConfig
-                        horizontalAlignment = Alignment.CenterHorizontally   // Căn giữa theo chiều ngang
-                    ) {
-                        JobCard(
-                            companyName = "Dribbble",
-                            jobTitle = "UI Designer",
-                            location = "Yogyakarta",
-                            jobType = "Fulltime",
-                            appliedDate = "June 3, 2021",
-                            appliedStatus = "APPLIED"
-                        )
+                    // Công tắc Wi-Fi
+                    item {
+                        // Cột chứa nội dung công tắc Wi-Fi
+                        Column (
+                            modifier = Modifier
+                                .wrapContentHeight()
+                                .padding(horizontal = layoutConfig.outerPadding) // Padding ngang linh hoạt theo LayoutConfig
+                                .width(layoutConfig.contentWidth),               // Độ rộng linh hoạt theo LayoutConfig
+                            horizontalAlignment = Alignment.CenterHorizontally   // Căn giữa theo chiều ngang
+                        ) {
+                            JobCard(
+                                companyName = "Dribbble",
+                                jobTitle = "UI Designer",
+                                location = "Yogyakarta",
+                                jobType = "Fulltime",
+                                appliedDate = "June 3, 2021",
+                                appliedStatus = "APPLIED"
+                            )
 
-                        JobCard(
-                            companyName = "Dribbble",
-                            jobTitle = "UI Designer",
-                            location = "Yogyakarta",
-                            jobType = "Fulltime",
-                            appliedDate = "June 3, 2021",
-                            appliedStatus = "APPLIED"
-                        )
+                            JobCard(
+                                companyName = "Dribbble",
+                                jobTitle = "UI Designer",
+                                location = "Yogyakarta",
+                                jobType = "Fulltime",
+                                appliedDate = "June 3, 2021",
+                                appliedStatus = "APPLIED"
+                            )
 
-                        JobCard(
-                            companyName = "Dribbble",
-                            jobTitle = "UI Designer",
-                            location = "Yogyakarta",
-                            jobType = "Fulltime",
-                            appliedDate = "June 3, 2021",
-                            appliedStatus = "APPLIED"
-                        )
+                            JobCard(
+                                companyName = "Dribbble",
+                                jobTitle = "UI Designer",
+                                location = "Yogyakarta",
+                                jobType = "Fulltime",
+                                appliedDate = "June 3, 2021",
+                                appliedStatus = "APPLIED"
+                            )
+                        }
                     }
                 }
             }
-        }
-    )
+        )
+    }
 }
 
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun DeviceSharingListScreenPreview() {
+    DeviceSharingListScreen(navController = rememberNavController())
+}
 
 @Composable
 fun JobCard(
@@ -324,130 +358,133 @@ fun JobCard(
     appliedDate: String,
     appliedStatus: String
 ) {
-    // Lấy thông tin layout responsive từ config
-    val layoutConfig = rememberResponsiveLayoutConfig()
-    return Card(
-        modifier = Modifier
-            .padding(top = layoutConfig.textFieldSpacing)
-            .clickable(onClick = {})
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(
+    AppTheme {
+        // Lấy thông tin layout responsive từ config
+        val colorScheme = MaterialTheme.colorScheme
+        val layoutConfig = rememberResponsiveLayoutConfig()
+        Card(
             modifier = Modifier
-                .padding(layoutConfig.outerPadding)
-                .fillMaxWidth()
+                .padding(top = layoutConfig.textFieldSpacing)
+                .clickable(onClick = {})
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = colorScheme.primary),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
-            // Row đầu tiên: Hiển thị logo người dùng được chia sẽ
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Vùng hiển thị Logo
-                Box(
-                    modifier = Modifier
-                        .size(layoutConfig.iconSize * 2)
-                        .background(Color(0xFFE74C3C), shape = RoundedCornerShape(50))
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                // Tên người dùng được chia sẽ
-                Text(
-                    text = companyName,
-                    fontSize = layoutConfig.textFontSize/ 1.5f,
-                    color = Color.Gray
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row (
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(layoutConfig.outerPadding)
+                    .fillMaxWidth()
             ) {
-                Column {
-                    // Tiêu đề của phần chia sẽ
-                    Text(
-                        text = jobTitle,
-                        fontSize = layoutConfig.headingFontSize/1.5f ,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                // Row đầu tiên: Hiển thị logo người dùng được chia sẽ
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Vùng hiển thị Logo
+                    Box(
+                        modifier = Modifier
+                            .size(layoutConfig.iconSize * 2)
+                            .background(Color(0xFFE74C3C), shape = RoundedCornerShape(50))
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
 
-                    // Location & Job Type
-                    Row (
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    // Tên người dùng được chia sẽ
+                    Text(
+                        text = companyName,
+                        fontSize = layoutConfig.textFontSize/ 1.5f,
+                        color = colorScheme.onPrimary
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row (
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        // Tiêu đề của phần chia sẽ
                         Text(
-                            text = location,
-                            fontSize = layoutConfig.textFontSize/1.5f,
-                            color = Color.Gray
+                            text = jobTitle,
+                            fontSize = layoutConfig.headingFontSize/1.5f ,
+                            fontWeight = FontWeight.Bold,
+                            color = colorScheme.onBackground
                         )
+                        Spacer(modifier = Modifier.height(4.dp))
 
-                        Spacer(modifier = Modifier.width(4.dp))
+                        // Location & Job Type
+                        Row (
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = location,
+                                fontSize = layoutConfig.textFontSize/1.5f,
+                                color = colorScheme.onPrimary
+                            )
 
-                        Text(
-                            text = "• $jobType",
-                            fontSize = layoutConfig.textFontSize/1.5f,
-                            color = Color(0xFFE74C3C),
-                            fontWeight = FontWeight.Bold
+                            Spacer(modifier = Modifier.width(4.dp))
+
+                            Text(
+                                text = "• $jobType",
+                                fontSize = layoutConfig.textFontSize/1.5f,
+                                color = Color(0xFFE74C3C),
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                    // Nội dung bên phải (Icon trong Box)
+                    Button(
+                        onClick = {},
+                        modifier = Modifier
+                            .size(36.dp), // Kích thước tổng thể của Button
+                        shape = CircleShape, // Đảm bảo Button có dạng hình tròn
+                        contentPadding = PaddingValues(0.dp), // Loại bỏ padding mặc định
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White
+                        )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = "Clear",
+                            tint = Color.Black,
+                            modifier = Modifier.size(24.dp) // Icon kích thước từ layoutConfig
                         )
                     }
                 }
-                // Nội dung bên phải (Icon trong Box)
-                Button(
-                    onClick = {},
-                    modifier = Modifier
-                        .size(36.dp), // Kích thước tổng thể của Button
-                    shape = CircleShape, // Đảm bảo Button có dạng hình tròn
-                    contentPadding = PaddingValues(0.dp), // Loại bỏ padding mặc định
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White
-                    )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Clear,
-                        contentDescription = "Clear",
-                        tint = Color.Black,
-                        modifier = Modifier.size(24.dp) // Icon kích thước từ layoutConfig
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .background(
-                            color = Color(0xFFFFEDED),
-                            shape = RoundedCornerShape(16.dp)
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = Color(0xFFFFEDED),
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                            .padding(vertical = 4.dp, horizontal = 12.dp)
+                    ) {
+                        Text(
+                            text = appliedStatus,
+                            color = Color(0xFFE74C3C),
+                            fontSize = layoutConfig.textFontSize/1.2f,
+                            fontWeight = FontWeight.Bold
                         )
-                        .padding(vertical = 4.dp, horizontal = 12.dp)
-                ) {
+                    }
+
                     Text(
-                        text = appliedStatus,
-                        color = Color(0xFFE74C3C),
-                        fontSize = layoutConfig.textFontSize/1.2f,
-                        fontWeight = FontWeight.Bold
+                        text = "Applied at $appliedDate",
+                        fontSize = layoutConfig.textFontSize/ 2,
+                        color = colorScheme.onPrimary
                     )
                 }
-
-                Text(
-                    text = "Applied at $appliedDate",
-                    fontSize = layoutConfig.textFontSize/ 2,
-                    color = Color.Gray
-                )
             }
         }
     }
