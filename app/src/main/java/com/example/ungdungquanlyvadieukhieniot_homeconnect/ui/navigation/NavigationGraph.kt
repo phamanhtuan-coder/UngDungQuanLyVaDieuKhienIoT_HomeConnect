@@ -27,6 +27,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.profile.Pro
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.settings.SettingsScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.signup.SignUpScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.space.SpaceScreen
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.update_password.UpdatePasswordScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.wifi_connection.WifiConnectionScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screens.DashboardScreen
 
@@ -173,6 +174,9 @@ fun NavigationGraph(
                 PasswordAuthenticationScreen(navController)
             }
 
+            composable(Screens.UpdatePassword.route) {
+                UpdatePasswordScreen(navController)
+            }
 
             // Todo:... other nested graphs (devices, profile, settings) ...
         }

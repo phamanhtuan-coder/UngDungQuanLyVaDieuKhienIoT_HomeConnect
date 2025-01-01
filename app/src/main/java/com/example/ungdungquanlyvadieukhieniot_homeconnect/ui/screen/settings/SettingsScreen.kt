@@ -74,6 +74,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_poin
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.wifi_connection.WifiConnectionScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 
 /** Giao diện màn hình Settings Screen (SettingsScreen)
  * -----------------------------------------
@@ -132,6 +133,7 @@ fun SettingsScreen(
                                     title = "Đổi mật khẩu",
                                     onClick = {
                                         //ToDo: Kiểm tra dữ liệu, di chuyển đền màn hình cài đặt password.
+                                        navController.navigate(Screens.UpdatePassword.route)
                                     }
                                 )
 
@@ -173,7 +175,7 @@ fun CardSettings(icon: ImageVector, title: String, onClick: () -> Unit) {
 
     Row(
         modifier = Modifier
-            .clickable { onClick() }
+            .clickable {onClick ()}
             .width(if (isTablet()) 500.dp else 400.dp)
             .height(if (isTablet()) 80.dp else 70.dp)
             .padding(16.dp),

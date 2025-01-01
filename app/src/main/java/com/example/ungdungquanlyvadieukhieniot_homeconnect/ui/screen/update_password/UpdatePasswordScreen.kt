@@ -48,7 +48,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.Navigator
+import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.isTablet
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.settings.SettingsScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 /** Giao diện màn hình Cập nhật Mật Khẩu (Update PassWord Screen)
@@ -62,9 +67,10 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
  * Output: Column chứa các thành phần giao diện của màn hình Cập nhật Mật Khẩu
  */
 
-@Preview(showBackground = true)
 @Composable
-fun UpdatePasswordScreen() {
+fun UpdatePasswordScreen(
+    navController: NavHostController
+) {
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
         val configuration = LocalConfiguration.current
@@ -97,7 +103,7 @@ fun UpdatePasswordScreen() {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White),
+                .background(colorScheme.background),
 
             )
         {
@@ -252,6 +258,7 @@ fun UpdatePasswordScreen() {
                     // Nút quay lại màn hình đăng nhập
                     TextButton(onClick = {
                         //ToDo: Sử lý xự kiện quay lại
+                        navController.popBackStack()
                     }) {
                         Text(
                             text = "Quay lại",
@@ -264,4 +271,10 @@ fun UpdatePasswordScreen() {
             }
         }
     }
+}
+
+@Preview(showBackground = true,showSystemUi = true)
+@Composable
+fun UpdatePasswordScreenPreview() {
+    UpdatePasswordScreen(navController = rememberNavController())
 }
