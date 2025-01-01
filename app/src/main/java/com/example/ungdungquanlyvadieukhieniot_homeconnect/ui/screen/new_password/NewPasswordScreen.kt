@@ -109,7 +109,7 @@ fun NewPasswordScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .background(Color.White),
+                    .background(colorScheme.background),
                 )
             {
                 Box(modifier = Modifier.align(Alignment.Center)) {
