@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -80,6 +81,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.DeviceScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -548,7 +550,7 @@ fun DeviceDetailPhoneScreen(
                                     Box(
                                         modifier = Modifier
                                             .background(
-                                                Color.Black,
+                                                colorScheme.background,
                                                 shape = RoundedCornerShape(12.dp)
                                             )
                                             .padding(16.dp)
@@ -1220,82 +1222,108 @@ fun EndlessRollingPadlockTimePicker(
     modifier: Modifier = Modifier,
     onTimeSelected: (hour: Int, minute: Int, amPm: String) -> Unit // Callback trả kết quả ra ngoài
 ) {
-    val hoursList = (1..12).toList()
-    val minutesList = (0..59).toList()
-    val amPmList = listOf("AM", "PM")
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        val hoursList = (1..12).toList()
+        val minutesList = (0..59).toList()
+        val amPmList = listOf("AM", "PM")
 
-    val hourState = rememberLazyListState(initialFirstVisibleItemIndex = 50 * hoursList.indexOf(12))
-    val minuteState = rememberLazyListState(initialFirstVisibleItemIndex = 50 * minutesList.indexOf(0))
-    val amPmState = rememberLazyListState(initialFirstVisibleItemIndex = 50 * amPmList.indexOf("AM"))
+        val hourState = rememberLazyListState(initialFirstVisibleItemIndex = 50 * hoursList.indexOf(12))
+        val minuteState = rememberLazyListState(initialFirstVisibleItemIndex = 50 * minutesList.indexOf(0))
+        val amPmState = rememberLazyListState(initialFirstVisibleItemIndex = 50 * amPmList.indexOf("AM"))
 
-    val scope = rememberCoroutineScope()
+        val scope = rememberCoroutineScope()
 
-    Box(
-        modifier = modifier
-            .height(130.dp)
-            .background(Color.Black, shape = RoundedCornerShape(16.dp))
-            .border(2.dp, Color.Gray, RoundedCornerShape(16.dp))
-            .padding(4.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+        Box(
+            modifier = modifier
+                .height(130.dp)
+                .background(colorScheme.background, shape = RoundedCornerShape(16.dp))
+                .border(2.dp, Color.Gray, RoundedCornerShape(16.dp))
+                .padding(4.dp),
+            contentAlignment = Alignment.Center
         ) {
-            // Cột giờ
-            RollingColumn(
-                state = hourState,
-                items = hoursList,
-                modifier = Modifier.width(70.dp),
-                label = { hour -> hour.toString() }
-            )
-
-            // Dấu :
-            Text(
-                text = ":",
-                fontSize = 42.sp,
-                color = Color.White,
-                modifier = Modifier
-                    .wrapContentSize()// Chiều rộng cố định
-                    .padding(horizontal = 4.dp),
-                textAlign = TextAlign.Center
-            )
-
-            // Cột phút
-            RollingColumn(
-                state = minuteState,
-                items = minutesList,
-                modifier = Modifier.width(70.dp),
-                label = { minute -> minute.toString().padStart(2, '0') }
-            )
-
-            // Cột AM/PM
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .width(70.dp)
-                    .height(140.dp) // Đồng bộ chiều cao với các cột khác
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
             ) {
+                // Cột giờ
                 RollingColumn(
-                    state = amPmState,
-                    items = amPmList,
-                    modifier = Modifier.align(Alignment.Center),
-                    label = { amPm -> amPm },
-                    fontSize = 36.sp // Đảm bảo AM/PM nổi bật
+                    state = hourState,
+                    items = hoursList,
+                    modifier = Modifier.width(70.dp),
+                    label = { hour -> hour.toString() }
                 )
+
+                // Dấu :
+                Text(
+                    text = ":",
+                    fontSize = 42.sp,
+                    color = colorScheme.onBackground,
+                    modifier = Modifier
+                        .wrapContentSize()// Chiều rộng cố định
+                        .padding(horizontal = 4.dp),
+                    textAlign = TextAlign.Center
+                )
+
+                // Cột phút
+                RollingColumn(
+                    state = minuteState,
+                    items = minutesList,
+                    modifier = Modifier.width(70.dp),
+                    label = { minute -> minute.toString().padStart(2, '0') }
+                )
+
+                // Cột AM/PM
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .width(70.dp)
+                        .height(140.dp) // Đồng bộ chiều cao với các cột khác
+                ) {
+                    RollingColumn(
+                        state = amPmState,
+                        items = amPmList,
+                        modifier = Modifier.align(Alignment.Center),
+                        label = { amPm -> amPm },
+                        fontSize = 36.sp // Đảm bảo AM/PM nổi bật
+                    )
+                }
+            }
+        }
+
+        // Snap Effect
+        LaunchedEffect(hourState.isScrollInProgress, minuteState.isScrollInProgress, amPmState.isScrollInProgress) {
+            if (!hourState.isScrollInProgress && !minuteState.isScrollInProgress && !amPmState.isScrollInProgress) {
+                val selectedHour = hoursList[(hourState.firstVisibleItemIndex + 1) % hoursList.size]
+                val selectedMinute = minutesList[(minuteState.firstVisibleItemIndex + 1) % minutesList.size]
+                val selectedAmPm = amPmList[(amPmState.firstVisibleItemIndex + 1) % amPmList.size]
+
+                // Trả về kết quả khi cuộn xong
+                onTimeSelected(selectedHour, selectedMinute, selectedAmPm)
             }
         }
     }
+}
 
-    // Snap Effect
-    LaunchedEffect(hourState.isScrollInProgress, minuteState.isScrollInProgress, amPmState.isScrollInProgress) {
-        if (!hourState.isScrollInProgress && !minuteState.isScrollInProgress && !amPmState.isScrollInProgress) {
-            val selectedHour = hoursList[(hourState.firstVisibleItemIndex + 1) % hoursList.size]
-            val selectedMinute = minutesList[(minuteState.firstVisibleItemIndex + 1) % minutesList.size]
-            val selectedAmPm = amPmList[(amPmState.firstVisibleItemIndex + 1) % amPmList.size]
-
-            // Trả về kết quả khi cuộn xong
-            onTimeSelected(selectedHour, selectedMinute, selectedAmPm)
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun EndlessRollingPadlockTimePickerPreview() {
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        var selectedTimeBegin by remember { mutableStateOf("12:00 AM") }
+        Box(
+            modifier = Modifier
+                .background(
+                    colorScheme.background,
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .padding(16.dp)
+                .wrapContentSize()
+        ) {
+            EndlessRollingPadlockTimePicker { hour, minute, amPm ->
+                selectedTimeBegin =
+                    "$hour:${minute.toString().padStart(2, '0')} $amPm"
+            }
         }
     }
 }
@@ -1308,24 +1336,28 @@ fun <T> RollingColumn(
     label: (T) -> String,
     fontSize: TextUnit = 36.sp // Thay đổi kiểu từ Int sang TextUnit
 ) {
-    LazyColumn(
-        state = state,
-        modifier = modifier
-            .height(140.dp)
-            .background(Color.Black.copy(alpha = 0.8f)),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        items(items.size * 100) { index ->
-            val item = items[index % items.size]
-            val isSelected = index == state.firstVisibleItemIndex + 1
-            Text(
-                text = label(item),
-                fontSize = if (isSelected) fontSize else fontSize * 0.8f, // Giảm font size cho mục không được chọn
-                color = Color.White.copy(alpha = if (isSelected) 1f else 0.4f),
-                modifier = Modifier
-                    .padding(vertical = if (isSelected) 6.dp else 4.dp)
-            )
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+
+        LazyColumn(
+            state = state,
+            modifier = modifier
+                .height(140.dp)
+                .background(colorScheme.background.copy(alpha = 0.8f)),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            items(items.size * 100) { index ->
+                val item = items[index % items.size]
+                val isSelected = index == state.firstVisibleItemIndex + 1
+                Text(
+                    text = label(item),
+                    fontSize = if (isSelected) fontSize else fontSize * 0.8f, // Giảm font size cho mục không được chọn
+                    color = colorScheme.onBackground.copy(alpha = if (isSelected) 1f else 0.4f),
+                    modifier = Modifier
+                        .padding(vertical = if (isSelected) 6.dp else 4.dp)
+                )
+            }
         }
     }
 }
