@@ -118,7 +118,6 @@ fun LoginScreen(
                     singleLine = true,
                     value = emailState.value,
                     onValueChange = { emailState.value = it },
-                    label = { Text("Email") },
                     placeholder = { Text("Nhập email của bạn") },
                     leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null) },
                     keyboardOptions = KeyboardOptions(
@@ -144,7 +143,7 @@ fun LoginScreen(
                     onValueChange = {
                         passwordState.value = it
                     },
-                    label = { Text("Mật khẩu") },
+                    placeholder = { Text("Mật khẩu") },
                     leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
                     trailingIcon = {
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
