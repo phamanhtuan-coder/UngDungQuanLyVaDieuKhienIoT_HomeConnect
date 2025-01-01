@@ -106,7 +106,7 @@ fun ActivityHistoryScreenDetailScreen(
                     modifier = Modifier
                         .padding(innerPadding)
                         .fillMaxSize()
-                        .background(Color.White),
+                        .background(colorScheme.background),
 
                     )
                 {
@@ -162,7 +162,10 @@ fun ActivityHistoryScreenDetailScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Button(
-                                    onClick = { /* ToDo: Quay lại logic */ },
+                                    onClick = {
+                                        /* ToDo: Quay lại logic */
+                                        navController.popBackStack()
+                                    },
                                     colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
                                     modifier = Modifier
                                         .weight(1f)
