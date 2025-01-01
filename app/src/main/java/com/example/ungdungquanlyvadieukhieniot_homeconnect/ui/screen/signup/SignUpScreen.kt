@@ -446,19 +446,17 @@ fun SignUpScreen(navController: NavHostController) {
                 }
 
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(
-                        6.dp,
-                        alignment = Alignment.CenterHorizontally
-                    ),
+                    horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .fillMaxWidth(if (isTablet) 0.8f else 0.9f)
+                        .fillMaxWidth(if (isTablet) 0.8f else 1f)
                         .padding(horizontal = 16.dp)
                 ) {
                     if (stage == 2) {
                         OutlinedButton(
                             onClick = { stage = 1 },
                             modifier = Modifier
+                                .weight(1f) // Chia đều không gian
                                 .width(if (isTablet) 300.dp else 200.dp)
                                 .height(if (isTablet) 56.dp else 48.dp),
                         ) {
@@ -467,7 +465,7 @@ fun SignUpScreen(navController: NavHostController) {
                         Spacer(modifier = Modifier.width(16.dp))
                     }
 
-                    Button(
+                    OutlinedButton(
                         onClick = {
                             if (stage == 1) {
                                 stage = 2
@@ -479,6 +477,7 @@ fun SignUpScreen(navController: NavHostController) {
                         },
                         enabled = (stage == 1 || (stage == 2 && validateInput())),
                         modifier = Modifier
+                            .weight(1f) // Chia đều không gian
                             .width(if (isTablet) 300.dp else 200.dp)
                             .height(if (isTablet) 56.dp else 48.dp)
                             .align(Alignment.CenterVertically),
@@ -487,10 +486,8 @@ fun SignUpScreen(navController: NavHostController) {
                     ) {
                         Text(if (stage == 1) "Tiếp tục" else "Đăng ký")
                     }
-
-
-
                 }
+
                 Spacer(modifier = Modifier.height(16.dp))
                 // Chuyển tới đăng nhập
                 Row(
@@ -513,15 +510,9 @@ fun SignUpScreen(navController: NavHostController) {
                         )
                     }
                 }
-
-
             }
-
-
         }
-
     }
-
 }
 
 
