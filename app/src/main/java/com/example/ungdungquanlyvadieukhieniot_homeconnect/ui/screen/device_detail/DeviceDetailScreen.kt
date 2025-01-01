@@ -1228,11 +1228,27 @@ fun EndlessRollingPadlockTimePicker(
         val minutesList = (0..59).toList()
         val amPmList = listOf("AM", "PM")
 
-        val hourState = rememberLazyListState(initialFirstVisibleItemIndex = 50 * hoursList.indexOf(12))
-        val minuteState = rememberLazyListState(initialFirstVisibleItemIndex = 50 * minutesList.indexOf(0))
-        val amPmState = rememberLazyListState(initialFirstVisibleItemIndex = 50 * amPmList.indexOf("AM"))
+        //Giá trị muốn hiên khi mở đầu
+        val initialHour = 9
+        val initialMinute = 0
+        val initialAmPm = "AM" // Hoặc giá trị mong muốn
 
-        val scope = rememberCoroutineScope()
+        // Kiểm tra giá trị AM/PM
+        val amPmIndex = amPmList.indexOf(initialAmPm)
+        if (amPmIndex == -1) {
+            throw IllegalArgumentException("Invalid value for AM/PM: $initialAmPm. Allowed values: ${amPmList.joinToString()}")
+        }
+
+        // Tính toán chỉ số khởi tạo
+        val hourState = rememberLazyListState(
+            initialFirstVisibleItemIndex = (100 * hoursList.size / 2) + hoursList.indexOf(initialHour) - 1
+        )
+        val minuteState = rememberLazyListState(
+            initialFirstVisibleItemIndex = (100 * minutesList.size / 2) + minutesList.indexOf(initialMinute) - 1
+        )
+        val amPmState = rememberLazyListState(
+            initialFirstVisibleItemIndex = (100 * amPmList.size / 2) + amPmIndex -1
+        )
 
         Box(
             modifier = modifier
@@ -1370,7 +1386,7 @@ fun <T> RollingColumn(
             items(items.size * 100) { index ->
                 val item = items[index % items.size]
                 // Xác định mục được chọn
-                val isSelected = (index == state.firstVisibleItemIndex + 1)
+                val isSelected = (index % items.size == (state.firstVisibleItemIndex + 1) % items.size)
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -1399,53 +1415,56 @@ suspend fun snapToCenter(scope: CoroutineScope, state: LazyListState, size: Int)
 @Preview
 @Composable
 fun DayPicker() {
-    // Danh sách các thứ trong tuần
-    val daysOfWeek = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        // Danh sách các thứ trong tuần
+        val daysOfWeek = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
-    // State lưu trữ các ngày đã được chọn
-    var selectedDays by remember { mutableStateOf(setOf<String>()) }
+        // State lưu trữ các ngày đã được chọn
+        var selectedDays by remember { mutableStateOf(setOf<String>()) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Select Days",
-            fontSize = 24.sp,
-            color = Color.Black,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        // Hiển thị các ngày trong tuần dưới dạng Row
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            daysOfWeek.forEach { day ->
-                DayItem(
-                    day = day,
-                    isSelected = selectedDays.contains(day),
-                    onDayClicked = {
-                        selectedDays = if (selectedDays.contains(day)) {
-                            selectedDays - day
-                        } else {
-                            selectedDays + day
+            Text(
+                text = "Select Days",
+                fontSize = 24.sp,
+                color = colorScheme.onBackground,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            // Hiển thị các ngày trong tuần dưới dạng Row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                daysOfWeek.forEach { day ->
+                    DayItem(
+                        day = day,
+                        isSelected = selectedDays.contains(day),
+                        onDayClicked = {
+                            selectedDays = if (selectedDays.contains(day)) {
+                                selectedDays - day
+                            } else {
+                                selectedDays + day
+                            }
                         }
-                    }
-                )
+                    )
+                }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Hiển thị kết quả các ngày đã chọn
+            Text(
+                text = "Selected Days: ${selectedDays.joinToString(", ")}",
+                fontSize = 16.sp,
+                color = colorScheme.onSecondary
+            )
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Hiển thị kết quả các ngày đã chọn
-        Text(
-            text = "Selected Days: ${selectedDays.joinToString(", ")}",
-            fontSize = 16.sp,
-            color = Color.Gray
-        )
     }
 }
 
