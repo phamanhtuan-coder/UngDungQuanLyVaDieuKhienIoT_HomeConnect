@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Info
@@ -45,6 +46,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -146,37 +149,53 @@ fun AccessPointConnectionScreen(
 
                                         // Ô nhập liệu đầu tiên - ID thiết bị
                                         OutlinedTextField(
+                                            //ToDo: Bố sung biến cho value
                                             value = "",
                                             onValueChange = {
                                                 //Todo: Hiển thị ID thiết bị
                                             },
+                                            shape = RoundedCornerShape(25),
                                             placeholder = { Text("ID thiết bị của bạn là:") },
                                             singleLine = true,
-                                            modifier = Modifier.width(layoutConfig.contentWidth),
+                                            modifier = Modifier
+                                                .width(if (isTablet()) 400.dp else 300.dp)
+                                                .height(if (isTablet()) 80.dp else 70.dp),
                                             colors = TextFieldDefaults.colors(
                                                 focusedContainerColor = colorScheme.onPrimary,
                                                 unfocusedContainerColor = colorScheme.onPrimary,
                                                 focusedIndicatorColor = colorScheme.primary,
                                                 unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
-                                            )
+                                            ),
+                                            keyboardOptions = KeyboardOptions(
+                                                keyboardType = KeyboardType.Text,
+                                                imeAction = ImeAction.Next
+                                            ),
                                         )
 
                                         Spacer(modifier = Modifier.height(layoutConfig.textFieldSpacing))
 
                                         OutlinedTextField(
+                                            //ToDo: Bố sung biến cho value
                                             value = "",
                                             onValueChange = {
                                                 //Todo: Hiển thị tên thiết bị
                                             },
+                                            shape = RoundedCornerShape(25),
                                             placeholder = { Text("Tên thiết bị của bạn là:") },
                                             singleLine = true,
-                                            modifier = Modifier.width(layoutConfig.contentWidth),
+                                            modifier = Modifier
+                                                .width(if (isTablet()) 400.dp else 300.dp)
+                                                .height(if (isTablet()) 80.dp else 70.dp),
                                             colors = TextFieldDefaults.colors(
                                                 focusedContainerColor = colorScheme.onPrimary,
                                                 unfocusedContainerColor = colorScheme.onPrimary,
                                                 focusedIndicatorColor = colorScheme.primary,
                                                 unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
-                                            )
+                                            ),
+                                            keyboardOptions = KeyboardOptions(
+                                                keyboardType = KeyboardType.Text,
+                                                imeAction = ImeAction.Next
+                                            ),
                                         )
                                     }
                                 }
