@@ -1,5 +1,6 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.otp
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,6 +16,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -23,11 +25,13 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
@@ -43,17 +47,16 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OtpScreen(navController: NavHostController) {
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
         val configuration = LocalConfiguration.current
         val isTablet = configuration.screenWidthDp >= 600
-        val otpLength = 6 // Độ dài mã OTP (số ô nhập OTP)
-        val otpValue =
-            remember { Array(otpLength) { TextFieldValue("") } } // Khởi tạo danh sách các TextFieldValue cho mỗi ô OTP
-        val focusRequesters =
-            List(otpLength) { FocusRequester() } // Danh sách FocusRequester để quản lý focus cho từng ô OTP
+        val otpLength = 6 // Độ dài mã OTP
+        val otpValue = remember { mutableStateListOf(*Array(otpLength) { "" }) } // Sử dụng MutableStateList
+        val focusRequesters = List(otpLength) { FocusRequester() }
 
         Scaffold(
             containerColor = colorScheme.background
@@ -80,35 +83,26 @@ fun OtpScreen(navController: NavHostController) {
                     color = colorScheme.onBackground.copy(alpha = 0.6f)
                 )
 
-
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     repeat(otpLength) { index ->
                         OutlinedTextField(
-                            value = otpValue[index], // Current OTP value
-                            onValueChange = {
-                                //ToDo: Xử lý khi nhập mã OTP vào đây
-                                    input ->
-                                if (input.text.length <= 1) { // Limit input to one character
-                                    otpValue[index] =
-                                        TextFieldValue(input.text, TextRange(input.text.length))
-
-                                    // Move to the next field if not empty and not the last index
-                                    if (input.text.isNotEmpty() && index < otpLength - 1) {
+                            value = otpValue[index], // Lấy giá trị từ danh sách
+                            onValueChange = { input ->
+                                if (input.length <= 1 && input.all { it.isDigit() }) {
+                                    otpValue[index] = input
+                                    if (input.isNotEmpty() && index < otpLength - 1) {
                                         focusRequesters[index + 1].requestFocus()
-                                    }
-
-                                    // Handle backspace and move focus back
-                                    if (input.text.isEmpty() && index > 0) {
+                                    } else if (input.isEmpty() && index > 0) {
                                         focusRequesters[index - 1].requestFocus()
                                     }
                                 }
                             },
                             modifier = Modifier
                                 .size(if (isTablet) 60.dp else 50.dp)
-                                .focusRequester(focusRequesters[index]), // Attach focusRequester
+                                .focusRequester(focusRequesters[index]),
                             singleLine = true,
                             textStyle = MaterialTheme.typography.bodyLarge.copy(
                                 color = colorScheme.onBackground,
@@ -119,25 +113,21 @@ fun OtpScreen(navController: NavHostController) {
                                 keyboardType = KeyboardType.Number,
                                 imeAction = if (index == otpLength - 1) ImeAction.Done else ImeAction.Next
                             ),
-                            colors = MaterialTheme.colorScheme.run {
-                                TextFieldDefaults.colors(
-                                    focusedTextColor = onBackground,
-                                    unfocusedTextColor = onBackground,
-                                    focusedContainerColor = onPrimary,
-                                    unfocusedContainerColor = onPrimary,
-                                    focusedIndicatorColor = primary,
-                                    unfocusedIndicatorColor = onBackground.copy(alpha = 0.5f)
-                                )
-                            }
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = colorScheme.primary,
+                                unfocusedBorderColor = colorScheme.onBackground.copy(alpha = 0.5f),
+                                focusedLabelColor = colorScheme.primary,
+                                unfocusedLabelColor = colorScheme.onBackground.copy(alpha = 0.6f),
+                                cursorColor = colorScheme.primary,
+                                errorCursorColor = colorScheme.error
+                            )
                         )
                     }
                 }
 
                 LaunchedEffect(Unit) {
-                    focusRequesters[0].requestFocus() // Focus the first field
+                    focusRequesters[0].requestFocus()
                 }
-
-
 
                 Text(
                     text = "Mã OTP có hiệu lực trong 5 phút.",
@@ -146,10 +136,10 @@ fun OtpScreen(navController: NavHostController) {
                 )
                 Spacer(modifier = Modifier.height(24.dp))
 
-
-                // Nút xác nhận OTP
                 Button(
-                    onClick = {/* TODO: Xử lý xác nhận OTP */
+                    onClick = {
+                        // Debug giá trị hiện tại của OTP
+                        Log.d("OTP_DEBUG", "OTP Entered: ${otpValue.joinToString("")}")
                         navController.navigate("new_password")
                     },
                     modifier = Modifier.size(
@@ -166,52 +156,9 @@ fun OtpScreen(navController: NavHostController) {
                         color = colorScheme.onPrimary
                     )
                 }
-
-                // Nút gửi lại OTP
-                TextButton(
-                    onClick = {
-
-                    },
-                    content =
-                    {
-                        Text(
-                            text = "Gửi lại mã OTP",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = colorScheme.primary,
-                        )
-                    },
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .align(Alignment.CenterHorizontally)
-                )
-
-
-                // Chuyển tới đăng nhập
-                Row(
-                    modifier = Modifier.fillMaxWidth(if (isTablet) 0.8f else 0.9f),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Bạn muốn đăng nhập?",
-                        fontSize = 14.sp,
-                        color = colorScheme.onBackground
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    TextButton(onClick = { navController.navigate(Screens.Login.route) }) {
-                        Text(
-                            text = "Đăng nhập",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = colorScheme.primary
-                        )
-                    }
-                }
             }
         }
     }
-
 }
 
 @Preview(showBackground = true, showSystemUi = true)
