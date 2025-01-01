@@ -73,6 +73,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.WarningDialog
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.isTablet
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -572,24 +573,25 @@ fun ProfileScreen(
                             showDatePicker = false //Ẩn date picker
                         }
                     }
-
-
+                    // Save Button
+                    Button(
+                        onClick = {
+                            // TODO: Xử lý lưu thông tin
+                        },
+                        modifier = Modifier
+                            .width(if (isTablet()) 300.dp else 200.dp)
+                            .height(if (isTablet()) 56.dp else 48.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
+                        shape = RoundedCornerShape(50)
+                    ) {
+                        Text(
+                            "Lưu thông tin",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = colorScheme.onPrimary
+                        )
+                    }
                 }
-                // Save Button
-                Button(
-                    onClick = {
-                        // TODO: Xử lý lưu thông tin
-                    },
-                    modifier = Modifier
-                        .width(if (isTablet) 300.dp else 200.dp)
-                        .height(if (isTablet) 56.dp else 48.dp)
-                        .padding(top = 16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
-                    shape = RoundedCornerShape(50)
-                ) {
-                    Text("Lưu thông tin")
-                }
-
             }
         }
     }
