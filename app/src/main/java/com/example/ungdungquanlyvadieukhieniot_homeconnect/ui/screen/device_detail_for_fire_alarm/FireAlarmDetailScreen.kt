@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -71,6 +72,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.isTablet
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.DayPicker
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.DeviceDetailPhoneScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.EndlessRollingPadlockTimePicker
@@ -357,9 +359,10 @@ fun FireAlarmDetailScreen(
                         ) {
                             Column(
                                 modifier = Modifier
+                                    .widthIn(max = if (isTablet()) 700.dp else 400.dp)
                                     .padding(horizontal = 12.dp)
                                     .wrapContentWidth(),
-                                horizontalAlignment = Alignment.Start,
+                                horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
 
@@ -474,9 +477,9 @@ fun FireAlarmDetailScreen(
                                         navController.navigate(Screens.ActivityHistory.route)
                                     },
                                     modifier = Modifier
-                                        .weight(1f) // Chia đều không gian
-                                        .width(200.dp)
-                                        .height(48.dp),
+                                        .weight(0.5f) // Chia đều không gian
+                                        .width(if (isTablet()) 300.dp else 200.dp)
+                                        .height(if (isTablet()) 56.dp else 48.dp),
                                     colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
                                     shape = RoundedCornerShape(50)
                                 ) {
@@ -492,9 +495,9 @@ fun FireAlarmDetailScreen(
                                         //Todo: Xử lý khi nhấn nút Gỡ kết nối
                                     },
                                     modifier = Modifier
-                                        .weight(1f) // Chia đều không gian
-                                        .width(200.dp)
-                                        .height(48.dp),
+                                        .weight(0.5f) // Chia đều không gian
+                                        .width(if (isTablet()) 300.dp else 200.dp)
+                                        .height(if (isTablet()) 56.dp else 48.dp),
                                     colors = ButtonDefaults.buttonColors(containerColor = colorScheme.error),
                                     shape = RoundedCornerShape(50)
                                 ) {
