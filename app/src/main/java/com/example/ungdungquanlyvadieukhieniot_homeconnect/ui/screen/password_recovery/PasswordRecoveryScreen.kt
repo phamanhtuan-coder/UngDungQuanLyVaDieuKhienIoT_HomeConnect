@@ -99,7 +99,6 @@ fun PasswordRecoveryScreen(navController: NavHostController) {
                 OutlinedTextField(
                     value = emailState.value,
                     onValueChange = { emailState.value = it },
-                    label = { Text("Email") },
                     placeholder = { Text("Nhập email của bạn") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
