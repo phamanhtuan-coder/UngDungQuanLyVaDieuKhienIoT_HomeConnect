@@ -106,7 +106,9 @@ fun AddSpaceScreen(
                                                     contentDescription = null
                                                 )
                                             },
-                                            label = { Text("Tên Space") },
+                                            singleLine = true,
+                                            shape = RoundedCornerShape(25),
+                                            placeholder = { Text("Tên Space") },
                                             modifier = Modifier
                                                 .width(if (isTablet) 500.dp else 400.dp)
                                                 .height(if (isTablet) 80.dp else 70.dp),
@@ -132,7 +134,9 @@ fun AddSpaceScreen(
                                                     contentDescription = null
                                                 )
                                             },
-                                            label = { Text("Chọn Nhà") },
+                                            singleLine = true,
+                                            shape = RoundedCornerShape(25),
+                                            placeholder = { Text("Chọn Nhà") },
                                             modifier = Modifier
                                                 .width(if (isTablet) 500.dp else 400.dp)
                                                 .height(if (isTablet) 80.dp else 70.dp),
