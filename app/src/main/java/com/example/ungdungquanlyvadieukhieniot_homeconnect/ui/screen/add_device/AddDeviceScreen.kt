@@ -128,6 +128,7 @@ fun AddDeviceScreen(
                                                     contentDescription = null
                                                 ) // Icon người dùng
                                             },
+                                            shape = RoundedCornerShape(25),
                                             label = { Text("ID Thiết bị") }, // Nhãn cho ô nhập liệu
                                             modifier = Modifier
                                                 .width(if (isTablet) 500.dp else 400.dp)
@@ -152,6 +153,7 @@ fun AddDeviceScreen(
                                                     contentDescription = null
                                                 ) // Icon
                                             },
+                                            shape = RoundedCornerShape(25),
                                             label = { Text("Tên thiết bị") }, // Nhãn cho ô nhập liệu
                                             modifier = Modifier
                                                 .width(if (isTablet) 500.dp else 400.dp)
@@ -173,6 +175,7 @@ fun AddDeviceScreen(
                                                     contentDescription = null
                                                 )
                                             },
+                                            shape = RoundedCornerShape(25),
                                             onValueChange = { /* TODO: Xử lý thay đổi giá trị */ },
                                             label = { Text("Chon phòng") },
                                             modifier = Modifier
