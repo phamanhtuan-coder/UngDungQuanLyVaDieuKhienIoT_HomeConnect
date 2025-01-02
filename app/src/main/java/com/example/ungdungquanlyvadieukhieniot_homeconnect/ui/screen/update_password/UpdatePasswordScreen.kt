@@ -55,6 +55,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.isTablet
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.settings.SettingsScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.ValidationUtils
 
 /** Giao diện màn hình Cập nhật Mật Khẩu (Update PassWord Screen)
  * -----------------------------------------
@@ -76,12 +77,21 @@ fun UpdatePasswordScreen(
         val configuration = LocalConfiguration.current
         val screenHeightDp = configuration.screenHeightDp.dp
         val screenWidthDp = configuration.screenWidthDp.dp
-        val passwordState = remember { mutableStateOf("") }
+
+        // Trạng thái cho các trường mật khẩu
+        var passwordState by remember { mutableStateOf("") }
         var passwordVisible by remember { mutableStateOf(false) }
-        val passwordState2 = remember { mutableStateOf("") }
+
+        var passwordState2 by remember { mutableStateOf("") }
         var passwordVisible2 by remember { mutableStateOf(false) }
-        val passwordState3 = remember { mutableStateOf("") }
+
+        var passwordState3 by remember { mutableStateOf("") }
         var passwordVisible3 by remember { mutableStateOf(false) }
+
+        // Biến trạng thái lưu thông báo lỗi
+        var passwordError by remember { mutableStateOf("") }
+        var passwordNewError by remember { mutableStateOf("") }
+        var passwordConfirmError by remember { mutableStateOf("") }
 
         // Xác định xem nếu chúng ta đang ở chế độ ngang
         val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -140,9 +150,10 @@ fun UpdatePasswordScreen(
                     OutlinedTextField(
                         shape = RoundedCornerShape(25),
                         singleLine = true,
-                        value = passwordState.value,
+                        value = passwordState,
                         onValueChange = {
-                            passwordState.value = it
+                            passwordState = it
+                            passwordError = ValidationUtils.validatePassword(it) // Kiểm tra mật khẩu
                         },
                         placeholder = { Text("Mật khẩu:") },
                         leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
@@ -173,9 +184,10 @@ fun UpdatePasswordScreen(
                     OutlinedTextField(
                         shape = RoundedCornerShape(25),
                         singleLine = true,
-                        value = passwordState2.value,
+                        value = passwordState2,
                         onValueChange = {
-                            passwordState2.value = it
+                            passwordState2 = it
+                            passwordNewError = ValidationUtils.validatePassword(it) // Kiểm tra mật khẩu mới
                         },
                         placeholder = { Text("Mật khẩu mới:") },
                         leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
@@ -207,9 +219,10 @@ fun UpdatePasswordScreen(
                     OutlinedTextField(
                         shape = RoundedCornerShape(25),
                         singleLine = true,
-                        value = passwordState3.value,
+                        value = passwordState3,
                         onValueChange = {
-                            passwordState3.value = it
+                            passwordState3 = it
+                            passwordConfirmError = ValidationUtils.validateConfirmPassword(passwordState2, it) // Kiểm tra mật khẩu xác nhận
                         },
                         placeholder = { Text("Nhập lại mật khẩu mới:") },
                         leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
