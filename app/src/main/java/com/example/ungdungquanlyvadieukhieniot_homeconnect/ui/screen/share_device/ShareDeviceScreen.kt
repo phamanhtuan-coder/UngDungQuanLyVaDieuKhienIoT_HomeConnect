@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.sp
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.isTablet
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.ValidationUtils
 
 
 /** Giao diện màn hình Share Device (ShareDeviceScreen)
@@ -75,6 +76,11 @@ fun ShareDeviceScreens() {
         val configuration = LocalConfiguration.current
         val isTablet = configuration.screenWidthDp >= 600
 
+        val deviceIdState = remember { mutableStateOf("") }
+        val deviceIdErrorState = remember { mutableStateOf("") }
+
+        val emailState = remember { mutableStateOf("") }
+        val emailErrorState = remember { mutableStateOf("") }
         Scaffold(
             modifier = Modifier
                 .fillMaxSize()
@@ -115,8 +121,12 @@ fun ShareDeviceScreens() {
                     // Ô nhập ID thiết bị
                     OutlinedTextField(
                         //ToDo: Bổ sung biến lưu giá trị
-                        value = "", // Giá trị hiện tại (để trống)
-                        onValueChange = {}, // Hàm xử lý khi nhập liệu (chưa triển khai)
+                        value = deviceIdState.value, // Giá trị hiện tại (để trống)
+                        onValueChange = {
+                            deviceIdState.value = it
+                            // Kiểm tra lỗi ngay khi nhập
+                            deviceIdErrorState.value = ValidationUtils.validateDeviceId(it)
+                        }, // Hàm xử lý khi nhập liệu (chưa triển khai)
                         leadingIcon = { // Biểu tượng ở bên trái ô nhập liệu
                             Icon(Icons.Filled.Person, contentDescription = null) // Icon người dùng
                         },
@@ -139,14 +149,18 @@ fun ShareDeviceScreens() {
 
                     // Ô nhập Email tài khoản
                     OutlinedTextField(
-                        value = "", // Giá trị hiện tại (để trống)
-                        onValueChange = {}, // Hàm xử lý khi nhập liệu (chưa triển khai)
+                        value = emailState.value, // Giá trị hiện tại (để trống)
+                        onValueChange = {
+                            emailState.value = it
+                            // Kiểm tra lỗi ngay khi nhập
+                            emailErrorState.value = ValidationUtils.validateEmail(it)
+                        }, // Hàm xử lý khi nhập liệu (chưa triển khai)
                         leadingIcon = { // Biểu tượng ở bên trái ô nhập liệu
                             Icon(Icons.Filled.Email, contentDescription = null) // Icon email
                         },
                         shape = RoundedCornerShape(25),
                         singleLine = true,
-                        placeholder = { Text("ID Thiết bị") }, // Nhãn cho ô nhập liệu
+                        placeholder = { Text("Email tài khoản") }, // Nhãn cho ô nhập liệu
                         modifier = Modifier
                             .width(if (isTablet) 500.dp else 400.dp)
                             .height(if (isTablet) 80.dp else 70.dp),
