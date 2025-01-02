@@ -74,10 +74,26 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.ValidationUtils
 
 @SuppressLint("InlinedApi")
 @Composable
 fun SignUpScreen(navController: NavHostController) {
+    // Họ tên
+    var name by remember { mutableStateOf("") }
+    var nameError by remember { mutableStateOf("") }
+
+    // Email
+    var email by remember { mutableStateOf("") }
+    var emailError by remember { mutableStateOf("") }
+
+    // Số điện thoại
+    var phoneNumber by remember { mutableStateOf("") }
+    var phoneError by remember { mutableStateOf("") }
+
+    // Địa chỉ
+    var address by remember { mutableStateOf("") }
+    var addressError by remember { mutableStateOf("") }
 
     AppTheme {
         val context = LocalContext.current
@@ -171,7 +187,10 @@ fun SignUpScreen(navController: NavHostController) {
                         shape = RoundedCornerShape(25),
                         singleLine = true,
                         value = name,
-                        onValueChange = { name = it },
+                        onValueChange = {
+                            name = it
+                            nameError = ValidationUtils.validateFullName(it) // Gọi hàm kiểm tra
+                                        },
                         placeholder = { Text("Họ tên") },
                         leadingIcon = { Icon(Icons.Filled.Person, contentDescription = null) },
                         modifier = Modifier
@@ -191,7 +210,10 @@ fun SignUpScreen(navController: NavHostController) {
                         shape = RoundedCornerShape(25),
                         singleLine = true,
                         value = email,
-                        onValueChange = { email = it },
+                        onValueChange = {
+                            email = it
+                            emailError = ValidationUtils.validateEmail(it) // Gọi hàm kiểm tra
+                                        },
                         placeholder = { Text("Email") },
                         leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -212,7 +234,10 @@ fun SignUpScreen(navController: NavHostController) {
                         shape = RoundedCornerShape(25),
                         singleLine = true,
                         value = phoneNumber,
-                        onValueChange = { phoneNumber = it },
+                        onValueChange = {
+                            phoneNumber = it
+                            phoneError = ValidationUtils.validatePhoneNumber(it) // Gọi hàm kiểm tra
+                                        },
                         placeholder = { Text("Số điện thoại") },
                         leadingIcon = { Icon(Icons.Filled.Phone, contentDescription = null) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
@@ -233,7 +258,10 @@ fun SignUpScreen(navController: NavHostController) {
                         shape = RoundedCornerShape(25),
                         singleLine = true,
                         value = address,
-                        onValueChange = { address = it },
+                        onValueChange = {
+                            address = it
+                            addressError = ValidationUtils.validateAddress(it) // Gọi hàm kiểm tra
+                                        },
                         placeholder = { Text("Địa chỉ") },
                         leadingIcon = { Icon(Icons.Filled.Home, contentDescription = null) },
                         modifier = Modifier
