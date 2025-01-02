@@ -39,6 +39,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.ValidationUtils
 
 /**
  * Màn hình Khôi phục mật khẩu
@@ -66,6 +67,8 @@ fun PasswordRecoveryScreen(navController: NavHostController) {
         val configuration = LocalConfiguration.current
         val isTablet = configuration.screenWidthDp >= 600
 
+        // Biến trạng thái để lưu thông báo lỗi
+        val emailErrorState = remember { mutableStateOf("") }
         Scaffold(
             modifier = Modifier
                 .fillMaxSize()
@@ -98,7 +101,11 @@ fun PasswordRecoveryScreen(navController: NavHostController) {
                 // Trường nhập email
                 OutlinedTextField(
                     value = emailState.value,
-                    onValueChange = { emailState.value = it },
+                    onValueChange = {
+                        emailState.value = it
+                        // Kiểm tra email ngay khi giá trị thay đổi
+                        emailErrorState.value = ValidationUtils.validateEmail(it)
+                    },
                     placeholder = { Text("Nhập email của bạn") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
@@ -117,8 +124,9 @@ fun PasswordRecoveryScreen(navController: NavHostController) {
                         focusedIndicatorColor = colorScheme.primary,
                         unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
                     ),
-                    leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null) },
+                    leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null) }
                 )
+
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // Nút khôi phục mật khẩu
