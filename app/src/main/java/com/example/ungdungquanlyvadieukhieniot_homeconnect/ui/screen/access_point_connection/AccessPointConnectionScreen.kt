@@ -58,6 +58,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.ValidationUtils
 
 /** Giao diện màn hình Access Point Connection Screen (AccessPointConnectionScreen
  * -----------------------------------------
@@ -79,6 +80,13 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 fun AccessPointConnectionScreen(
     navController: NavHostController
 ) {
+    // Biến trạng thái để lưu giá trị nhập
+    var deviceId by remember { mutableStateOf("") }
+    var deviceName by remember { mutableStateOf("") }
+
+    // Biến trạng thái để hiển thị thông báo lỗi
+    var deviceIdError by remember { mutableStateOf("") }
+    var deviceNameError by remember { mutableStateOf("") }
     val layoutConfig = rememberResponsiveLayoutConfig() // Lấy LayoutConfig
     var showDialog by remember { mutableStateOf(false) }
 
@@ -148,11 +156,13 @@ fun AccessPointConnectionScreen(
                                         Spacer(modifier = Modifier.height(layoutConfig.textFieldSpacing))
 
                                         // Ô nhập liệu đầu tiên - ID thiết bị
+                                        // TextField để nhập ID thiết bị
                                         OutlinedTextField(
-                                            //ToDo: Bố sung biến cho value
-                                            value = "",
+                                            value = deviceId,
                                             onValueChange = {
-                                                //Todo: Hiển thị ID thiết bị
+                                                deviceId = it
+                                                // Kiểm tra ID thiết bị ngay khi thay đổi
+                                                deviceIdError = ValidationUtils.validateDeviceId(it)
                                             },
                                             shape = RoundedCornerShape(25),
                                             placeholder = { Text("ID thiết bị của bạn là:") },
@@ -161,8 +171,8 @@ fun AccessPointConnectionScreen(
                                                 .width(if (isTablet()) 400.dp else 300.dp)
                                                 .height(if (isTablet()) 80.dp else 70.dp),
                                             colors = TextFieldDefaults.colors(
-                                                focusedTextColor = colorScheme.onBackground,  // Màu text khi TextField được focus
-                                                unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),  // Màu text khi TextField không được focus
+                                                focusedTextColor = colorScheme.onBackground,
+                                                unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),
                                                 focusedContainerColor = colorScheme.onPrimary,
                                                 unfocusedContainerColor = colorScheme.onPrimary,
                                                 focusedIndicatorColor = colorScheme.primary,
@@ -171,16 +181,17 @@ fun AccessPointConnectionScreen(
                                             keyboardOptions = KeyboardOptions(
                                                 keyboardType = KeyboardType.Text,
                                                 imeAction = ImeAction.Next
-                                            ),
+                                            )
                                         )
 
                                         Spacer(modifier = Modifier.height(layoutConfig.textFieldSpacing))
 
+                                        // TextField nhập tên thiết bị
                                         OutlinedTextField(
-                                            //ToDo: Bố sung biến cho value
-                                            value = "",
+                                            value = deviceName,
                                             onValueChange = {
-                                                //Todo: Hiển thị tên thiết bị
+                                                deviceName = it
+                                                deviceNameError = ValidationUtils.validateDeviceName(it) // Kiểm tra tên thiết bị
                                             },
                                             shape = RoundedCornerShape(25),
                                             placeholder = { Text("Tên thiết bị của bạn là:") },
@@ -189,8 +200,8 @@ fun AccessPointConnectionScreen(
                                                 .width(if (isTablet()) 400.dp else 300.dp)
                                                 .height(if (isTablet()) 80.dp else 70.dp),
                                             colors = TextFieldDefaults.colors(
-                                                focusedTextColor = colorScheme.onBackground,  // Màu text khi TextField được focus
-                                                unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),  // Màu text khi TextField không được focus
+                                                focusedTextColor = colorScheme.onBackground,
+                                                unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),
                                                 focusedContainerColor = colorScheme.onPrimary,
                                                 unfocusedContainerColor = colorScheme.onPrimary,
                                                 focusedIndicatorColor = colorScheme.primary,
@@ -199,10 +210,11 @@ fun AccessPointConnectionScreen(
                                             keyboardOptions = KeyboardOptions(
                                                 keyboardType = KeyboardType.Text,
                                                 imeAction = ImeAction.Next
-                                            ),
+                                            )
                                         )
                                     }
                                 }
+
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
