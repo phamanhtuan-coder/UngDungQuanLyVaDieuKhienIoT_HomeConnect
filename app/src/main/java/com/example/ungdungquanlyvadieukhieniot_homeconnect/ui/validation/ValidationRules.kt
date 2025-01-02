@@ -16,6 +16,13 @@ object ValidationRules {
     // Danh sách các ký tự đặc biệt được yêu cầu trong mật khẩu
     const val PASSWORD_SPECIAL_CHARS = "!@#\$%^&*()_-+=<>?/"
 
+    // Quy tắc ID thiết bị
+    const val DEVICE_ID_REGEX = "^[a-zA-Z0-9_]{5,20}\$" // Chỉ chữ cái, số và dấu gạch dưới, từ 5-20 ký tự.
+
+    // Quy tắc Tên thiết bị
+    const val MIN_DEVICE_NAME_LENGTH = 3
+    const val MAX_DEVICE_NAME_LENGTH = 50
+
     /**
      * Kiểm tra xem email có đúng định dạng không.
      * Sử dụng bộ lọc có sẵn `android.util.Patterns.EMAIL_ADDRESS`.

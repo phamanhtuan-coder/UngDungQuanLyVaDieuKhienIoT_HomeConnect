@@ -105,4 +105,35 @@ object ValidationUtils {
             "Số điện thoại hợp lệ." // Nếu hợp lệ.
         }
     }
+
+    /**
+     * Kiểm tra ID thiết bị.
+     * - ID không được để trống.
+     * - ID phải tuân thủ định dạng: chỉ gồm chữ cái, số và dấu gạch dưới (_).
+     * - Độ dài từ 5 đến 20 ký tự.
+     * @param deviceId ID thiết bị cần kiểm tra.
+     * @return Thông báo xác định ID hợp lệ hay không.
+     */
+    fun validateDeviceId(deviceId: String): String {
+        return if (deviceId.isBlank() || !deviceId.matches(Regex(ValidationRules.DEVICE_ID_REGEX))) {
+            "ID thiết bị không hợp lệ. Phải từ 5-20 ký tự, chỉ gồm chữ cái, số và dấu gạch dưới (_)."
+        } else {
+            "ID thiết bị hợp lệ."
+        }
+    }
+
+    /**
+     * Kiểm tra Tên thiết bị.
+     * - Tên không được để trống.
+     * - Tên phải có độ dài từ 3 đến 50 ký tự.
+     * @param deviceName Tên thiết bị cần kiểm tra.
+     * @return Thông báo xác định Tên thiết bị hợp lệ hay không.
+     */
+    fun validateDeviceName(deviceName: String): String {
+        return if (deviceName.isBlank() || deviceName.length < ValidationRules.MIN_DEVICE_NAME_LENGTH || deviceName.length > ValidationRules.MAX_DEVICE_NAME_LENGTH) {
+            "Tên thiết bị không hợp lệ. Phải có từ ${ValidationRules.MIN_DEVICE_NAME_LENGTH} đến ${ValidationRules.MAX_DEVICE_NAME_LENGTH} ký tự."
+        } else {
+            "Tên thiết bị hợp lệ."
+        }
+    }
 }
