@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.ValidationUtils
 
 /**
  * Màn hình Xác thực mật khẩu
@@ -65,6 +66,9 @@ fun PasswordAuthenticationScreen(navController: NavHostController) {
         var passwordVisible by remember { mutableStateOf(false) }
         val configuration = LocalConfiguration.current
         val isTablet = configuration.screenWidthDp >= 600
+
+        // Biến trạng thái để lưu thông báo lỗi
+        val passwordErrorState = remember { mutableStateOf("") }
 
         Scaffold(
             modifier = Modifier
@@ -98,7 +102,11 @@ fun PasswordAuthenticationScreen(navController: NavHostController) {
                 // Trường nhập mật khẩu
                 OutlinedTextField(
                     value = passwordState.value,
-                    onValueChange = { passwordState.value = it },
+                    onValueChange = {
+                        passwordState.value = it
+                        // Gọi hàm kiểm tra mật khẩu ngay khi giá trị thay đổi
+                        passwordErrorState.value = ValidationUtils.validatePassword(it)
+                    },
                     placeholder = { Text("Nhập mật khẩu của bạn") },
                     singleLine = true,
                     leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
@@ -117,14 +125,15 @@ fun PasswordAuthenticationScreen(navController: NavHostController) {
                         .height(if (isTablet) 80.dp else 70.dp),
                     shape = RoundedCornerShape(25),
                     colors = TextFieldDefaults.colors(
-                        focusedTextColor = colorScheme.onBackground,  // Màu text khi TextField được focus
-                        unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),  // Màu text khi TextField không được focus
+                        focusedTextColor = colorScheme.onBackground,
+                        unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),
                         focusedContainerColor = colorScheme.onPrimary,
                         unfocusedContainerColor = colorScheme.onPrimary,
                         focusedIndicatorColor = colorScheme.primary,
                         unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
                     )
                 )
+
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // Nút xác thực mật khẩu
