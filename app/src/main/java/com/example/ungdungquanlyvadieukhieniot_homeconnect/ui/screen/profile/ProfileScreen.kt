@@ -399,6 +399,8 @@ fun ProfileScreen(
                             .width(if (isTablet) 500.dp else 400.dp)
                             .height(if (isTablet) 80.dp else 70.dp),
                         colors = TextFieldDefaults.colors(
+                            focusedTextColor = colorScheme.onBackground,  // Màu text khi TextField được focus
+                            unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),  // Màu text khi TextField không được focus
                             focusedContainerColor = colorScheme.onPrimary,
                             unfocusedContainerColor = colorScheme.onPrimary,
                             focusedIndicatorColor = colorScheme.primary,
@@ -426,6 +428,8 @@ fun ProfileScreen(
                             .width(if (isTablet) 500.dp else 400.dp)
                             .height(if (isTablet) 80.dp else 70.dp),
                         colors = TextFieldDefaults.colors(
+                            focusedTextColor = colorScheme.onBackground,  // Màu text khi TextField được focus
+                            unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),  // Màu text khi TextField không được focus
                             focusedContainerColor = colorScheme.onPrimary,
                             unfocusedContainerColor = colorScheme.onPrimary,
                             focusedIndicatorColor = colorScheme.primary,
@@ -453,6 +457,8 @@ fun ProfileScreen(
                             .width(if (isTablet) 500.dp else 400.dp)
                             .height(if (isTablet) 80.dp else 70.dp),
                         colors = TextFieldDefaults.colors(
+                            focusedTextColor = colorScheme.onBackground,  // Màu text khi TextField được focus
+                            unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),  // Màu text khi TextField không được focus
                             focusedContainerColor = colorScheme.onPrimary,
                             unfocusedContainerColor = colorScheme.onPrimary,
                             focusedIndicatorColor = colorScheme.primary,
@@ -488,6 +494,8 @@ fun ProfileScreen(
                             .width(if (isTablet) 500.dp else 400.dp)
                             .height(if (isTablet) 80.dp else 70.dp),
                         colors = TextFieldDefaults.colors(
+                            focusedTextColor = colorScheme.onBackground,  // Màu text khi TextField được focus
+                            unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),  // Màu text khi TextField không được focus
                             focusedContainerColor = colorScheme.onPrimary,
                             unfocusedContainerColor = colorScheme.onPrimary,
                             focusedIndicatorColor = colorScheme.primary,
@@ -527,6 +535,8 @@ fun ProfileScreen(
                             .width(if (isTablet) 500.dp else 400.dp)
                             .height(if (isTablet) 80.dp else 70.dp),
                         colors = TextFieldDefaults.colors(
+                            focusedTextColor = colorScheme.onBackground,  // Màu text khi TextField được focus
+                            unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),  // Màu text khi TextField không được focus
                             focusedContainerColor = colorScheme.onPrimary,
                             unfocusedContainerColor = colorScheme.onPrimary,
                             focusedIndicatorColor = colorScheme.primary,
