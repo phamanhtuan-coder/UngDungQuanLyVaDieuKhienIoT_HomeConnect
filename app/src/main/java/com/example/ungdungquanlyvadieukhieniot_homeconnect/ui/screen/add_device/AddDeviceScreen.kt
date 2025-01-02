@@ -28,6 +28,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -38,6 +42,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.ValidationUtils
 
 
 /** Giao diện màn hình Thêm thiết bị (AddDeviceScreen)
@@ -55,6 +60,13 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 fun AddDeviceScreen(
     navController: NavHostController
 ) {
+    // Biến trạng thái để lưu giá trị nhập
+    var deviceId by remember { mutableStateOf("") }
+    var deviceName by remember { mutableStateOf("") }
+
+    // Biến trạng thái để hiển thị thông báo lỗi
+    var deviceIdError by remember { mutableStateOf("") }
+    var deviceNameError by remember { mutableStateOf("") }
     val configuration = LocalConfiguration.current
     val isTablet = configuration.screenWidthDp >= 600
     AppTheme {
@@ -118,25 +130,27 @@ fun AddDeviceScreen(
                                     ) {
                                         // Ô nhập ID thiết bị
                                         OutlinedTextField(
-                                            value = "", // Giá trị hiện tại (để trống)
+                                            value = deviceId, // Giá trị hiện tại của ID thiết bị
                                             onValueChange = {
-                                                //Todo: Xử lý thay đổi giá trị
-                                            }, // Hàm xử lý khi nhập liệu (chưa triển khai)
+                                                deviceId = it
+                                                // Kiểm tra lỗi cho ID thiết bị ngay khi thay đổi giá trị
+                                                deviceIdError = ValidationUtils.validateDeviceId(it)
+                                            },
                                             leadingIcon = { // Biểu tượng ở bên trái ô nhập liệu
                                                 Icon(
                                                     Icons.Filled.Person,
                                                     contentDescription = null
-                                                ) // Icon người dùng
+                                                )
                                             },
                                             shape = RoundedCornerShape(25),
                                             singleLine = true,
-                                            placeholder = { Text("ID Thiết bị") }, // Nhãn cho ô nhập liệu
+                                            placeholder = { Text("ID Thiết bị") },
                                             modifier = Modifier
                                                 .width(if (isTablet) 500.dp else 400.dp)
                                                 .height(if (isTablet) 80.dp else 70.dp),
                                             colors = TextFieldDefaults.colors(
-                                                focusedTextColor = colorScheme.onBackground,  // Màu text khi TextField được focus
-                                                unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),  // Màu text khi TextField không được focus
+                                                focusedTextColor = colorScheme.onBackground,
+                                                unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),
                                                 focusedContainerColor = colorScheme.onPrimary,
                                                 unfocusedContainerColor = colorScheme.onPrimary,
                                                 focusedIndicatorColor = colorScheme.primary,
@@ -145,32 +159,36 @@ fun AddDeviceScreen(
                                         )
                                         Spacer(modifier = Modifier.height(8.dp)) // Khoảng cách dưới ô nhập ID
 
+                                        // Ô nhập Tên thiết bị
                                         OutlinedTextField(
-                                            value = "", // Giá trị hiện tại (để trống)
+                                            value = deviceName, // Giá trị hiện tại của Tên thiết bị
                                             onValueChange = {
-                                                //todo: Xử lý thay đổi giá trị
-                                            }, // Hàm xử lý khi nhập liệu (chưa triển khai)
+                                                deviceName = it
+                                                // Kiểm tra lỗi cho Tên thiết bị ngay khi thay đổi giá trị
+                                                deviceNameError = ValidationUtils.validateDeviceName(it)
+                                            },
                                             leadingIcon = { // Biểu tượng ở bên trái ô nhập liệu
                                                 Icon(
                                                     Icons.Default.Devices,
                                                     contentDescription = null
-                                                ) // Icon
+                                                )
                                             },
                                             singleLine = true,
                                             shape = RoundedCornerShape(25),
-                                            placeholder = { Text("Tên thiết bị") }, // Nhãn cho ô nhập liệu
+                                            placeholder = { Text("Tên thiết bị") },
                                             modifier = Modifier
                                                 .width(if (isTablet) 500.dp else 400.dp)
                                                 .height(if (isTablet) 80.dp else 70.dp),
                                             colors = TextFieldDefaults.colors(
-                                                focusedTextColor = colorScheme.onBackground,  // Màu text khi TextField được focus
-                                                unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),  // Màu text khi TextField không được focus
+                                                focusedTextColor = colorScheme.onBackground,
+                                                unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),
                                                 focusedContainerColor = colorScheme.onPrimary,
                                                 unfocusedContainerColor = colorScheme.onPrimary,
                                                 focusedIndicatorColor = colorScheme.primary,
                                                 unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
-                                            ),
+                                            )
                                         )
+
                                         Spacer(modifier = Modifier.height(8.dp)) // Khoảng cách dưới ô nhập Email
 
                                         OutlinedTextField(
