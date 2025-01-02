@@ -55,6 +55,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.isTablet
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.wifi_connection.WifiConnectionScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.ValidationUtils
 
 /** Giao diện màn hình Tạo mật khẩu mới (NewPassword Screen)
  * -----------------------------------------
@@ -81,6 +82,10 @@ fun NewPasswordScreen(
         var passwordVisible by remember { mutableStateOf(false) }
         val passwordState2 = remember { mutableStateOf("") }
         var passwordVisible2 by remember { mutableStateOf(false) }
+
+// Biến trạng thái để lưu thông báo lỗi
+        val passwordErrorState = remember { mutableStateOf("") }
+        val passwordConfirmErrorState = remember { mutableStateOf("") }
 
         // Xác định xem nếu chúng ta đang ở chế độ ngang
         val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -138,15 +143,16 @@ fun NewPasswordScreen(
                         Spacer(modifier = Modifier.height(24.dp))
 
                         // MẬT KHẨU MỚI
-                        // Trường nhập mật khẩu
                         OutlinedTextField(
                             shape = RoundedCornerShape(25),
                             singleLine = true,
                             value = passwordState.value,
                             onValueChange = {
                                 passwordState.value = it
+                                // Kiểm tra lỗi mật khẩu mới
+                                passwordErrorState.value = ValidationUtils.validatePassword(it)
                             },
-                            placeholder = { Text("Mật khẩu:") },
+                            placeholder = { Text("Mật khẩu mới:") },
                             leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
                             trailingIcon = {
                                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
@@ -162,8 +168,8 @@ fun NewPasswordScreen(
                                 .width(if (isTablet()) 500.dp else 400.dp)
                                 .height(if (isTablet()) 80.dp else 70.dp),
                             colors = TextFieldDefaults.colors(
-                                focusedTextColor = colorScheme.onBackground,  // Màu text khi TextField được focus
-                                unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),  // Màu text khi TextField không được focus
+                                focusedTextColor = colorScheme.onBackground,
+                                unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),
                                 focusedContainerColor = colorScheme.onPrimary,
                                 unfocusedContainerColor = colorScheme.onPrimary,
                                 focusedIndicatorColor = colorScheme.primary,
@@ -179,6 +185,10 @@ fun NewPasswordScreen(
                             value = passwordState2.value,
                             onValueChange = {
                                 passwordState2.value = it
+                                // Kiểm tra lỗi nhập lại mật khẩu
+                                passwordConfirmErrorState.value = ValidationUtils.validateConfirmPassword(
+                                    passwordState.value, it
+                                )
                             },
                             placeholder = { Text("Nhập lại mật khẩu mới:") },
                             leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
@@ -196,8 +206,8 @@ fun NewPasswordScreen(
                                 .width(if (isTablet()) 500.dp else 400.dp)
                                 .height(if (isTablet()) 80.dp else 70.dp),
                             colors = TextFieldDefaults.colors(
-                                focusedTextColor = colorScheme.onBackground,  // Màu text khi TextField được focus
-                                unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),  // Màu text khi TextField không được focus
+                                focusedTextColor = colorScheme.onBackground,
+                                unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),
                                 focusedContainerColor = colorScheme.onPrimary,
                                 unfocusedContainerColor = colorScheme.onPrimary,
                                 focusedIndicatorColor = colorScheme.primary,
