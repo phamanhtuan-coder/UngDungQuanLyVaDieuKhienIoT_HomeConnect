@@ -50,6 +50,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.ValidationUtils
 
 /**
  * Màn hình đăng nhập
@@ -80,9 +81,15 @@ fun LoginScreen(
         val configuration = LocalConfiguration.current
         val isTablet = configuration.screenWidthDp >= 600
         val colorScheme = MaterialTheme.colorScheme
+        // Biến trạng thái để lưu giá trị email và mật khẩu
         val emailState = remember { mutableStateOf("") }
         val passwordState = remember { mutableStateOf("") }
         var passwordVisible by remember { mutableStateOf(false) }
+
+        // Biến trạng thái để lưu thông báo lỗi
+        val emailErrorState = remember { mutableStateOf("") }
+        val passwordErrorState = remember { mutableStateOf("") }
+
         Scaffold(
             modifier = Modifier
                 .fillMaxSize()
@@ -117,7 +124,11 @@ fun LoginScreen(
                     shape = RoundedCornerShape(25),
                     singleLine = true,
                     value = emailState.value,
-                    onValueChange = { emailState.value = it },
+                    onValueChange = {
+                        emailState.value = it
+                        // Kiểm tra Email ngay khi nhập
+                        emailErrorState.value = ValidationUtils.validateEmail(it)
+                    },
                     placeholder = { Text("Nhập email của bạn") },
                     leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null) },
                     keyboardOptions = KeyboardOptions(
@@ -137,13 +148,15 @@ fun LoginScreen(
                     )
                 )
 
-                // Trường nhập mật khẩu
+                // Trường nhập Mật khẩu
                 OutlinedTextField(
                     shape = RoundedCornerShape(25),
                     singleLine = true,
                     value = passwordState.value,
                     onValueChange = {
                         passwordState.value = it
+                        // Kiểm tra mật khẩu ngay khi nhập
+                        passwordErrorState.value = ValidationUtils.validatePassword(it)
                     },
                     placeholder = { Text("Mật khẩu") },
                     leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
