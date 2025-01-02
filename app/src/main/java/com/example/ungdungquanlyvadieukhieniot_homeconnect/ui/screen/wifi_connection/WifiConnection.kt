@@ -68,6 +68,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.isTablet
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.rememberResponsiveLayoutConfig
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.ValidationUtils
 import okhttp3.internal.wait
 
 /** Giao diện màn hình WifiConnection (WifiConnectionScreen)
@@ -86,10 +87,15 @@ fun WifiConnectionScreen(
     val layoutConfig = rememberResponsiveLayoutConfig() // Lấy LayoutConfig
 
     AppTheme {
-        val ssidState = remember { mutableStateOf("") }
-        val passwordState = remember { mutableStateOf("") }
-        var passwordVisible by remember { mutableStateOf(false) }
         val colorScheme = MaterialTheme.colorScheme
+
+        val ssidState = remember { mutableStateOf("") }
+        val ssidErrorState = remember { mutableStateOf("") }
+
+        val passwordState = remember { mutableStateOf("") }
+        val passwordErrorState = remember { mutableStateOf("") }
+        val passwordVisible = remember { mutableStateOf(false) }
+
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             containerColor = colorScheme.background,
@@ -135,12 +141,16 @@ fun WifiConnectionScreen(
                                 // Khoảng cách giữa tiêu đề và TextField
                                 Spacer(modifier = Modifier.height(layoutConfig.textFieldSpacing))
 
-                                // Ô nhập liệu đầu tiên - ID thiết bị
+                                // Ô nhập liệu đầu tiên - SSID
                                 OutlinedTextField(
                                     shape = RoundedCornerShape(25),
                                     singleLine = true,
                                     value = ssidState.value,
-                                    onValueChange = { ssidState.value = it },
+                                    onValueChange = {
+                                        ssidState.value = it
+                                        // Gọi hàm kiểm tra khi giá trị thay đổi
+                                        ssidErrorState.value = ValidationUtils.validateSSID(it)
+                                    },
                                     placeholder = { Text("SSID:") },
                                     leadingIcon = { Icon(Icons.Filled.Wifi, contentDescription = null) },
                                     modifier = Modifier
@@ -165,18 +175,20 @@ fun WifiConnectionScreen(
                                     value = passwordState.value,
                                     onValueChange = {
                                         passwordState.value = it
+                                        // Gọi hàm kiểm tra mật khẩu khi giá trị thay đổi
+                                        passwordErrorState.value = ValidationUtils.validatePassword(it)
                                     },
                                     placeholder = { Text("Mật khẩu:") },
                                     leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
                                     trailingIcon = {
-                                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                        IconButton(onClick = { passwordVisible.value = !passwordVisible.value }) {
                                             Icon(
-                                                imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                                contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                                                imageVector = if (passwordVisible.value) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                                contentDescription = if (passwordVisible.value) "Hide password" else "Show password"
                                             )
                                         }
                                     },
-                                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                                    visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                                     modifier = Modifier
                                         .width(if (isTablet()) 500.dp else 400.dp)
