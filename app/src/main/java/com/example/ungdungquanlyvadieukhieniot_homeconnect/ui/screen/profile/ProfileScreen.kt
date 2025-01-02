@@ -75,6 +75,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.WarningD
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.isTablet
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.ValidationUtils
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -101,6 +102,15 @@ fun ProfileScreen(
         var showDatePicker by remember { mutableStateOf(false) }
         val datePickerState = rememberDatePickerState()
         var showAlertDialog by remember { mutableStateOf(false) }
+
+        // Họ và tên
+        val nameErrorState = remember { mutableStateOf("") }
+
+        // Số điện thoại
+        val phoneErrorState = remember { mutableStateOf("") }
+
+        // Nơi sống hiện tại
+        val locationErrorState = remember { mutableStateOf("") }
 
         if (showAlertDialog) {
             WarningDialog(
@@ -391,7 +401,10 @@ fun ProfileScreen(
                 ) {
                     OutlinedTextField(
                         value = nameState.value,
-                        onValueChange = { nameState.value = it },
+                        onValueChange = {
+                            nameState.value = it
+                            nameErrorState.value = ValidationUtils.validateFullName(it)
+                                        },
                         placeholder = { Text("Họ và tên") },
                         shape = RoundedCornerShape(25),
                         singleLine = true,
@@ -420,7 +433,10 @@ fun ProfileScreen(
 
                     OutlinedTextField(
                         value = phoneState.value,
-                        onValueChange = { phoneState.value = it },
+                        onValueChange = {
+                            phoneState.value = it
+                            phoneErrorState.value = ValidationUtils.validatePhoneNumber(it)
+                                        },
                         placeholder = { Text("Số điện thoại") },
                         shape = RoundedCornerShape(25),
                         singleLine = true,
@@ -449,7 +465,10 @@ fun ProfileScreen(
 
                     OutlinedTextField(
                         value = locationState.value,
-                        onValueChange = { locationState.value = it },
+                        onValueChange = {
+                            locationState.value = it
+                            locationErrorState.value = ValidationUtils.validateAddress(it)
+                                        },
                         placeholder = { Text("Nơi sống hiện tại") },
                         shape = RoundedCornerShape(25),
                         singleLine = true,
@@ -478,7 +497,9 @@ fun ProfileScreen(
 
                     OutlinedTextField(
                         value = emailState.value,
-                        onValueChange = {},
+                        onValueChange = {
+                            //ToDo: Bổ sung sự kiện
+                        },
                         placeholder = { Text("Email") },
                         shape = RoundedCornerShape(25),
                         singleLine = true,
