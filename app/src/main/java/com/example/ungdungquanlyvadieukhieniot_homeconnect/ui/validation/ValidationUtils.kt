@@ -47,18 +47,64 @@ object ValidationUtils {
     }
 
     /**
-     * Kiểm tra xác nhận lại mật khẩu.
-     * - Mật khẩu và mật khẩu xác nhận phải trùng khớp.
+     * Kiểm tra tính hợp lệ của mật khẩu xác nhận.
+     * - Đảm bảo mật khẩu xác nhận không để trống.
+     * - Đảm bảo mật khẩu gốc không để trống.
+     * - Đảm bảo mật khẩu và mật khẩu xác nhận khớp nhau.
+     * - Đảm bảo mật khẩu đáp ứng các tiêu chí bảo mật:
+     *   + Độ dài tối thiểu.
+     *   + Chứa ít nhất một chữ số.
+     *   + Chứa ít nhất một chữ cái in hoa.
+     *   + Chứa ít nhất một chữ cái in thường.
+     *   + Chứa ít nhất một ký tự đặc biệt.
+     *
      * @param password Mật khẩu gốc.
      * @param confirmPassword Mật khẩu xác nhận.
-     * @return Thông báo xác định mật khẩu xác nhận hợp lệ hay không.
+     * @return Chuỗi thông báo xác định tình trạng hợp lệ của mật khẩu xác nhận.
      */
     fun validateConfirmPassword(password: String, confirmPassword: String): String {
-        return if (password != confirmPassword) {
-            "Mật khẩu xác nhận không khớp." // Thông báo nếu mật khẩu xác nhận không trùng.
-        } else {
-            "Mật khẩu xác nhận hợp lệ." // Thông báo nếu mật khẩu xác nhận hợp lệ.
+        // Kiểm tra nếu mật khẩu xác nhận để trống
+        if (confirmPassword.isBlank()) {
+            return "Mật khẩu xác nhận không được để trống."
         }
+
+        // Kiểm tra nếu mật khẩu gốc để trống
+        if (password.isBlank()) {
+            return "Mật khẩu gốc không được để trống."
+        }
+
+        // Kiểm tra nếu mật khẩu xác nhận không khớp
+        if (password != confirmPassword) {
+            return "Mật khẩu xác nhận không khớp."
+        }
+
+        // Kiểm tra độ dài tối thiểu
+        if (password.length < ValidationRules.MIN_PASSWORD_LENGTH || confirmPassword.length < ValidationRules.MIN_PASSWORD_LENGTH) {
+            return "Mật khẩu phải có ít nhất ${ValidationRules.MIN_PASSWORD_LENGTH} ký tự."
+        }
+
+        // Kiểm tra nếu mật khẩu không chứa số
+        if (!password.any { it.isDigit() } || !confirmPassword.any { it.isDigit() }) {
+            return "Mật khẩu phải chứa ít nhất một chữ số."
+        }
+
+        // Kiểm tra nếu mật khẩu không chứa chữ cái in hoa
+        if (!password.any { it.isUpperCase() } || !confirmPassword.any { it.isUpperCase() }) {
+            return "Mật khẩu phải chứa ít nhất một chữ cái in hoa."
+        }
+
+        // Kiểm tra nếu mật khẩu không chứa chữ cái in thường
+        if (!password.any { it.isLowerCase() } || !confirmPassword.any { it.isLowerCase() }) {
+            return "Mật khẩu phải chứa ít nhất một chữ cái in thường."
+        }
+
+        // Kiểm tra nếu mật khẩu không chứa ký tự đặc biệt
+        if (!ValidationRules.containsSpecialCharacter(password) || !ValidationRules.containsSpecialCharacter(confirmPassword)) {
+            return "Mật khẩu phải chứa ít nhất một ký tự đặc biệt."
+        }
+
+        // Nếu tất cả điều kiện đều đúng
+        return "Mật khẩu xác nhận hợp lệ."
     }
 
     /**
@@ -135,5 +181,62 @@ object ValidationUtils {
         } else {
             "Tên thiết bị hợp lệ."
         }
+    }
+
+    /**
+     * Kiểm tra Tên Space.
+     * - Tên Space không được để trống.
+     * - Tên Space phải có độ dài từ 3 đến 50 ký tự.
+     * @param spaceName Chuỗi tên Space cần kiểm tra.
+     * @return Thông báo xác định tên Space hợp lệ hay không.
+     */
+    fun validateSpaceName(spaceName: String): String {
+        // Kiểm tra nếu Tên Space để trống
+        if (spaceName.isBlank()) {
+            return "Tên Space không được để trống."
+        }
+
+        // Kiểm tra độ dài của Tên Space
+        if (spaceName.length < 3 || spaceName.length > 50) {
+            return "Tên Space phải có từ 3 đến 50 ký tự."
+        }
+
+        // Nếu tất cả các điều kiện đều hợp lệ
+        return "Tên Space hợp lệ."
+    }
+
+    /**
+     * Kiểm tra tính hợp lệ của SSID.
+     * - SSID không được để trống.
+     * - SSID phải có độ dài từ 3 đến 32 ký tự.
+     * - SSID không được chứa khoảng trắng.
+     * - SSID chỉ được chứa chữ cái, số và các ký tự đặc biệt '-', '_', '.'.
+     *
+     * @param ssid Chuỗi SSID cần kiểm tra.
+     * @return Chuỗi thông báo về tình trạng hợp lệ của SSID.
+     */
+    fun validateSSID(ssid: String): String {
+        // Kiểm tra nếu SSID để trống
+        if (ssid.isBlank()) {
+            return "SSID không được để trống." // Trả về thông báo nếu SSID bị bỏ trống
+        }
+
+        // Kiểm tra độ dài của SSID (phải nằm trong khoảng 3-32 ký tự)
+        if (ssid.length < 3 || ssid.length > 32) {
+            return "SSID phải có từ 3 đến 32 ký tự." // Trả về thông báo nếu độ dài không hợp lệ
+        }
+
+        // Kiểm tra nếu SSID chứa khoảng trắng
+        if (ssid.contains(" ")) {
+            return "SSID không được chứa khoảng trắng." // Trả về thông báo nếu SSID chứa khoảng trắng
+        }
+
+        // Kiểm tra nếu SSID chứa các ký tự không hợp lệ
+        if (!ssid.all { it.isLetterOrDigit() || "-_.".contains(it) }) {
+            return "SSID chỉ được chứa chữ cái, số và các ký tự '-', '_', '.'." // Trả về thông báo nếu SSID có ký tự không hợp lệ
+        }
+
+        // Nếu tất cả điều kiện đều đúng, SSID hợp lệ
+        return "SSID hợp lệ" // Trả về thông báo SSID hợp lệ
     }
 }
