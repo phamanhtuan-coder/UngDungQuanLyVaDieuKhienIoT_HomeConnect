@@ -3,8 +3,16 @@ package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_poi
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkRequest
 import android.net.wifi.ScanResult
+import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
+import android.net.wifi.WifiNetworkSpecifier
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -28,7 +36,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -73,6 +80,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.ValidationUtils
 
@@ -546,6 +554,7 @@ fun WiFiCard(
     // Hiện dialog để nhập password
     InputPasswordDialog(
         ssid = wifiName,
+        navController = navController,
         context = context,
         isVisible = showDialog,
         onDismiss = {
@@ -563,6 +572,7 @@ fun AccessPointConnectionScreenPreview() {
 @Composable
 fun InputPasswordDialog(
     ssid: String, // Tên Wi-Fi ban đầu được truyền vào
+    navController: NavHostController,
     context: Context, // Ngữ cảnh để thực hiện các thao tác hệ thống
     isVisible: Boolean, // Trạng thái hiển thị của dialog
     onDismiss: () -> Unit // Hành động khi dialog bị đóng
@@ -576,7 +586,7 @@ fun InputPasswordDialog(
                     .wrapContentHeight(),
                 shape = MaterialTheme.shapes.medium // Đặt hình dạng bo góc cho dialog
             ) {
-                InputPasswordForm(ssid, context, onDismiss) // Hiển thị nội dung chính của dialog
+                InputPasswordForm(ssid, navController, context, onDismiss) // Hiển thị nội dung chính của dialog
             }
         }
     }
@@ -585,6 +595,7 @@ fun InputPasswordDialog(
 @Composable
 fun InputPasswordForm(
     ssid: String, // Tên Wi-Fi
+    navController: NavHostController,
     context: Context, // Ngữ cảnh
     onDismiss: () -> Unit // Hành động khi người dùng đóng dialog
 ) {
@@ -672,6 +683,22 @@ fun InputPasswordForm(
             Button(
                 onClick = {
                     //ToDo: Sử lý sự kiện
+                    //Kiểm tra ssidInput và password có giá trị hay không
+                    if (ssidInput.isNotEmpty() && password.isNotEmpty()) {
+                        Connection(context, ssidInput, password) { success->
+                            //Đảm bào navController.navigate chạy trên luồng chính
+                            Handler(Looper.getMainLooper()).post {
+                                if (success) {
+                                    connectionStatus = "Kết nối thành công tới $ssidInput"
+                                    navController.navigate(Screens.WifiConnection.route)
+                                } else {
+                                    connectionStatus = "Không thể kết nối tới $ssidInput"
+                                }
+                            }
+                        }
+                    } else {
+                        connectionStatus = "Vui lòng nhập đầy đủ thông tin."
+                    }
                 },
                 modifier = Modifier
                     .width(if (isTablet()) 300.dp else 200.dp)
@@ -710,7 +737,70 @@ fun InputPasswordForm(
 fun PreviewInputPasswordForm() {
     InputPasswordForm(
         ssid = "WiFi_Nha_Minh", // Tên Wi-Fi mẫu
+        navController = rememberNavController(),
         context = LocalContext.current, // Lấy context từ LocalContext
         onDismiss = {} // Hành động mẫu khi đóng
     )
+}
+
+fun Connection(
+    context: Context, // Ngữ cảnh của ứng dụng
+    ssid: String, // Tên mạng Wi-Fi cần kết nối
+    password: String, // Mật khẩu của mạng Wi-Fi
+    onConnectionResult: (Boolean) -> Unit // Callback để trả về kết quả kết nối
+) {
+    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        // Sử dụng WifiNetworkSpecifier cho Android Q (API 29) trở lên
+        val wifiSpecifier = WifiNetworkSpecifier.Builder()
+            .setSsid(ssid)
+            .setWpa2Passphrase(password)
+            .build()
+
+        // Tạo NetworkRequest với WifiNetworkSpecifier
+        val networkRequest = NetworkRequest.Builder()
+            .addTransportType(android.net.NetworkCapabilities.TRANSPORT_WIFI)
+            .setNetworkSpecifier(wifiSpecifier)
+            .build()
+
+        // Lấy ConnectivityManager để quản lý kết nối mạng
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        // Yêu cầu kết nối mạng với thông số đã chỉ định
+        connectivityManager.requestNetwork(networkRequest, object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: android.net.Network) {
+                // Được gọi khi kết nối mạng thành công
+                super.onAvailable(network)
+                onConnectionResult(true) // Trả về kết quả thành công
+            }
+
+            override fun onUnavailable() {
+                // Được gọi khi không thể kết nối mạng
+                super.onUnavailable()
+                onConnectionResult(false) // Trả về kết quả thất bại
+            }
+        })
+    }
+    else {
+        // Sử dụng WifiManager cho Android dưới API 29
+        val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+
+        // Tạo cấu hình mạng Wi-Fi
+        val wifiConfig = WifiConfiguration().apply {
+            SSID = "\"ssid\"" // Đặt SSID (cần đặt trong dấu ngoặc kép)
+            preSharedKey = "\"password\"" // Đặt mật khẩu (cũng cần dấu ngoặc kép)
+        }
+
+        // Thêm mạng Wi-Fi mới và lấy ID của mạng
+        val networkId = wifiManager.addNetwork(wifiConfig)
+
+        if (networkId != -1) {
+            // Nếu thêm mạng thành công
+            wifiManager.disconnect() // Ngắt kết nối hiện tại
+            wifiManager.enableNetwork(networkId, true) // Kích hoạt mạng vừa thêm
+            wifiManager.reconnect() //Kết nối
+            onConnectionResult(true) // Trả về kết quả thành công
+        } else {
+            onConnectionResult(false)
+        }
+    }
 }
