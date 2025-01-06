@@ -144,7 +144,12 @@ fun AccessPointConnectionScreen(
             wifiManager.startScan()
 
             // Lưu danh sách kết quả quét (các mạng Wi-Fi tìm được)
-            wifiList = wifiManager.scanResults
+            val scanResults = wifiManager.scanResults
+
+            // Lọc và xử lý danh sách Wi-Fi
+            wifiList = scanResults
+                .filter { it.SSID.isNotEmpty() } // Bỏ các mạng không có tên
+                .distinctBy { it.SSID } // Loại bỏ các mục trùng lặp dựa trên SSID
         } catch (e: SecurityException) {
             // Xử lý ngoại lệ nếu có lỗi liên quan đến quyền
             e.printStackTrace()
