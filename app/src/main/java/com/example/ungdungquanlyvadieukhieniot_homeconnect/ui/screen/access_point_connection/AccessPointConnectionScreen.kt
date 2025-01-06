@@ -28,9 +28,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -39,6 +44,7 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -54,10 +60,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
@@ -457,6 +466,9 @@ fun WiFiCard(
     wifiName: String, // Tên mạng Wi-Fi hiển thị
     isConnected: Boolean, // Trạng thái kết nối (true nếu đã kết nối, false nếu chưa)
 ) {
+    val context = LocalContext.current
+    // Trạng thái điều khiển hiển thị dialog
+    var showDialog by remember { mutableStateOf(false) }
     // Card chứa thông tin Wi-Fi
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
@@ -467,7 +479,7 @@ fun WiFiCard(
                 .border(1.dp, colorScheme.onSecondary, RoundedCornerShape(8.dp))
                 .clickable(
                   onClick = {
-                          navController.navigate("wifi_connection")
+                      showDialog = true // Hiển thị dialog khi nhấn vào WiFiCard
                   }
                 ),
             shape = RoundedCornerShape(8.dp),
@@ -530,10 +542,175 @@ fun WiFiCard(
             }
         }
     }
+
+    // Hiện dialog để nhập password
+    InputPasswordDialog(
+        ssid = wifiName,
+        context = context,
+        isVisible = showDialog,
+        onDismiss = {
+            showDialog = false
+        }
+    )
 }
 
 @Preview(showBackground = true,showSystemUi = true)
 @Composable
 fun AccessPointConnectionScreenPreview() {
     AccessPointConnectionScreen(navController = rememberNavController())
+}
+
+@Composable
+fun InputPasswordDialog(
+    ssid: String, // Tên Wi-Fi ban đầu được truyền vào
+    context: Context, // Ngữ cảnh để thực hiện các thao tác hệ thống
+    isVisible: Boolean, // Trạng thái hiển thị của dialog
+    onDismiss: () -> Unit // Hành động khi dialog bị đóng
+) {
+    // Hiển thị dialog chỉ khi isVisible == true
+    if (isVisible) {
+        Dialog(onDismissRequest = { onDismiss() }) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
+                shape = MaterialTheme.shapes.medium // Đặt hình dạng bo góc cho dialog
+            ) {
+                InputPasswordForm(ssid, context, onDismiss) // Hiển thị nội dung chính của dialog
+            }
+        }
+    }
+}
+
+@Composable
+fun InputPasswordForm(
+    ssid: String, // Tên Wi-Fi
+    context: Context, // Ngữ cảnh
+    onDismiss: () -> Unit // Hành động khi người dùng đóng dialog
+) {
+    AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
+        val layoutConfig = rememberResponsiveLayoutConfig() // Lấy LayoutConfig
+        // Trạng thái cho tên Wi-Fi, mật khẩu và thông báo kết nối
+        var ssidInput by remember { mutableStateOf(ssid) }
+        var password by remember { mutableStateOf("") }
+        var connectionStatus by remember { mutableStateOf<String?>(null) }
+        val passwordVisible = remember { mutableStateOf(false) }
+
+        // Giao diện chính của form
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Tiêu đề
+            Text(
+                "Nhập thông tin Wi-Fi",
+                fontSize = layoutConfig.headingFontSize, // Font size linh hoạt
+                fontWeight = FontWeight.Bold,
+                color = colorScheme.onBackground
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Trường nhập tên Wi-Fi
+            OutlinedTextField(
+                value = ssidInput,
+                onValueChange = { ssidInput = it },
+                placeholder = { Text("Tên Wi-Fi") },
+                leadingIcon = { Icon(Icons.Filled.Wifi, contentDescription = null) },
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .width(if (isTablet()) 500.dp else 400.dp)
+                    .height(if (isTablet()) 80.dp else 70.dp),
+                shape = RoundedCornerShape(25),
+                singleLine = true,
+                colors = TextFieldDefaults.colors(
+                    focusedTextColor = colorScheme.onBackground,  // Màu text khi TextField được focus
+                    unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),  // Màu text khi TextField không được focus
+                    focusedContainerColor = colorScheme.onPrimary,
+                    unfocusedContainerColor = colorScheme.onPrimary,
+                    focusedIndicatorColor = colorScheme.primary,
+                    unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
+                )
+            )
+
+            // Trường nhập mật khẩu
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                placeholder = { Text("Password") },
+                leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .width(if (isTablet()) 500.dp else 400.dp)
+                    .height(if (isTablet()) 80.dp else 70.dp),
+                trailingIcon = {
+                    IconButton(onClick = { passwordVisible.value = !passwordVisible.value }) {
+                        Icon(
+                            imageVector = if (passwordVisible.value) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                            contentDescription = if (passwordVisible.value) "Hide password" else "Show password"
+                        )
+                    }
+                },
+                visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                shape = RoundedCornerShape(25),
+                singleLine = true,
+                colors = TextFieldDefaults.colors(
+                    focusedTextColor = colorScheme.onBackground,  // Màu text khi TextField được focus
+                    unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),  // Màu text khi TextField không được focus
+                    focusedContainerColor = colorScheme.onPrimary,
+                    unfocusedContainerColor = colorScheme.onPrimary,
+                    focusedIndicatorColor = colorScheme.primary,
+                    unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
+                )
+            )
+
+            // Nút kết nối
+            Button(
+                onClick = {
+                    //ToDo: Sử lý sự kiện
+                },
+                modifier = Modifier
+                    .width(if (isTablet()) 300.dp else 200.dp)
+                    .height(if (isTablet()) 56.dp else 48.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
+                shape = RoundedCornerShape(50)
+            ) {
+                Text(
+                    "Kết nối",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colorScheme.onPrimary
+                )
+            }
+
+            // Hiển thị thông báo trạng thái kết nối (nếu có)
+            connectionStatus?.let {
+                Text(it, modifier = Modifier.padding(top = 8.dp))
+            }
+
+            // Nút đóng dialog
+            TextButton(onClick = { onDismiss() }) {
+                Text(
+                    "Đóng",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colorScheme.primary
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewInputPasswordForm() {
+    InputPasswordForm(
+        ssid = "WiFi_Nha_Minh", // Tên Wi-Fi mẫu
+        context = LocalContext.current, // Lấy context từ LocalContext
+        onDismiss = {} // Hành động mẫu khi đóng
+    )
 }
