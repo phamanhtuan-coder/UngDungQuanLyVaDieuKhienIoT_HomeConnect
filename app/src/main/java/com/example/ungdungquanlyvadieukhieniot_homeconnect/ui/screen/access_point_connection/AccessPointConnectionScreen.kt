@@ -1,5 +1,10 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.net.wifi.ScanResult
+import android.net.wifi.WifiManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -45,6 +50,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -53,6 +59,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
@@ -80,6 +87,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.Validat
 fun AccessPointConnectionScreen(
     navController: NavHostController
 ) {
+    val context = LocalContext.current
     // Biến trạng thái để lưu giá trị nhập
     var deviceId by remember { mutableStateOf("") }
     var deviceName by remember { mutableStateOf("") }
@@ -89,6 +97,43 @@ fun AccessPointConnectionScreen(
     var deviceNameError by remember { mutableStateOf("") }
     val layoutConfig = rememberResponsiveLayoutConfig() // Lấy LayoutConfig
     var showDialog by remember { mutableStateOf(false) }
+    var connectionStatus by remember { mutableStateOf<String?>(null) }
+    var wifiList by remember { mutableStateOf(listOf<ScanResult>()) }
+
+    // Function to scan Wi-Fi networks
+    fun scanWifiNetworks() {
+        // Kiểm tra xem quyền ACCESS_FINE_LOCATION đã được cấp hay chưa
+        val hasPermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+        // Nếu chưa được cấp quyền, cập nhật trạng thái và kết thúc hàm
+        if (!hasPermission) {
+            connectionStatus = "Vui lòng cấp quyền để quét Wi-Fi." // Yêu cầu người dùng cấp quyền
+            return
+        }
+
+        try {
+            // Lấy WifiManager từ hệ thống
+            val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+
+            // Nếu Wi-Fi đang tắt, bật Wi-Fi
+            if (!wifiManager.isWifiEnabled) {
+                wifiManager.isWifiEnabled = true // Bật Wi-Fi
+            }
+
+            // Bắt đầu quét các mạng Wi-Fi xung quanh
+            wifiManager.startScan()
+
+            // Lưu danh sách kết quả quét (các mạng Wi-Fi tìm được)
+            wifiList = wifiManager.scanResults
+        } catch (e: SecurityException) {
+            // Xử lý ngoại lệ nếu có lỗi liên quan đến quyền
+            e.printStackTrace()
+            connectionStatus = "Không thể quét Wi-Fi do lỗi quyền." // Cập nhật trạng thái lỗi
+        }
+    }
 
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
@@ -248,9 +293,6 @@ fun AccessPointConnectionScreen(
                                             horizontalArrangement = Arrangement.SpaceBetween,     // Các thành phần được bố trí cách xa nhau
                                             verticalAlignment = Alignment.CenterVertically        // Căn giữa theo chiều dọc
                                         ) {
-                                            Box() {
-
-                                            }
                                             // Nút Icon thông tin
                                             IconButton(
                                                 onClick = { showDialog = true },
@@ -314,24 +356,28 @@ fun AccessPointConnectionScreen(
                                 verticalAlignment = Alignment.CenterVertically        // Căn giữa theo chiều dọc
                             ) {
                                 Text("Available networks", fontSize = layoutConfig.textFontSize)
-                                Icon(Icons.Default.Refresh, contentDescription = "")
+                                Icon(
+                                    Icons.Default.Refresh,
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .clickable(
+                                            onClick = {
+                                                scanWifiNetworks()
+                                            }
+                                        )
+                                )
                             }
-                            Spacer(modifier = Modifier.height(layoutConfig.textFieldSpacing))
                         }
-                        val wifiList = listOf(
-                            "AP-DenThongMinh_A1-SLB_001",
-                            "AP-DenThongMinh_A1-SLB_002",
-                            "AP-DenThongMinh_A1-SLB_003"
-                        )
+
                         Column(
                             modifier = Modifier
-                                .padding(horizontal = layoutConfig.outerPadding)
+                                .padding(horizontal = layoutConfig.outerPadding, vertical = 8.dp)
                                 .width(layoutConfig.contentWidth)
                         ) {
-                            for (wifiName in wifiList) {
+                            for (wifiItem in wifiList) {
                                 WiFiCard(
                                     navController,
-                                    wifiName = wifiName,
+                                    wifiName = wifiItem.SSID,
                                     isConnected = false,
                                 )
                             }
