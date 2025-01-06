@@ -116,6 +116,11 @@ fun AccessPointConnectionScreen(
     var showDialog by remember { mutableStateOf(false) }
     var connectionStatus by remember { mutableStateOf<String?>(null) }
     var wifiList by remember { mutableStateOf(listOf<ScanResult>()) }
+    val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+    val wifiInfo = wifiManager.connectionInfo
+
+    //AccessPoint đang kết nối
+    val currentSsid = wifiInfo.ssid
 
     // Function to scan Wi-Fi networks
     fun scanWifiNetworks() {
@@ -355,11 +360,14 @@ fun AccessPointConnectionScreen(
                                     //Todo: Bật/Tắt Wi-Fi
                                 })
                             }
-                            WiFiCard(
-                                navController,
-                                wifiName = "ABC",
-                                isConnected = true,
-                            )
+
+                            if(wifiManager.isWifiEnabled) {
+                                WiFiCard(
+                                    navController,
+                                    wifiName = currentSsid,
+                                    isConnected = true,
+                                )
+                            }
                         }
                     }
 
@@ -492,7 +500,11 @@ fun WiFiCard(
                 .border(1.dp, colorScheme.onSecondary, RoundedCornerShape(8.dp))
                 .clickable(
                   onClick = {
-                      showDialog = true // Hiển thị dialog khi nhấn vào WiFiCard
+                      if (isConnected) {
+                          navController.navigate(Screens.WifiConnection.route)
+                      } else {
+                          showDialog = true // Hiển thị dialog khi nhấn vào WiFiCard chưa kết nối
+                      }
                   }
                 ),
             shape = RoundedCornerShape(8.dp),
