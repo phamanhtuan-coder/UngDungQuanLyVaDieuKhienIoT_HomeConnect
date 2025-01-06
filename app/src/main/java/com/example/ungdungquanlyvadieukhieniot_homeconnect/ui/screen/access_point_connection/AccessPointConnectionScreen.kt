@@ -88,7 +88,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.Validat
  * -----------------------------------------
  * Người viết: Nguyễn Thanh Sang
  * Ngày viết: 07/12/2024
- * Lần cập nhật cuối: 09/12/2024
+ * Lần cập nhật cuối: 06/1/2025
  * -----------------------------------------
  * @param navController Đối tượng điều khiển điều hướng.
  * @return Scaffold chứa toàn bộ nội dung
@@ -98,6 +98,15 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.Validat
  * ---------------------------
  * Lần cập nhật 30/12/2024
  * Người sửa: Phạm Anh Tuấn
+ * ---------------------------
+ * Access Point:
+ *  + Hiện
+ *  + Kết nối
+ *  + Lấy dữ liệu AP đã kết nối
+ *  + Các kiểm tra
+ * ---------------------------
+ * Lần cập nhật 6/1/2024
+ * Người sửa: Nguyên Thanh Sang
  * ---------------------------
  */
 @Composable
