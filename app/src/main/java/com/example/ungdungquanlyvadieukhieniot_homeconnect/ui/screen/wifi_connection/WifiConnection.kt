@@ -1,6 +1,8 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.wifi_connection
 
+import android.content.Context
 import android.graphics.drawable.Icon
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -51,6 +53,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -69,7 +72,13 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_poin
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.rememberResponsiveLayoutConfig
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.ValidationUtils
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import okhttp3.internal.wait
+import java.net.DatagramPacket
+import java.net.DatagramSocket
+import java.net.InetAddress
 
 /** Giao diện màn hình WifiConnection (WifiConnectionScreen)
  * -----------------------------------------
@@ -88,6 +97,7 @@ fun WifiConnectionScreen(
 
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
+        val context = LocalContext.current
 
         val ssidState = remember { mutableStateOf("") }
         val ssidErrorState = remember { mutableStateOf("") }
@@ -209,6 +219,21 @@ fun WifiConnectionScreen(
                                 Button(
                                     onClick = {
                                         /* TODO: Xử lý khi nhấn nút kết nối, kiểm tra và báo lỗi v.v và quây trở lại màn hình trước đó*/
+                                        // Kiểm tra dữ liệu đầu vào
+                                        if (ssidState.value.isEmpty() || passwordState.value.isEmpty()) {
+                                            // Báo lỗi nếu SSID hoặc mật khẩu rỗng
+                                            Toast.makeText(context, "Vui lòng nhập đầy đủ thông tin Wi-Fi!", Toast.LENGTH_SHORT).show()
+                                        } else {
+                                            // Gửi thông tin Wi-Fi qua UDP
+                                            // Gọi hàm
+                                            sendWiFiCredentialsUDP(context, "192.168.4.1", 4210, ssidState.value, passwordState.value)
+
+                                            // Hiển thị thông báo thành công (giả sử việc gửi luôn thành công)
+                                            Toast.makeText(context, "Đã gửi thông tin Wi-Fi!", Toast.LENGTH_SHORT).show()
+
+                                            // Quay lại màn hình trước đó (nếu cần)
+                                            navController.popBackStack()
+                                        }
                                     },
                                     modifier = Modifier
                                         .width(if (isTablet()) 300.dp else 200.dp)
@@ -236,4 +261,31 @@ fun WifiConnectionScreen(
 @Composable
 fun WifiConnectionScreenPreview() {
     WifiConnectionScreen(navController = rememberNavController())
+}
+
+fun sendWiFiCredentialsUDP(context: Context, espIp: String, port: Int, ssid: String, password: String) {
+    CoroutineScope(Dispatchers.IO).launch {
+        try {
+            val socket = DatagramSocket()
+            val address = InetAddress.getByName(espIp)
+
+            val data = "$ssid,$password"
+            val buffer = data.toByteArray()
+            val packet = DatagramPacket(buffer, buffer.size, address, port)
+
+            socket.send(packet)
+            println("Gói UDP đã được gửi đến $espIp:$port")
+
+            // Đọc phản hồi từ ESP
+            val responseBuffer = ByteArray(256)
+            val responsePacket = DatagramPacket(responseBuffer, responseBuffer.size)
+            socket.receive(responsePacket)
+            val response = String(responsePacket.data, 0, responsePacket.length)
+            println("Phản hồi từ ESP: $response")
+
+            socket.close()
+        } catch (e: Exception) {
+            println("Lỗi khi gửi hoặc nhận gói UDP: ${e.message}")
+        }
+    }
 }
