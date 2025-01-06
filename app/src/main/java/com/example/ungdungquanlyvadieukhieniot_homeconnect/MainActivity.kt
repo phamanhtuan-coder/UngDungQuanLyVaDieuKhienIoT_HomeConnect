@@ -20,6 +20,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import androidx.activity.result.registerForActivityResult
 
 
 class MainActivity : ComponentActivity() {
@@ -35,6 +36,30 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         // Khai báo biến navController
         lateinit var navController: NavHostController
+
+        // Đăng ký trình khởi chạy để yêu cầu nhiều quyền cùng một lúc
+        val requestPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions() // Sử dụng contract yêu cầu nhiều quyền
+        ) { permissions ->
+            // Kiểm tra trạng thái cấp quyền cho từng quyền trong danh sách
+            val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true &&
+                    permissions[Manifest.permission.ACCESS_WIFI_STATE] == true
+
+            // Nếu không được cấp đủ quyền, thông báo cho người dùng
+            if (!granted) {
+                println("Quyền cần thiết không được cấp.") // In ra thông báo khi quyền bị từ chối
+            }
+        }
+
+        // Khởi chạy yêu cầu cấp quyền cho các quyền cần thiết
+        requestPermissionLauncher.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION, // Quyền truy cập vị trí chính xác
+                Manifest.permission.ACCESS_WIFI_STATE     // Quyền truy cập trạng thái Wi-Fi
+            )
+        )
+
+
         installSplashScreen()
         enableEdgeToEdge()
         setContent {
@@ -58,6 +83,7 @@ class MainActivity : ComponentActivity() {
                 requestMediaPermissions()
             }
         }
+
 
     }
 
