@@ -41,6 +41,7 @@ android {
 
 
 dependencies {
+    implementation("io.github.thanosfisherman.wifiutils:wifiutils:1.6.6")
     implementation(libs.easypermissions.ktx)
     implementation(libs.coil.compose)
     implementation(libs.androidx.core.splashscreen)

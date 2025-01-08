@@ -1,10 +1,12 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.Network
+import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.net.wifi.ScanResult
 import android.net.wifi.WifiConfiguration
@@ -13,6 +15,7 @@ import android.net.wifi.WifiNetworkSpecifier
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -75,6 +78,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -109,6 +113,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.Validat
  * Người sửa: Nguyên Thanh Sang
  * ---------------------------
  */
+
 @Composable
 fun AccessPointConnectionScreen(
     navController: NavHostController
@@ -131,44 +136,50 @@ fun AccessPointConnectionScreen(
     //AccessPoint đang kết nối
     val currentSsid = wifiInfo.ssid
 
-    // Function to scan Wi-Fi networks
-    fun scanWifiNetworks() {
-        // Kiểm tra xem quyền ACCESS_FINE_LOCATION đã được cấp hay chưa
-        val hasPermission = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
+    // Hàm kiểm tra và yêu cầu quyền
+    fun checkAndRequestPermissions(context: Context): Boolean {
+        val requiredPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            listOf(Manifest.permission.ACCESS_FINE_LOCATION)
+        } else {
+            listOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_WIFI_STATE,
+                Manifest.permission.CHANGE_WIFI_STATE
+            )
+        }
 
-        // Nếu chưa được cấp quyền, cập nhật trạng thái và kết thúc hàm
-        if (!hasPermission) {
-            connectionStatus = "Vui lòng cấp quyền để quét Wi-Fi." // Yêu cầu người dùng cấp quyền
+        val missingPermissions = requiredPermissions.filter {
+            ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
+        }
+
+        if (missingPermissions.isNotEmpty()) {
+            ActivityCompat.requestPermissions(
+                context as Activity,
+                missingPermissions.toTypedArray(),
+                1001
+            )
+            return false
+        }
+
+        return true
+    }
+
+    // Function to scan Wi-Fi networks
+    fun scanWifiNetworks(context: Context, onResult: (List<ScanResult>) -> Unit) {
+        if (!checkAndRequestPermissions(context)) {
+            println("Quyền chưa được cấp, không thể quét Wi-Fi.")
             return
         }
 
-        try {
-            // Lấy WifiManager từ hệ thống
-            val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
-            // Nếu Wi-Fi đang tắt, bật Wi-Fi
-            if (!wifiManager.isWifiEnabled) {
-                wifiManager.isWifiEnabled = true // Bật Wi-Fi
-            }
-
-            // Bắt đầu quét các mạng Wi-Fi xung quanh
-            wifiManager.startScan()
-
-            // Lưu danh sách kết quả quét (các mạng Wi-Fi tìm được)
-            val scanResults = wifiManager.scanResults
-
-            // Lọc và xử lý danh sách Wi-Fi
-            wifiList = scanResults
-                .filter { it.SSID.isNotEmpty() } // Bỏ các mạng không có tên
-                .distinctBy { it.SSID } // Loại bỏ các mục trùng lặp dựa trên SSID
-        } catch (e: SecurityException) {
-            // Xử lý ngoại lệ nếu có lỗi liên quan đến quyền
-            e.printStackTrace()
-            connectionStatus = "Không thể quét Wi-Fi do lỗi quyền." // Cập nhật trạng thái lỗi
+        if (!wifiManager.isWifiEnabled) {
+            wifiManager.isWifiEnabled = true
         }
+
+        wifiManager.startScan()
+        val scanResults = wifiManager.scanResults.filter { it.SSID.isNotEmpty() }.distinctBy { it.SSID }
+        onResult(scanResults)
     }
 
     AppTheme {
@@ -401,7 +412,9 @@ fun AccessPointConnectionScreen(
                                     modifier = Modifier
                                         .clickable(
                                             onClick = {
-                                                scanWifiNetworks()
+                                                scanWifiNetworks(context) { scanResults ->
+                                                    wifiList = scanResults // Cập nhật danh sách Wi-Fi tìm thấy vào trạng thái
+                                                }
                                             }
                                         )
                                 )
@@ -625,6 +638,51 @@ fun InputPasswordForm(
     context: Context, // Ngữ cảnh
     onDismiss: () -> Unit // Hành động khi người dùng đóng dialog
 ) {
+    // Hàm kiểm tra và yêu cầu quyền
+    fun checkAndRequestPermissions(context: Context): Boolean {
+        val requiredPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            listOf(Manifest.permission.ACCESS_FINE_LOCATION)
+        } else {
+            listOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_WIFI_STATE,
+                Manifest.permission.CHANGE_WIFI_STATE
+            )
+        }
+
+        val missingPermissions = requiredPermissions.filter {
+            ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
+        }
+
+        if (missingPermissions.isNotEmpty()) {
+            ActivityCompat.requestPermissions(
+                context as Activity,
+                missingPermissions.toTypedArray(),
+                1001
+            )
+            return false
+        }
+
+        return true
+    }
+
+    fun connectToWifi(
+        context: Context,
+        ssid: String,
+        password: String,
+        onConnectionResult: (Boolean) -> Unit
+    ) {
+        if (!checkAndRequestPermissions(context)) {
+            onConnectionResult(false)
+            return
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            connectToESPAndroid10Plus(context, ssid, password, onConnectionResult)
+        } else {
+            connectToESPBelowAndroid10(context, ssid, password, onConnectionResult)
+        }
+    }
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
         val layoutConfig = rememberResponsiveLayoutConfig() // Lấy LayoutConfig
@@ -711,20 +769,23 @@ fun InputPasswordForm(
                     //ToDo: Sử lý sự kiện
                     //Kiểm tra ssidInput và password có giá trị hay không
                     if (ssidInput.isNotEmpty() && password.isNotEmpty()) {
-                        Connection(context, ssidInput, password) { success->
-                            //Đảm bào navController.navigate chạy trên luồng chính
+                        connectToWifi(context, ssidInput, password) { success ->
                             Handler(Looper.getMainLooper()).post {
-                                if (success) {
-                                    connectionStatus = "Kết nối thành công tới $ssidInput"
+                                connectionStatus = if (success) {
+                                    // Kết nối thành công
+
                                     navController.navigate(Screens.WifiConnection.route)
+                                    "Kết nối thành công tới $ssidInput"
                                 } else {
-                                    connectionStatus = "Không thể kết nối tới $ssidInput"
+                                    // Kết nối thất bại
+                                    "Không thể kết nối tới $ssidInput"
                                 }
                             }
                         }
                     } else {
                         connectionStatus = "Vui lòng nhập đầy đủ thông tin."
                     }
+
                 },
                 modifier = Modifier
                     .width(if (isTablet()) 300.dp else 200.dp)
@@ -769,64 +830,82 @@ fun PreviewInputPasswordForm() {
     )
 }
 
-fun Connection(
-    context: Context, // Ngữ cảnh của ứng dụng
-    ssid: String, // Tên mạng Wi-Fi cần kết nối
-    password: String, // Mật khẩu của mạng Wi-Fi
-    onConnectionResult: (Boolean) -> Unit // Callback để trả về kết quả kết nối
+
+@RequiresApi(Build.VERSION_CODES.Q)
+fun connectToESPAndroid10Plus(
+    context: Context,
+    ssid: String,
+    password: String,
+    onConnectionResult: (Boolean) -> Unit
 ) {
-    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        // Sử dụng WifiNetworkSpecifier cho Android Q (API 29) trở lên
-        val wifiSpecifier = WifiNetworkSpecifier.Builder()
+    try {
+        val wifiNetworkSpecifier = WifiNetworkSpecifier.Builder()
             .setSsid(ssid)
             .setWpa2Passphrase(password)
             .build()
 
-        // Tạo NetworkRequest với WifiNetworkSpecifier
         val networkRequest = NetworkRequest.Builder()
-            .addTransportType(android.net.NetworkCapabilities.TRANSPORT_WIFI)
-            .setNetworkSpecifier(wifiSpecifier)
+            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+            .setNetworkSpecifier(wifiNetworkSpecifier)
             .build()
 
-        // Lấy ConnectivityManager để quản lý kết nối mạng
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-
-        // Yêu cầu kết nối mạng với thông số đã chỉ định
         connectivityManager.requestNetwork(networkRequest, object : ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network: android.net.Network) {
-                // Được gọi khi kết nối mạng thành công
-                super.onAvailable(network)
-                onConnectionResult(true) // Trả về kết quả thành công
+            override fun onAvailable(network: Network) {
+                println("Connected to Wi-Fi: $ssid")
+                bindToNetwork(context, network) // Bind network to process
+                onConnectionResult(true)
             }
 
             override fun onUnavailable() {
-                // Được gọi khi không thể kết nối mạng
-                super.onUnavailable()
-                onConnectionResult(false) // Trả về kết quả thất bại
+                println("Failed to connect to Wi-Fi: $ssid")
+                onConnectionResult(false)
             }
         })
-    }
-    else {
-        // Sử dụng WifiManager cho Android dưới API 29
-        val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-
-        // Tạo cấu hình mạng Wi-Fi
-        val wifiConfig = WifiConfiguration().apply {
-            SSID = "\"ssid\"" // Đặt SSID (cần đặt trong dấu ngoặc kép)
-            preSharedKey = "\"password\"" // Đặt mật khẩu (cũng cần dấu ngoặc kép)
-        }
-
-        // Thêm mạng Wi-Fi mới và lấy ID của mạng
-        val networkId = wifiManager.addNetwork(wifiConfig)
-
-        if (networkId != -1) {
-            // Nếu thêm mạng thành công
-            wifiManager.disconnect() // Ngắt kết nối hiện tại
-            wifiManager.enableNetwork(networkId, true) // Kích hoạt mạng vừa thêm
-            wifiManager.reconnect() //Kết nối
-            onConnectionResult(true) // Trả về kết quả thành công
-        } else {
-            onConnectionResult(false)
-        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+        onConnectionResult(false)
     }
 }
+
+
+fun connectToESPBelowAndroid10(
+    context: Context,
+    ssid: String,
+    password: String,
+    onConnectionResult: (Boolean) -> Unit
+) {
+    try {
+        val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+
+        val wifiConfig = WifiConfiguration().apply {
+            SSID = "\"$ssid\""
+            preSharedKey = "\"$password\""
+        }
+
+        val networkId = wifiManager.addNetwork(wifiConfig)
+        if (networkId != -1) {
+            wifiManager.disconnect()
+            wifiManager.enableNetwork(networkId, true)
+            wifiManager.reconnect()
+            println("Connected to Wi-Fi: $ssid")
+            onConnectionResult(true)
+        } else {
+            println("Failed to connect to Wi-Fi: $ssid")
+            onConnectionResult(false)
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+        onConnectionResult(false)
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.Q)
+fun bindToNetwork(context: Context, network: Network) {
+    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    connectivityManager.bindProcessToNetwork(network)
+    println("Network bound to process.")
+}
+
+
+
