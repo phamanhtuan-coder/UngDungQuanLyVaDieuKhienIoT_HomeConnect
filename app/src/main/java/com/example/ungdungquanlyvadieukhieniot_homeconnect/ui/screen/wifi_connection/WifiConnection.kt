@@ -88,6 +88,12 @@ import java.net.InetAddress
  * -----------------------------------------
  * @param navController Đối tượng điều khiển điều hướng.
  * @return Scaffold chứa toàn bộ nội dung
+ * ---------------------------
+ * Gửi SSID và Password
+ *  ---------------------------
+ *  Lần cập nhật: 8/1/2024
+ *  Người sửa: Nguyên Thanh Sang
+ *  ---------------------------
  */
 @Composable
 fun WifiConnectionScreen(

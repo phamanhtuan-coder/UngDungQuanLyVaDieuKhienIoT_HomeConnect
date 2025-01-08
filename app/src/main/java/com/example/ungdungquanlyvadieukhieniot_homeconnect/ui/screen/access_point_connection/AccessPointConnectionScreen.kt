@@ -109,7 +109,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.Validat
  *  + Lấy dữ liệu AP đã kết nối
  *  + Các kiểm tra
  * ---------------------------
- * Lần cập nhật 6/1/2024
+ * Lần cập nhật 8/1/2024
  * Người sửa: Nguyên Thanh Sang
  * ---------------------------
  */
