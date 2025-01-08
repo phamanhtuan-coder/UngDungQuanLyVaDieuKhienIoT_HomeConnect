@@ -269,7 +269,7 @@ fun sendWiFiCredentialsUDP(context: Context, espIp: String, port: Int, ssid: Str
             val socket = DatagramSocket()
             val address = InetAddress.getByName(espIp)
 
-            val data = "$ssid,$password"
+            val data = "SSID=$ssid;PASSWORD=$password;"
             val buffer = data.toByteArray()
             val packet = DatagramPacket(buffer, buffer.size, address, port)
 
