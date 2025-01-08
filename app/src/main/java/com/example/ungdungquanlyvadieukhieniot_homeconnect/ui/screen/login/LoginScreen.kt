@@ -31,6 +31,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,6 +48,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
@@ -75,7 +78,8 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.Validat
 
 @Composable
 fun LoginScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: LoginViewModel = viewModel()  // Hoặc hiltViewModel()
 ) {
     AppTheme {
         val configuration = LocalConfiguration.current
@@ -90,6 +94,8 @@ fun LoginScreen(
         val emailErrorState = remember { mutableStateOf("") }
         val passwordErrorState = remember { mutableStateOf("") }
 
+        // Lấy trạng thái đăng nhập từ ViewModel
+        val loginUiState by viewModel.loginState.collectAsState()
         Scaffold(
             modifier = Modifier
                 .fillMaxSize()
@@ -209,12 +215,11 @@ fun LoginScreen(
                 Button(
                     onClick = {
                         /* TODO: Xử lý khi nhấn nút đăng nhập, kiểm tra và báo lỗi v.v*/
-                        navController.navigate("home_graph") {
-                            // Remove welcome and login from back stack
-                            popUpTo(Screens.Welcome.route) {
-                                inclusive = true
-                            }
-                        }
+                        viewModel.login(
+                            emailState.value,
+                            passwordState.value
+                        )
+
                     },
                     modifier = Modifier
                         .width(if (isTablet) 300.dp else 200.dp)
@@ -228,6 +233,37 @@ fun LoginScreen(
                         fontWeight = FontWeight.Bold,
                         color = colorScheme.onPrimary
                     )
+                }
+
+                // Lắng nghe kết quả login để điều hướng nếu thành công
+                when (loginUiState) {
+                    is LoginUiState.Idle -> {
+                        // Không làm gì
+                    }
+
+                    is LoginUiState.Loading -> {
+                        // Hiển thị loading indicator nếu cần
+                    }
+
+                    is LoginUiState.Success -> {
+                        // Đăng nhập thành công
+                        // Điều hướng sang Home
+                        LaunchedEffect(Unit) {
+                            navController.navigate("home_graph") {
+                                popUpTo(Screens.Welcome.route) { inclusive = true }
+                            }
+                        }
+                    }
+
+                    is LoginUiState.Error -> {
+                        // Hiển thị thông báo lỗi
+                        val errorMessage = (loginUiState as LoginUiState.Error).message
+                        // Ví dụ: Toast hoặc Text hiển thị
+                        Text(
+                            text = errorMessage,
+                            color = colorScheme.error,
+                        )
+                    }
                 }
 
                 // Chuyển tới đăng ký
