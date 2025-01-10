@@ -41,7 +41,16 @@ android {
 
 
 dependencies {
-    implementation("io.github.thanosfisherman.wifiutils:wifiutils:1.6.6")
+    //wifiutils
+    implementation(libs.wifiutils)
+    //retrofit
+    implementation(libs.retrofit2.retrofit)
+    implementation(libs.converter.gson)
+    // Coroutines cho ViewModel
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
+    // Jetpack ViewModel
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.easypermissions.ktx)
     implementation(libs.coil.compose)
     implementation(libs.androidx.core.splashscreen)
