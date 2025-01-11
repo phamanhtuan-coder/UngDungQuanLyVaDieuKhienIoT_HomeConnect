@@ -13,8 +13,8 @@ import kotlinx.coroutines.launch
 sealed class OTPState {
     object Idle : OTPState()               // Chưa làm gì
     object Loading : OTPState()            // Đang loading
-    data class Success(val success:Boolean, val exists:Boolean?, val message: String) : OTPState()
-    data class Error(val success:Boolean, val message: String) : OTPState()
+    data class Success(val success: Boolean, val exists: Boolean?, val message: String) : OTPState()
+    data class Error(val success: Boolean, val message: String) : OTPState()
 }
 
 class OTPViewModel(application: Application) : AndroidViewModel(application) {

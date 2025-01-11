@@ -68,7 +68,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.Validat
 @Composable
 fun PasswordRecoveryScreen(
     navController: NavHostController,
-    viewModel: PasswordRecoveryViewModel=viewModel()
+    viewModel: PasswordRecoveryViewModel = viewModel()
 ) {
     val checkEmailState by viewModel.checkEmailState.collectAsState()
     AppTheme {
@@ -139,7 +139,7 @@ fun PasswordRecoveryScreen(
                 Text(
                     text = emailErrorState.value,
                     fontSize = 14.sp,
-                    color = if(emailErrorState.value =="Email hợp lệ.") Color.Green else colorScheme.error
+                    color = if (emailErrorState.value == "Email hợp lệ.") Color.Green else colorScheme.error
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -164,19 +164,22 @@ fun PasswordRecoveryScreen(
                     )
                 }
 
-                when(checkEmailState) {
+                when (checkEmailState) {
                     is CheckEmailState.Success -> {
-                            LaunchedEffect(Unit) {
-                                navController.navigate("${Screens.OTP.route}?email=$emailState")
-                            }
+                        LaunchedEffect(Unit) {
+                            navController.navigate("${Screens.OTP.route}?email=$emailState")
+                        }
 
                     }
+
                     is CheckEmailState.Error -> {
                         emailErrorState.value = (checkEmailState as CheckEmailState.Error).message
                     }
+
                     is CheckEmailState.Loading -> {
                         CircularProgressIndicator()
                     }
+
                     is CheckEmailState.Idle -> {
                         // Do nothing
                     }
