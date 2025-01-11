@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
@@ -49,7 +50,12 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OtpScreen(navController: NavHostController) {
+fun OtpScreen(
+    navController: NavHostController,
+    email: String,
+    viewModel: OTPViewModel = viewModel()
+
+) {
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
         val configuration = LocalConfiguration.current
@@ -164,5 +170,5 @@ fun OtpScreen(navController: NavHostController) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun OtpScreenPreview() {
-    OtpScreen(navController = rememberNavController())
+    OtpScreen(navController = rememberNavController(), email = "")
 }

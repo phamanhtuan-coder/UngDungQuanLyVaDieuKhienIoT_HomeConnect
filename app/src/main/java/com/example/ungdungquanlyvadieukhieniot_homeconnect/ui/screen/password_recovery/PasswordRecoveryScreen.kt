@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -24,10 +25,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -35,6 +40,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
@@ -60,10 +66,14 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.Validat
  */
 
 @Composable
-fun PasswordRecoveryScreen(navController: NavHostController) {
+fun PasswordRecoveryScreen(
+    navController: NavHostController,
+    viewModel: PasswordRecoveryViewModel=viewModel()
+) {
+    val checkEmailState by viewModel.checkEmailState.collectAsState()
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
-        val emailState = remember { mutableStateOf("") }
+        val emailState = remember { mutableStateOf("0306221391@caothang.edu.vn") }
         val configuration = LocalConfiguration.current
         val isTablet = configuration.screenWidthDp >= 600
 
@@ -126,6 +136,11 @@ fun PasswordRecoveryScreen(navController: NavHostController) {
                     ),
                     leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null) }
                 )
+                Text(
+                    text = emailErrorState.value,
+                    fontSize = 14.sp,
+                    color = if(emailErrorState.value =="Email hợp lệ.") Color.Green else colorScheme.error
+                )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -133,7 +148,7 @@ fun PasswordRecoveryScreen(navController: NavHostController) {
                 Button(
                     onClick = {
                         /* TODO: Xử lý khôi phục mật khẩu kiểm tra email hợp lệ hay không? Email phải đã tồn tại trong database thì mới có thể gửi mã OTP*/
-                        navController.navigate(Screens.OTP.route)
+                        viewModel.checkEmail(emailState.value)
                     },
                     modifier = Modifier
                         .width(if (isTablet) 300.dp else 200.dp)
@@ -147,6 +162,24 @@ fun PasswordRecoveryScreen(navController: NavHostController) {
                         fontWeight = FontWeight.Bold,
                         color = colorScheme.onPrimary
                     )
+                }
+
+                when(checkEmailState) {
+                    is CheckEmailState.Success -> {
+                            LaunchedEffect(Unit) {
+                                navController.navigate("${Screens.OTP.route}?email=$emailState")
+                            }
+
+                    }
+                    is CheckEmailState.Error -> {
+                        emailErrorState.value = (checkEmailState as CheckEmailState.Error).message
+                    }
+                    is CheckEmailState.Loading -> {
+                        CircularProgressIndicator()
+                    }
+                    is CheckEmailState.Idle -> {
+                        // Do nothing
+                    }
                 }
 
                 // Nút quay lại màn hình đăng nhập

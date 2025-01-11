@@ -2,8 +2,10 @@ package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.AccessPointConnectionScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.activity_detail.ActivityHistoryScreenDetailScreen
@@ -61,10 +63,21 @@ fun NavigationGraph(
             }
 
             // OTP Screen
-            composable(Screens.OTP.route) {
-                OtpScreen(navController)
+            composable(
+                route = "${Screens.OTP.route}?email={email}",
+                arguments = listOf(
+                    navArgument("email") {
+                        type = NavType.StringType
+                        defaultValue = ""
+                    }
+                )
+            ) { backStackEntry ->
+                val email = backStackEntry.arguments?.getString("email") ?: ""
+                OtpScreen(
+                    navController = navController,
+                    email = email
+                )
             }
-
             // HomeScreen
             navigation(startDestination = Screens.Home.route, route = "home_graph") {
                 composable(Screens.Home.route) {

@@ -17,7 +17,7 @@ private val LightColors = lightColorScheme(
     onBackground = Color(0xFF333333),
     onSurface = Color(0xFF333333),
     error = Color(0xFFF44336),
-    onError = Color.White
+    onError = Color.White,
 )
 
 private val DarkColors = darkColorScheme(
