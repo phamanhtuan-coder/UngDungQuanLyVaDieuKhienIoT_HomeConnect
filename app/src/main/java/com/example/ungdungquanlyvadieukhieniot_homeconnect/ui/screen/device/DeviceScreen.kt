@@ -1,5 +1,7 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device
 
+import android.app.Application
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,8 +17,11 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,6 +45,8 @@ import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,18 +57,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.HouseSelection
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.login.LoginUiState
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 
@@ -88,9 +100,67 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
  */
 @Composable
 fun DeviceScreen(
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     var selectedTabIndex by remember { mutableStateOf(0) }
+
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+    val viewModel = remember {
+        DeviceViewModel(application, context)
+    }
+
+    var spaces by remember { mutableStateOf<List<SpaceResponse>>(emptyList()) } // Lắng nghe danh sách thiết bị
+    val spacesListState by viewModel.spacesListState.collectAsState()
+    LaunchedEffect(1) {
+//        selectedSpaceId?.let { spaceId ->
+//            viewModel.loadDevices(spaceId) // Tải danh sách thiết bị khi Space thay đổi
+//        }
+        viewModel.getSpacesByHomeId(3)
+    }
+
+    when(spacesListState){
+        is SpaceState.Error ->{
+            Log.d("Error",  (spacesListState as SpaceState.Error).error)
+        }
+        is SpaceState.Idle ->{
+            //Todo
+        }
+        is SpaceState.Loading -> {
+            //Todo
+        }
+        is SpaceState.Success -> {
+            spaces = (spacesListState as SpaceState.Success).spacesList
+            Log.d("List Device", (spacesListState as SpaceState.Success).spacesList.toString())
+        }
+    }
+
+    var devices by remember { mutableStateOf<List<DeviceResponse>>(emptyList()) } // Lắng nghe danh sách thiết bị
+    val deviceListState by viewModel.deviceListState.collectAsState()
+    LaunchedEffect(1) {
+//        selectedSpaceId?.let { spaceId ->
+//            viewModel.loadDevices(spaceId) // Tải danh sách thiết bị khi Space thay đổi
+//        }
+        viewModel.loadDevices(4)
+    }
+
+
+    when(deviceListState){
+        is DeviceState.Error ->{
+            Log.d("Error",  (deviceListState as DeviceState.Error).error)
+        }
+        is DeviceState.Idle ->{
+            //Todo
+        }
+        is DeviceState.Loading -> {
+            //Todo
+        }
+        is DeviceState.Success -> {
+            devices=(deviceListState as DeviceState.Success).deviceList
+            Log.d("List Device", (deviceListState as DeviceState.Success).deviceList.toString())
+        }
+    }
+
     AppTheme {
         val configuration = LocalConfiguration.current
         val screenWidthDp = configuration.screenWidthDp.dp
@@ -217,10 +287,23 @@ fun DeviceScreen(
                                         modifier = Modifier
                                             .clip(RoundedCornerShape(topEndPercent = 100)) // Clip nội dung ScrollableTabRow
                                     ) {
-                                        CustomScrollableTabRow(selectedTabIndex = selectedTabIndex) { newIndex ->
-                                            selectedTabIndex =
-                                                newIndex // Update the tabIndex when a tab is clicked
+                                        if (spaces.isNotEmpty()) {
+                                            CustomScrollableTabRow(
+                                                selectedTabIndex = selectedTabIndex,
+                                                spaces = spaces,
+                                                onTabSelected = { index, spaceId ->
+                                                    selectedTabIndex = index
+                                                    viewModel.selectSpace(spaceId) // Cập nhật Space được chọn
+                                                }
+                                            )
+                                        } else {
+                                            // Xử lý khi danh sách spaces trống
+                                            Text(
+                                                text = "Không có không gian nào để hiển thị.",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                            )
                                         }
+
                                     }
                                 }
                             }
@@ -247,7 +330,7 @@ fun DeviceScreen(
                                 contentAlignment = Alignment.Center // Căn Text nằm giữa Box
                             ) {
                                 Text(
-                                    text = "4",
+                                    text = devices.size.toString(),
                                     color = colorScheme.onPrimary, // Màu chữ
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold
@@ -261,35 +344,46 @@ fun DeviceScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             //ToDo: Đổi thành Lazy Collumn
-                            Column(
-                                modifier = Modifier
-                                    .onGloballyPositioned { coordinates ->
-                                        // Lấy Width của Widget
-                                        widgetWidth = coordinates.size.width
+                            // Hiển thị trạng thái
+                            if (devices.isEmpty()) {
+                                Text(
+                                    text = "Không có thiết bị nào.",
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                    modifier = Modifier
+                                        .align(Alignment.CenterHorizontally)
+                                        .padding(16.dp)
+                                )
+                            } else {
+                                // Hiển thị danh sách thiết bị
+                                LazyColumn(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(500.dp),
+                                    verticalArrangement = Arrangement.Top,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    items(devices) {device ->
+                                        SmartCard(
+                                            device = device,
+                                            isTablet = true,
+                                            navController = navController
+                                        )
                                     }
-                                    .wrapContentSize(),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                SmartCard(isTablet, false, navController)
-                                SmartCard(isTablet, navController = navController)
-                                SmartCard(isTablet, false, navController)
-                                SmartCard(isTablet, navController = navController)
+                                }
                             }
                         }
                     }
                 }
-
-
             }
         )
     }
-
 }
 
 @Composable
 fun CustomScrollableTabRow(
     selectedTabIndex: Int,
-    onTabSelected: (Int) -> Unit
+    spaces: List<SpaceResponse>,
+    onTabSelected: (Int, Int) -> Unit
 ) {
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
@@ -307,16 +401,16 @@ fun CustomScrollableTabRow(
                 )
             }
         ) {
-            (1..10).forEach { index ->
+            spaces.forEachIndexed { index, space ->
                 Tab(
-                    selected = selectedTabIndex == index - 1,
+                    selected = selectedTabIndex == index,
                     onClick = {
-                        onTabSelected(index - 1) // Notify parent of the new tab selection
+                        onTabSelected(index, space.SpaceID) // Gửi vị trí và ID Space được chọn
                     },
                     text = {
                         Text(
-                            "Tab $index",
-                            color = if (selectedTabIndex == index - 1) colorScheme.primary else colorScheme.onBackground, // Đổi màu chữ
+                            text = space.Name,
+                            color = if (selectedTabIndex == index) colorScheme.primary else colorScheme.onBackground, // Đổi màu chữ
                         )
                     },
                     selectedContentColor = colorScheme.onBackground, // Màu khi được chọn
@@ -329,7 +423,11 @@ fun CustomScrollableTabRow(
 
 
 @Composable
-fun SmartCard(isTablet: Boolean, switchState: Boolean = true, navController: NavHostController) {
+fun SmartCard(
+    device: DeviceResponse, // Nhận thông tin thiết bị từ ViewModel
+    isTablet: Boolean,
+    switchState: Boolean = true,
+    navController: NavHostController) {
     val endPadding = 32.dp
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
@@ -355,7 +453,7 @@ fun SmartCard(isTablet: Boolean, switchState: Boolean = true, navController: Nav
                 ) {
                     Column {
                         Text(
-                            text = "Smart Lamp",
+                            text = device.Name.toString(),
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
                             color = colorScheme.onPrimary
@@ -402,11 +500,6 @@ fun SmartCard(isTablet: Boolean, switchState: Boolean = true, navController: Nav
                     modifier = Modifier.wrapContentWidth()
                 ) {
                     DeviceInfoSection("8 pm", "8 am", endPadding)
-
-                    if (isTablet) {
-                        ExtraInfoSection("Điện áp hoạt động", "5V", endPadding / 2)
-                        ExtraInfoSection("Dòng tiêu thụ", "20mA", endPadding / 2)
-                    }
 
                     Column(
                         horizontalAlignment = Alignment.End,
