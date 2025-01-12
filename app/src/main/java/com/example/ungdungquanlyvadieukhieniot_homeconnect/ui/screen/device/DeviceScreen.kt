@@ -432,7 +432,8 @@ fun SmartCard(
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
             onClick = {
                 //Todo: Xử lý chuyển tới trang chi tiết thiết bị
-                navController.navigate("device_detail")
+                navController.navigate("device/${device.TypeID}/${device.DeviceID}")
+
             }
         ) {
             Column(
