@@ -27,51 +27,83 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.NavigationGraph
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
-
 class MainActivity : ComponentActivity() {
+
+    // Navigation Controller
+    private lateinit var navController: NavHostController
+
+    // Permission Launchers
+    private lateinit var requestNotificationPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var requestMediaPermissionLauncher: ActivityResultLauncher<Array<String>>
+    private lateinit var requestLocationWifiPermissionLauncher: ActivityResultLauncher<Array<String>>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        // Initialize Permission Launchers
+        initializePermissionLaunchers()
+
+        // Setup Notification Channel
+        setupNotificationChannel()
+
+        // Setup UI Components
+        setupUI()
+
+        // Handle Permissions
+        handleMediaPermissions()
+        handleLocationWifiPermissions()
+
+        // Request Notification Permission
+        requestNotificationPermission()
+    }
+
     override fun onResume() {
         super.onResume()
         if (areMediaPermissionsGranted()) {
             accessMedia()
         }
+        if (areLocationWifiPermissionsGranted()) {
+            accessLocationWifi()
+        }
     }
 
-    // Launcher cho việc yêu cầu quyền POST_NOTIFICATIONS
-    private lateinit var requestNotificationPermissionLauncher: ActivityResultLauncher<String>
-
-    @SuppressLint("ObsoleteSdkInt")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        // Khai báo biến navController
-        lateinit var navController: NavHostController
-
-        // Đăng ký trình khởi chạy để yêu cầu nhiều quyền cùng một lúc
-        val requestPermissionLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions() // Sử dụng contract yêu cầu nhiều quyền
+    /**
+     * Initializes all permission request launchers.
+     */
+    private fun initializePermissionLaunchers() {
+        // Launcher for Media Permissions
+        requestMediaPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
         ) { permissions ->
-            // Kiểm tra trạng thái cấp quyền cho từng quyền trong danh sách
-            val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true &&
-                    permissions[Manifest.permission.ACCESS_WIFI_STATE] == true
-
-            // Nếu không được cấp đủ quyền, thông báo cho người dùng
-            if (!granted) {
-                println("Quyền cần thiết không được cấp.") // In ra thông báo khi quyền bị từ chối
-            }
+            handleMediaPermissionResult(permissions)
         }
 
-        // Khởi chạy yêu cầu cấp quyền cho các quyền cần thiết
-        requestPermissionLauncher.launch(
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION, // Quyền truy cập vị trí chính xác
-                Manifest.permission.ACCESS_WIFI_STATE     // Quyền truy cập trạng thái Wi-Fi
-            )
-        )
+        // Launcher for Location and Wi-Fi Permissions
+        requestLocationWifiPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            handleLocationWifiPermissionResult(permissions)
+        }
 
-        // Tạo kênh thông báo Warning
+        // Launcher for Notification Permission
+        requestNotificationPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted ->
+            if (isGranted) {
+                Log.i("MainActivity", "Notification permission granted.")
+            } else {
+                Log.e("MainActivity", "Notification permission denied.")
+            }
+        }
+    }
+
+    /**
+     * Sets up the notification channel for warnings.
+     */
+    @SuppressLint("ObsoleteSdkInt")
+    private fun setupNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val soundUri: Uri =
-                Uri.parse("android.resource://com.example.ungdungquanlyvadieukhieniot_homeconnect/raw/alert")
-            val bitmap = BitmapFactory.decodeResource(resources, R.drawable.alert)
+            val soundUri: Uri = Uri.parse("android.resource://${packageName}/raw/alert")
             val audioAttributes = AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
@@ -80,35 +112,26 @@ class MainActivity : ComponentActivity() {
             val channelId = "homeconnect_warning"
             val channelName = "Cảnh báo"
             val importance = NotificationManager.IMPORTANCE_HIGH
+
             val channel = NotificationChannel(channelId, channelName, importance).apply {
-                description = "Kênh thông báo cảnh báo nguy hiểm/ khẩn cấp"
+                description = "Kênh thông báo cảnh báo nguy hiểm/khẩn cấp"
                 setSound(soundUri, audioAttributes)
                 enableLights(true)
                 enableVibration(true)
                 setShowBadge(true)
                 lockscreenVisibility = 1
                 setBypassDnd(true)
-
-
             }
+
             val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(channel)
         }
+    }
 
-
-        // Khởi tạo launcher để yêu cầu quyền POST_NOTIFICATIONS
-        requestNotificationPermissionLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted ->
-            if (isGranted) {
-                Log.i("MainActivity", "Quyền gửi thông báo đã được cấp.")
-            } else {
-                Log.e("MainActivity", "Quyền gửi thông báo bị từ chối.")
-            }
-        }
-
-
-
+    /**
+     * Sets up the UI components including splash screen and navigation graph.
+     */
+    private fun setupUI() {
         installSplashScreen()
         enableEdgeToEdge()
         setContent {
@@ -117,28 +140,41 @@ class MainActivity : ComponentActivity() {
                 NavigationGraph(navController)
             }
         }
+    }
 
-        // Kiểm tra và xử lý quyền truy cập hình ảnh
+    /**
+     * Handles the media permissions by checking, requesting, and processing the result.
+     */
+    private fun handleMediaPermissions() {
         if (areMediaPermissionsGranted()) {
-            // Quyền đã được cấp, tiếp tục truy cập phương tiện
             accessMedia()
         } else {
-            // Yêu cầu quyền truy cập nếu chưa được cấp
-            if (shouldShowRationale()) {
-                // Hiển thị lý do yêu cầu quyền nếu có thể
-                showPermissionRationaleDialog()
+            if (shouldShowMediaRationale()) {
+                showMediaPermissionRationaleDialog()
             } else {
-                // Yêu cầu cấp quyền
                 requestMediaPermissions()
             }
         }
-
-        // Yêu cầu quyền gửi thông báo
-        requestNotificationPermission()
-
-
     }
 
+    /**
+     * Handles the location and Wi-Fi permissions by checking, requesting, and processing the result.
+     */
+    private fun handleLocationWifiPermissions() {
+        if (areLocationWifiPermissionsGranted()) {
+            accessLocationWifi()
+        } else {
+            if (shouldShowLocationWifiRationale()) {
+                showLocationWifiPermissionRationaleDialog()
+            } else {
+                requestLocationWifiPermissions()
+            }
+        }
+    }
+
+    /**
+     * Checks if the necessary media permissions are granted.
+     */
     private fun areMediaPermissionsGranted(): Boolean {
         val permissions = when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
@@ -160,20 +196,17 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
-
-
+    /**
+     * Requests the necessary media permissions based on Android version.
+     */
     private fun requestMediaPermissions() {
         val permissions = when {
-            // Quyền truy cập hình ảnh cho Android 13+
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
                 arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
             }
-            // Quyền truy cập file cho Android 10+
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
                 arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
             }
-            // Quyền truy cập file cho Android 9 và thấp hơn
             else -> {
                 arrayOf(
                     Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -182,47 +215,41 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        // Kích hoạt launcher yêu cầu quyền
-        requestPermissionLauncher.launch(permissions)
+        requestMediaPermissionLauncher.launch(permissions)
     }
 
     /**
-     * Launcher để xử lý kết quả sau khi yêu cầu quyền.
+     * Handles the result of media permission requests.
      */
-    private val requestPermissionLauncher: ActivityResultLauncher<Array<String>> =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            // Kiểm tra quyền có được cấp hay không
-            val isImagePermissionGranted = when {
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
-                    permissions[Manifest.permission.READ_MEDIA_IMAGES] == true
-                }
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
-                    permissions[Manifest.permission.READ_EXTERNAL_STORAGE] == true
-                }
-                else -> {
-                    permissions[Manifest.permission.READ_EXTERNAL_STORAGE] == true &&
-                            permissions[Manifest.permission.WRITE_EXTERNAL_STORAGE] == true
-                }
+    private fun handleMediaPermissionResult(permissions: Map<String, Boolean>) {
+        val isGranted = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
+                permissions[Manifest.permission.READ_MEDIA_IMAGES] == true
             }
-
-            // Nếu quyền đã được cấp
-            if (isImagePermissionGranted) {
-                accessMedia()
-            } else {
-                // Nếu người dùng từ chối cấp quyền
-                if (shouldShowRationale()) {
-                    showPermissionRationaleDialog()
-                } else {
-                    showSettingsRedirectDialog()
-                }
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
+                permissions[Manifest.permission.READ_EXTERNAL_STORAGE] == true
+            }
+            else -> {
+                permissions[Manifest.permission.READ_EXTERNAL_STORAGE] == true &&
+                        permissions[Manifest.permission.WRITE_EXTERNAL_STORAGE] == true
             }
         }
 
+        if (isGranted) {
+            accessMedia()
+        } else {
+            if (shouldShowMediaRationale()) {
+                showMediaPermissionRationaleDialog()
+            } else {
+                showSettingsRedirectDialog("media")
+            }
+        }
+    }
+
     /**
-     * Phương thức kiểm tra xem có cần hiển thị lý do yêu cầu quyền không.
-     * @return true nếu cần hiển thị lý do, false nếu không.
+     * Determines whether to show a rationale for the media permissions.
      */
-    private fun shouldShowRationale(): Boolean {
+    private fun shouldShowMediaRationale(): Boolean {
         return when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
                 shouldShowRequestPermissionRationale(Manifest.permission.READ_MEDIA_IMAGES)
@@ -238,9 +265,9 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * Hiển thị dialog lý do yêu cầu quyền nếu người dùng từ chối.
+     * Shows a dialog explaining why media permissions are needed.
      */
-    private fun showPermissionRationaleDialog() {
+    private fun showMediaPermissionRationaleDialog() {
         AlertDialog.Builder(this)
             .setTitle("Yêu cầu quyền truy cập")
             .setMessage("Ứng dụng cần quyền truy cập vào ảnh và tệp để hoạt động chính xác. Vui lòng cấp quyền.")
@@ -255,12 +282,95 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * Hiển thị dialog hướng dẫn mở cài đặt nếu quyền bị từ chối vĩnh viễn.
+     * Checks if the necessary location and Wi-Fi permissions are granted.
      */
-    private fun showSettingsRedirectDialog() {
+    private fun areLocationWifiPermissionsGranted(): Boolean {
+        val permissions = arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_WIFI_STATE
+        )
+
+        return permissions.all {
+            ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
+        }
+    }
+
+    /**
+     * Requests the necessary location and Wi-Fi permissions.
+     */
+    private fun requestLocationWifiPermissions() {
+        val permissions = arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_WIFI_STATE
+        )
+
+        requestLocationWifiPermissionLauncher.launch(permissions)
+    }
+
+    /**
+     * Handles the result of location and Wi-Fi permission requests.
+     */
+    private fun handleLocationWifiPermissionResult(permissions: Map<String, Boolean>) {
+        val isGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true &&
+                permissions[Manifest.permission.ACCESS_WIFI_STATE] == true
+
+        if (isGranted) {
+            accessLocationWifi()
+        } else {
+            if (shouldShowLocationWifiRationale()) {
+                showLocationWifiPermissionRationaleDialog()
+            } else {
+                showSettingsRedirectDialog("location_wifi")
+            }
+        }
+    }
+
+    /**
+     * Determines whether to show a rationale for the location and Wi-Fi permissions.
+     */
+    private fun shouldShowLocationWifiRationale(): Boolean {
+        return shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) ||
+                shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_WIFI_STATE)
+    }
+
+    /**
+     * Shows a dialog explaining why location and Wi-Fi permissions are needed.
+     */
+    private fun showLocationWifiPermissionRationaleDialog() {
         AlertDialog.Builder(this)
-            .setTitle("Quyền bị từ chối vĩnh viễn")
-            .setMessage("Bạn đã từ chối quyền cần thiết. Hãy bật quyền trong cài đặt ứng dụng để tiếp tục.")
+            .setTitle("Yêu cầu quyền truy cập")
+            .setMessage("Ứng dụng cần quyền truy cập vị trí và trạng thái Wi-Fi để hoạt động chính xác. Vui lòng cấp quyền.")
+            .setPositiveButton("Cấp quyền") { _, _ ->
+                requestLocationWifiPermissions()
+            }
+            .setNegativeButton("Hủy") { _, _ ->
+                Toast.makeText(this, "Quyền bị từ chối. Không thể tiếp tục.", Toast.LENGTH_SHORT).show()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    /**
+     * Shows a dialog directing the user to app settings to manually grant permissions.
+     *
+     * @param permissionGroup The group of permissions that were denied ("media" or "location_wifi").
+     */
+    private fun showSettingsRedirectDialog(permissionGroup: String) {
+        val title = when (permissionGroup) {
+            "media" -> "Quyền truy cập phương tiện bị từ chối vĩnh viễn"
+            "location_wifi" -> "Quyền vị trí/Wi-Fi bị từ chối vĩnh viễn"
+            else -> "Quyền bị từ chối"
+        }
+
+        val message = when (permissionGroup) {
+            "media" -> "Bạn đã từ chối quyền truy cập phương tiện. Hãy bật quyền trong cài đặt ứng dụng để tiếp tục."
+            "location_wifi" -> "Bạn đã từ chối quyền vị trí và Wi-Fi. Hãy bật quyền trong cài đặt ứng dụng để tiếp tục."
+            else -> "Bạn đã từ chối quyền cần thiết. Hãy bật quyền trong cài đặt ứng dụng để tiếp tục."
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle(title)
+            .setMessage(message)
             .setPositiveButton("Mở cài đặt") { _, _ ->
                 val intent = Intent(
                     Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
@@ -276,24 +386,32 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * Phương thức xử lý logic sau khi quyền được cấp thành công.
+     * Handles actions after media permissions are granted.
      */
     private fun accessMedia() {
         Toast.makeText(this, "Đã cấp quyền truy cập hình ảnh!", Toast.LENGTH_SHORT).show()
+        // Add additional logic to access media as needed
     }
 
     /**
-     * Yêu cầu quyền gửi thông báo.
+     * Handles actions after location and Wi-Fi permissions are granted.
+     */
+    private fun accessLocationWifi() {
+        Toast.makeText(this, "Đã cấp quyền truy cập vị trí và Wi-Fi!", Toast.LENGTH_SHORT).show()
+        // Add additional logic to access location and Wi-Fi as needed
+    }
+
+    /**
+     * Requests the POST_NOTIFICATIONS permission if necessary.
      */
     private fun requestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED
             ) {
-                // Xin quyền thông báo
+                // Request notification permission
                 requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
     }
-
 }

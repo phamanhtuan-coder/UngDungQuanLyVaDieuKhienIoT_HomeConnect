@@ -79,8 +79,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         // Tạo thông báo với hình ảnh
         val notificationBuilder = NotificationCompat.Builder(this, "homeconnect_warning")
-            .setContentTitle("Tiêu đề thông báo")
-            .setContentText("Nội dung thông báo")
+            .setContentTitle(title?:"Tiêu đề thông báo")
+            .setContentText(body?:"Nội dung thông báo")
             .setSmallIcon(R.drawable.alert)
             .setLargeIcon(bitmap)
             .setStyle(
