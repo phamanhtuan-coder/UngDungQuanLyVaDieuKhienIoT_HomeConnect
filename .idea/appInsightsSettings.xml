@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.example.ungdungquanlyvadieukhieniot_homeconnect" />
+                  <option name="mobileSdkAppId" value="1:697438598174:android:ead2401912e95158532a0f" />
+                  <option name="projectId" value="homeconnect-teamiot" />
+                  <option name="projectNumber" value="697438598174" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

@@ -6,6 +6,8 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.repository.AuthRepository
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.repository.UserRepository
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -20,6 +22,7 @@ sealed class LoginUiState {
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = AuthRepository()
+    private val userRepository = UserRepository(context = application)
 
     // StateFlow cho UI lắng nghe
     private val _loginState = MutableStateFlow<LoginUiState>(LoginUiState.Idle)
@@ -35,6 +38,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                 val response = repository.login(email, password)
                 // Lưu token
                 saveToken(response.token)
+                sendFcmTokenToServer()
                 // Bắn state về UI
                 _loginState.value = LoginUiState.Success(response.token)
             } catch (e: Exception) {
@@ -51,5 +55,29 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             .getSharedPreferences("MY_APP_PREFS", Context.MODE_PRIVATE)
 
         sharedPrefs.edit().putString("JWT_TOKEN", token).apply()
+    }
+
+    // Hàm để gửi FCM token tới server
+    private fun sendFcmTokenToServer() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("LoginViewModel", "Fetching FCM token failed", task.exception)
+                return@addOnCompleteListener
+            }
+
+            // Get new FCM registration token
+            val fcmToken = task.result
+            Log.d("LoginViewModel", "FCM Token: $fcmToken")
+
+            // Gửi FCM token tới server
+            viewModelScope.launch {
+                try {
+                    userRepository.sendToken(fcmToken)
+                    Log.d("LoginViewModel", "FCM Token sent to server successfully.")
+                } catch (e: Exception) {
+                    Log.e("LoginViewModel", "Failed to send FCM token: ${e.message}")
+                }
+            }
+        }
     }
 }

@@ -2,9 +2,15 @@ package com.example.ungdungquanlyvadieukhieniot_homeconnect
 
 import android.Manifest
 import android.app.AlertDialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -17,10 +23,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.NavigationGraph
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
-import android.content.Intent
-import android.net.Uri
-import android.provider.Settings
-import androidx.activity.result.registerForActivityResult
 
 
 class MainActivity : ComponentActivity() {
@@ -31,6 +33,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    // Launcher cho việc yêu cầu quyền POST_NOTIFICATIONS
+    private lateinit var requestNotificationPermissionLauncher: ActivityResultLauncher<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +63,31 @@ class MainActivity : ComponentActivity() {
             )
         )
 
+        // Tạo kênh thông báo Warning
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelId = "homeconnect_warning"
+            val channelName = "Cảnh báo"
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel(channelId, channelName, importance).apply {
+                description = "Kênh thông báo cảnh báo nguy hiểm/ khẩn cấp"
+            }
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(channel)
+        }
+
+
+        // Khởi tạo launcher để yêu cầu quyền POST_NOTIFICATIONS
+        requestNotificationPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted ->
+            if (isGranted) {
+                Log.i("MainActivity", "Quyền gửi thông báo đã được cấp.")
+            } else {
+                Log.e("MainActivity", "Quyền gửi thông báo bị từ chối.")
+            }
+        }
+
+
 
         installSplashScreen()
         enableEdgeToEdge()
@@ -83,6 +112,9 @@ class MainActivity : ComponentActivity() {
                 requestMediaPermissions()
             }
         }
+
+        // Yêu cầu quyền gửi thông báo
+        requestNotificationPermission()
 
 
     }
@@ -230,6 +262,18 @@ class MainActivity : ComponentActivity() {
         Toast.makeText(this, "Đã cấp quyền truy cập hình ảnh!", Toast.LENGTH_SHORT).show()
     }
 
-
+    /**
+     * Yêu cầu quyền gửi thông báo.
+     */
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                // Xin quyền thông báo
+                requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
 
 }

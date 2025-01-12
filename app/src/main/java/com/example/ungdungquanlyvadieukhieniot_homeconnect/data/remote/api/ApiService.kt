@@ -1,6 +1,8 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.api
 
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceTokenRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceTokenResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.EmailRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.EmailResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LoginRequest
@@ -35,5 +37,11 @@ interface ApiService {
 
     @POST("/api/users/reset-password")
     suspend fun newPassword(@Body request: NewPasswordRequest): NewPasswordResponse
+
+    @POST("/api/auth/update-device-token")
+    suspend fun sendToken(
+        @Header("Authorization") token: String,
+        @Body request: DeviceTokenRequest
+    ): DeviceTokenResponse
 
 }
