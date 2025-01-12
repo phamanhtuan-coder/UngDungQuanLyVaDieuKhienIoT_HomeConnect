@@ -2,6 +2,7 @@ package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.profile
 
 //import com.vmadalin.easypermissions.EasyPermissions
 import android.Manifest
+import android.app.Application
 import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -80,11 +81,29 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+
+/***
+ * Người viết: Nguyễn Thanh Sang
+ * Ngày viết: 01/12/2024
+ * --------------------------------
+ * Người cập nhật: Phạm Anh Tuấn
+ * Lần cập nhật cuối: 12/1/2025
+ * --------------------------------
+ * @param navController: Đối tượng điều khiển điều hướng
+ * @return Scaffold chứa toàn bộ giao diện trang cá nhân
+ * --------------------------------
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     navController: NavHostController
 ) {
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+    val viewModel = remember {
+        ProfileScreenViewModel(application, context)
+    }
+
     AppTheme {
         val configuration = LocalConfiguration.current
         val isTablet = configuration.screenWidthDp >= 600
@@ -117,16 +136,11 @@ fun ProfileScreen(
                 title = "Cảnh báo",
                 text = "Hành động này sẽ đăng xuất bạn ra khỏi ứng dụng. Bạn có chắc chắn không?",
                 onConfirm = {
-                    //Todo: Đăng xuất
-                    navController.navigate(Screens.Welcome.route) {
-                        popUpTo(Screens.Welcome.route) { inclusive = true }
-                    }
+                    viewModel.logoutAndNavigateToLogin(context)
                 },
                 onDismiss = { showAlertDialog = false }
             )
         }
-
-        val context = LocalContext.current
 
         Scaffold(
             topBar = {
