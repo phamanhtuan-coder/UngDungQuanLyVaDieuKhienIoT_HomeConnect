@@ -1,5 +1,6 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -73,6 +74,7 @@ fun NavigationGraph(
                 )
             ) { backStackEntry ->
                 val email = backStackEntry.arguments?.getString("email") ?: ""
+                Log.d("OTP", "Email: $email")
                 OtpScreen(
                     navController = navController,
                     email = email

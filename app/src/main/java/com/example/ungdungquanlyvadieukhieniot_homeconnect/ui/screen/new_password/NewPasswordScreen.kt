@@ -1,5 +1,6 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.new_password
 
+import android.app.Application
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +23,7 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +33,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -46,9 +51,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.isTablet
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.ValidationUtils
@@ -62,9 +67,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.Validat
  * Lần cập nhật cuối: 12/1/2025
  * -----------------------------------------
  * @param navController: Đối tượng điều khiển điều hướng
- * @param email: Email người dùng
- * @param viewModel: ViewModel chứa dữ liệu và xử lý logic
- *
+ * @param email: Email người dùng*
  * @return Column chứa các thành phần giao diện của màn hình Tạo mật khẩu mới
  */
 
@@ -72,21 +75,53 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.Validat
 fun NewPasswordScreen(
     navController: NavHostController,
     email: String,
-    viewModel: NewPasswordViewModel = viewModel()
 ) {
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+    val viewModel = remember {
+        NewPasswordViewModel(application, context)
+    }
+    val newPasswordState by viewModel.newPasswordState.collectAsState()
+
+    // Biến trạng thái để lưu thông báo lỗi
+    val passwordErrorState = remember { mutableStateOf("") }
+    val passwordConfirmErrorState = remember { mutableStateOf("") }
+
+    when (newPasswordState) {
+        is NewPassWordState.Success -> {
+            LaunchedEffect(Unit) {
+                navController.navigate(Screens.Login.route) {
+                    popUpTo(Screens.Login.route) {
+                        inclusive = true
+                    }
+                }
+            }
+        }
+
+        is NewPassWordState.Error -> {
+            passwordConfirmErrorState.value =
+                (newPasswordState as NewPassWordState.Error).error.toString()
+        }
+
+        is NewPassWordState.Loading -> {
+            CircularProgressIndicator()
+        }
+
+        else -> {
+            // Xử lý khi chưa làm gì
+        }
+    }
+
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
         val configuration = LocalConfiguration.current
-        val screenHeightDp = configuration.screenHeightDp.dp
         val screenWidthDp = configuration.screenWidthDp.dp
         val passwordState = remember { mutableStateOf("") }
         var passwordVisible by remember { mutableStateOf(false) }
         val passwordState2 = remember { mutableStateOf("") }
         var passwordVisible2 by remember { mutableStateOf(false) }
 
-        // Biến trạng thái để lưu thông báo lỗi
-        val passwordErrorState = remember { mutableStateOf("") }
-        val passwordConfirmErrorState = remember { mutableStateOf("") }
+
 
         // Xác định xem nếu chúng ta đang ở chế độ ngang
         val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -170,6 +205,12 @@ fun NewPasswordScreen(
                                 unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
                             )
                         )
+                        Text(
+                            text = passwordErrorState.value,
+                            fontSize = 12.sp,
+                            color = colorScheme.error,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
                         Spacer(modifier = Modifier.height(16.dp))
 
                         // NHẬP LẠI MẬT KHẨU MỚI
@@ -208,13 +249,19 @@ fun NewPasswordScreen(
                                 unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
                             )
                         )
+                        Text(
+                            text = passwordConfirmErrorState.value,
+                            fontSize = 12.sp,
+                            color = colorScheme.error,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // Nút đăng nhập
+                        // Nút tạo mật khẩu mới
                         Button(
                             onClick = {
-                                /* TODO: Xử lý khi nhấn nút kết nối, kiểm tra và báo lỗi v.v và quây trở lại màn hình trước đó*/
+                                viewModel.newPassword(email, passwordState.value)
                             },
                             modifier = Modifier
                                 .width(if (isTablet()) 300.dp else 200.dp)

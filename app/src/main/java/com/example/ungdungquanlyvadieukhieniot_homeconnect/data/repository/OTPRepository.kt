@@ -20,7 +20,8 @@ class OTPRepository {
     suspend fun sendOTP(email: String): EmailResponse {
         // Tạo request
         val request = EmailRequest(
-            email = email
+            email = email,
+            otp = null
         )
         // Gọi API
         return apiService.sendOTP(request)

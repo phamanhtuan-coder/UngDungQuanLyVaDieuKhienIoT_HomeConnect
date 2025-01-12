@@ -1,6 +1,6 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto
 
-data class EmailRequest(
+data class NewPasswordRequest(
     val email: String,
-    val otp: String? = null
+    val newPassword: String
 )

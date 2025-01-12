@@ -181,23 +181,27 @@ fun OtpScreen(
                             ),
                         )
                     }
-                    TextButton(
-                        onClick = {
-                            otpValue.forEachIndexed { index, _ ->
-                                otpValue[index] = ""
-                            }
-                            focusRequesters[0].requestFocus()
-                            viewModel.sendOTP(email)
-                            verifyOTPMessage = ""
-                            sendSuccesful = ""
+
+                }
+                TextButton(
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .padding(end = 16.dp),
+                    onClick = {
+                        otpValue.forEachIndexed { index, _ ->
+                            otpValue[index] = ""
                         }
-                    ) {
-                        Text(
-                            text = "Gửi lại",
-                            fontSize = 14.sp,
-                            color = colorScheme.primary
-                        )
+                        focusRequesters[0].requestFocus()
+                        viewModel.sendOTP(email)
+                        verifyOTPMessage = ""
+                        sendSuccesful = ""
                     }
+                ) {
+                    Text(
+                        text = "Gửi lại",
+                        fontSize = 14.sp,
+                        color = colorScheme.primary
+                    )
                 }
 
 

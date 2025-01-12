@@ -5,6 +5,8 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Email
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.EmailResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LoginRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LoginResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.NewPasswordRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.NewPasswordResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -30,5 +32,8 @@ interface ApiService {
 
     @POST("/api/otp/verify")
     suspend fun verifyOTP(@Body request: EmailRequest): EmailResponse
+
+    @POST("/api/users/reset-password")
+    suspend fun newPassword(@Body request: NewPasswordRequest): NewPasswordResponse
 
 }

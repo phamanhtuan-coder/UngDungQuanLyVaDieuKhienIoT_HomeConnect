@@ -166,7 +166,7 @@ fun PasswordRecoveryScreen(
                 when (checkEmailState) {
                     is CheckEmailState.Success -> {
                         LaunchedEffect(Unit) {
-                            navController.navigate("${Screens.OTP.route}?email=$emailState")
+                            navController.navigate("${Screens.OTP.route}?email=${emailState.value}")
                         }
 
                     }
