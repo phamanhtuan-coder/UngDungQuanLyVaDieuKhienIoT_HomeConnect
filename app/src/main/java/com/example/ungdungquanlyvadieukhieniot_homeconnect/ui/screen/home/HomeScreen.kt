@@ -97,8 +97,11 @@ fun HomeScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         HouseSelection(
-                            houses = listOf("House 1", "House 2", "House 3"),
-                            onManageHouseClicked = { navController.navigate(Screens.HouseManagement.route) }
+                            //houses = listOf("House 1", "House 2", "House 3"),
+                            onManageHouseClicked = { navController.navigate(Screens.HouseManagement.route) },
+                            onTabSelected = {id ->
+
+                            }
                         )
                     }
 
