@@ -4,6 +4,9 @@ import android.Manifest
 import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
+import android.media.AudioAttributes
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -65,13 +68,28 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun showAlert(title: String?, body: String?) {
+        val soundUri: Uri =
+            Uri.parse("android.resource://com.example.ungdungquanlyvadieukhieniot_homeconnect/raw/alert")
+        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.alert)
+        val audioAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .build()
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        // Tạo thông báo với hình ảnh
         val notificationBuilder = NotificationCompat.Builder(this, "homeconnect_warning")
-            .setContentTitle(title ?: "Cảnh báo khẩn cấp!!!")
-            .setContentText(body ?: "Bạn có cảnh báo khẩn cấp!!!")
-            .setSmallIcon(R.mipmap.app_icon_round)
+            .setContentTitle("Tiêu đề thông báo")
+            .setContentText("Nội dung thông báo")
+            .setSmallIcon(R.drawable.alert)
+            .setLargeIcon(bitmap)
+            .setStyle(
+                NotificationCompat.BigPictureStyle()
+                    .bigPicture(bitmap)
+            )
+            .setSound(soundUri)
             .setAutoCancel(true)
+
 
         notificationManager.notify(System.currentTimeMillis().toInt(), notificationBuilder.build())
     }

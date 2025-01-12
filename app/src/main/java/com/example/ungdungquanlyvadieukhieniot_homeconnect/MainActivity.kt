@@ -1,11 +1,14 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
+import android.media.AudioAttributes
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -36,6 +39,7 @@ class MainActivity : ComponentActivity() {
     // Launcher cho việc yêu cầu quyền POST_NOTIFICATIONS
     private lateinit var requestNotificationPermissionLauncher: ActivityResultLauncher<String>
 
+    @SuppressLint("ObsoleteSdkInt")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Khai báo biến navController
@@ -65,11 +69,27 @@ class MainActivity : ComponentActivity() {
 
         // Tạo kênh thông báo Warning
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val soundUri: Uri =
+                Uri.parse("android.resource://com.example.ungdungquanlyvadieukhieniot_homeconnect/raw/alert")
+            val bitmap = BitmapFactory.decodeResource(resources, R.drawable.alert)
+            val audioAttributes = AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build()
+
             val channelId = "homeconnect_warning"
             val channelName = "Cảnh báo"
             val importance = NotificationManager.IMPORTANCE_HIGH
             val channel = NotificationChannel(channelId, channelName, importance).apply {
                 description = "Kênh thông báo cảnh báo nguy hiểm/ khẩn cấp"
+                setSound(soundUri, audioAttributes)
+                enableLights(true)
+                enableVibration(true)
+                setShowBadge(true)
+                lockscreenVisibility = 1
+                setBypassDnd(true)
+
+
             }
             val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(channel)
