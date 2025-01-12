@@ -7,7 +7,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
 import android.media.AudioAttributes
 import android.net.Uri
 import android.os.Build
@@ -226,9 +225,11 @@ class MainActivity : ComponentActivity() {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
                 permissions[Manifest.permission.READ_MEDIA_IMAGES] == true
             }
+
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
                 permissions[Manifest.permission.READ_EXTERNAL_STORAGE] == true
             }
+
             else -> {
                 permissions[Manifest.permission.READ_EXTERNAL_STORAGE] == true &&
                         permissions[Manifest.permission.WRITE_EXTERNAL_STORAGE] == true
@@ -344,7 +345,8 @@ class MainActivity : ComponentActivity() {
                 requestLocationWifiPermissions()
             }
             .setNegativeButton("Hủy") { _, _ ->
-                Toast.makeText(this, "Quyền bị từ chối. Không thể tiếp tục.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Quyền bị từ chối. Không thể tiếp tục.", Toast.LENGTH_SHORT)
+                    .show()
             }
             .setCancelable(false)
             .show()
