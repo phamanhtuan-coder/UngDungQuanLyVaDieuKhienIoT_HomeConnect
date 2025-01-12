@@ -1,6 +1,7 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.api
 
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.HouseResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LoginRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LoginResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RegisterRequest
@@ -24,4 +25,7 @@ interface ApiService {
 
     @POST("/api/auth/register")
     suspend fun register(@Body request: RegisterRequest) : RegisterResponse
+
+    @GET("/api/houses")
+    suspend fun  getListHome(@Header("Authorization") token: String): List<HouseResponse>
 }
