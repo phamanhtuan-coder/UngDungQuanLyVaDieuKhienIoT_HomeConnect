@@ -1,5 +1,7 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component
 
+import android.app.Application
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +21,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,10 +30,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.HouseResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.isTablet
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.DeviceViewModel
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.SpaceState
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 /**
@@ -48,15 +57,49 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
  * ---------------------------------------
  *
  */
-@Preview(showBackground = true)
 @Composable
 fun HouseSelection(
-    houses: List<String> = listOf("Nhà chính", "Nhà vợ", "Nhà chồng"),
+    onTabSelected: (Int) -> Unit,
     onManageHouseClicked: () -> Unit = {} // Callback for managing house
 ) {
     AppTheme {
+        val context = LocalContext.current
+        val application = context.applicationContext as Application
+        val viewModel = remember {
+            HouseDropDownViewModel(application, context)
+        }
+
+        var houses by remember { mutableStateOf<List<HouseResponse>>(emptyList()) } // Lắng nghe danh sách thiết bị
+        val housesListState by viewModel.houseListState.collectAsState()
+        LaunchedEffect(1) {
+//        selectedSpaceId?.let { spaceId ->
+//            viewModel.loadDevices(spaceId) // Tải danh sách thiết bị khi Space thay đổi
+//        }
+            viewModel.getListHouse()
+        }
+        var selectedItem by remember {
+            mutableStateOf<HouseResponse>(houses.firstOrNull() ?: HouseResponse(HouseID = 0, Name = "Không có nhà"))
+        }
+
+        when(housesListState){
+            is HouseState.Error ->{
+                Log.d("Error",  (housesListState as SpaceState.Error).error)
+            }
+            is HouseState.Idle ->{
+                //Todo
+            }
+            is HouseState.Loading -> {
+                //Todo
+            }
+            is HouseState.Success -> {
+                houses = (housesListState as HouseState.Success).houseList
+                Log.d("List Device", (housesListState as HouseState.Success).houseList.toString())
+                selectedItem = houses.first()
+                onTabSelected(selectedItem.HouseID)
+            }
+        }
+
         var isDropdownExpanded by remember { mutableStateOf(false) }
-        var selectedItem by remember { mutableStateOf(houses.first()) }
         val colorScheme = MaterialTheme.colorScheme
         Column(
             modifier = Modifier.fillMaxWidth()
@@ -77,7 +120,7 @@ fun HouseSelection(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = selectedItem,
+                        text = selectedItem.Name,
                         color = colorScheme.onSurface,
                         fontSize = 18.sp
                     )
@@ -99,11 +142,12 @@ fun HouseSelection(
                 ) {
                     houses.forEach { house ->
                         Text(
-                            text = house,
+                            text = house.Name,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
                                     selectedItem = house
+                                    onTabSelected(house.HouseID)
                                     isDropdownExpanded = false
                                 }
                                 .padding(horizontal = 16.dp, vertical = 12.dp),
