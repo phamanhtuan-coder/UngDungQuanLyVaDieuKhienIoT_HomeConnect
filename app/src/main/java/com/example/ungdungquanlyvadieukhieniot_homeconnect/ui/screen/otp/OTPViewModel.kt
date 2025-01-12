@@ -25,12 +25,12 @@ class OTPViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _verifyOtpState = MutableStateFlow<OTPState>(OTPState.Idle)
     val verifyOtpState = _verifyOtpState.asStateFlow()
-    fun verifyOTP(email: String,otp: String) {
+    fun verifyOTP(email: String, otp: String) {
         // Reset state
         _verifyOtpState.value = OTPState.Loading
         viewModelScope.launch {
             try {
-                val response = repository.verifyOTP(email,otp)
+                val response = repository.verifyOTP(email, otp)
                 // Bắn state về UI
                 _verifyOtpState.value = OTPState.Success(response.success, true, response.message)
             } catch (e: Exception) {
@@ -40,7 +40,6 @@ class OTPViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
-
 
 
     private val _sendOtpState = MutableStateFlow<OTPState>(OTPState.Idle)

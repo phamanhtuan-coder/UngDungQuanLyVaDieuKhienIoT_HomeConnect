@@ -187,7 +187,7 @@ fun NavigationGraph(
                         defaultValue = ""
                     }
                 )
-            ) {backStackEntry ->
+            ) { backStackEntry ->
                 val email = backStackEntry.arguments?.getString("email") ?: ""
                 NewPasswordScreen(navController, email)
             }

@@ -26,7 +26,7 @@ class OTPRepository {
         return apiService.sendOTP(request)
     }
 
-    suspend fun verifyOTP(email: String,otp:String): EmailResponse {
+    suspend fun verifyOTP(email: String, otp: String): EmailResponse {
         // Tạo request
         val request = EmailRequest(
             email = email,

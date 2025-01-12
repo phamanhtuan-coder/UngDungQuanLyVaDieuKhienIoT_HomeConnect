@@ -1,6 +1,5 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.otp
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,7 +13,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -64,12 +62,15 @@ fun OtpScreen(
         is OTPState.Success -> {
             sendSuccesful = "Mã OTP đã được gửi tới Email của bạn."
         }
+
         is OTPState.Error -> {
             sendSuccesful = "Gửi mã OTP thất bại! Email không tồn tại."
         }
+
         is OTPState.Loading -> {
             sendSuccesful = "Đang gửi mã OTP..."
         }
+
         else -> {
 
         }
@@ -83,12 +84,15 @@ fun OtpScreen(
                 navController.navigate("${Screens.NewPassword.route}?email=$email")
             }
         }
+
         is OTPState.Error -> {
             verifyOTPMessage = "Xác thực OTP thất bại! Mã OTP không đúng."
         }
+
         is OTPState.Loading -> {
             verifyOTPMessage = "Đang xác thực mã OTP..."
         }
+
         else -> {
             verifyOTPMessage = "Mã OTP có hiệu lực trong 5 phút."
         }
@@ -215,7 +219,7 @@ fun OtpScreen(
 
                 Button(
                     onClick = {
-                      viewModel.verifyOTP(email, otpValue.joinToString(""))
+                        viewModel.verifyOTP(email, otpValue.joinToString(""))
                     },
                     modifier = Modifier.size(
                         width = if (isTablet) 300.dp else 200.dp,
