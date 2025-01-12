@@ -112,12 +112,6 @@ fun DeviceScreen(
 
     var spaces by remember { mutableStateOf<List<SpaceResponse>>(emptyList()) } // Lắng nghe danh sách thiết bị
     val spacesListState by viewModel.spacesListState.collectAsState()
-    LaunchedEffect(1) {
-//        selectedSpaceId?.let { spaceId ->
-//            viewModel.loadDevices(spaceId) // Tải danh sách thiết bị khi Space thay đổi
-//        }
-        viewModel.getSpacesByHomeId(3)
-    }
 
     when(spacesListState){
         is SpaceState.Error ->{
@@ -132,18 +126,14 @@ fun DeviceScreen(
         is SpaceState.Success -> {
             spaces = (spacesListState as SpaceState.Success).spacesList
             Log.d("List Device", (spacesListState as SpaceState.Success).spacesList.toString())
+            if (selectedTabIndex == 0) {
+                viewModel.loadDevices(spaces.first().SpaceID)
+            }
         }
     }
 
     var devices by remember { mutableStateOf<List<DeviceResponse>>(emptyList()) } // Lắng nghe danh sách thiết bị
     val deviceListState by viewModel.deviceListState.collectAsState()
-    LaunchedEffect(1) {
-//        selectedSpaceId?.let { spaceId ->
-//            viewModel.loadDevices(spaceId) // Tải danh sách thiết bị khi Space thay đổi
-//        }
-        viewModel.loadDevices(4)
-    }
-
 
     when(deviceListState){
         is DeviceState.Error ->{
@@ -245,10 +235,13 @@ fun DeviceScreen(
                                         .align(Alignment.Center)
                                 ) {
                                     HouseSelection(
-                                        houses = listOf("House 1", "House 2", "House 3"),
+                                        //houses = listOf("House 1", "House 2", "House 3"),
                                         onManageHouseClicked = {
                                             /* TODO: Navigate */
                                             navController.navigate(Screens.HouseManagement.route)
+                                        },
+                                        onTabSelected = {id ->
+                                            viewModel.getSpacesByHomeId(id)
                                         }
                                     )
                                 }
@@ -299,8 +292,7 @@ fun DeviceScreen(
                                         } else {
                                             // Xử lý khi danh sách spaces trống
                                             Text(
-                                                text = "Không có không gian nào để hiển thị.",
-                                                style = MaterialTheme.typography.bodyMedium,
+                                                text = "",
                                             )
                                         }
 

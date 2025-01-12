@@ -2,11 +2,15 @@ package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.signup
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.util.Base64
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -22,6 +26,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -31,6 +36,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lock
@@ -41,6 +47,9 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -50,7 +59,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,42 +70,81 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.InspectableModifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RegisterRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.User
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.SpaceState
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.ValidationUtils
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Date
+import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("InlinedApi")
 @Composable
-fun SignUpScreen(navController: NavHostController) {
-    // Họ tên
-    var name by remember { mutableStateOf("") }
-    var nameError by remember { mutableStateOf("") }
+fun SignUpScreen(navController: NavHostController,
+    viewModel: SignUpViewModel = viewModel()
+) {
 
-    // Email
-    var email by remember { mutableStateOf("") }
-    var emailError by remember { mutableStateOf("") }
+//    // Họ tên
+//    var name by remember { mutableStateOf("") }
+      var nameError by remember { mutableStateOf("") }
+//
+//    // Email
+//    var email by remember { mutableStateOf("") }
+      var emailError by remember { mutableStateOf("") }
+//
+//    // Số điện thoại
+//    var phoneNumber by remember { mutableStateOf("") }
+      var phoneError by remember { mutableStateOf("") }
+//
+//    // Địa chỉ
+//    var address by remember { mutableStateOf("") }
+      var addressError by remember { mutableStateOf("") }
 
-    // Số điện thoại
-    var phoneNumber by remember { mutableStateOf("") }
-    var phoneError by remember { mutableStateOf("") }
+    val signUpState by viewModel.signUpState.collectAsState()
 
-    // Địa chỉ
-    var address by remember { mutableStateOf("") }
-    var addressError by remember { mutableStateOf("") }
+    when(signUpState){
+        is SignUpState.Error ->{
+            Text((signUpState as SignUpState.Error).error, color = Color.Red)
+            Log.e("Error",  (signUpState as SignUpState.Error).error)
+        }
+        is SignUpState.Idle ->{
+            //Todo
+        }
+        is SignUpState.Loading -> {
+            CircularProgressIndicator()
+        }
+        is SignUpState.Success -> {
+            Text((signUpState as SignUpState.Success).message, color = Color.Red)
+            //navController.navigate(Screens.Login.route)
+            Log.d("List Device", (signUpState as SignUpState.Success).message)
+        }
+    }
 
     AppTheme {
         val context = LocalContext.current
@@ -104,29 +155,54 @@ fun SignUpScreen(navController: NavHostController) {
         var passwordVisible by remember { mutableStateOf(false) }
         var confirmPasswordVisible by remember { mutableStateOf(false) }
 
-        var name by remember { mutableStateOf("") }
-        var email by remember { mutableStateOf("") }
-        var password by remember { mutableStateOf("") }
-        var confirmPassword by remember { mutableStateOf("") }
-        var phoneNumber by remember { mutableStateOf("") }
-        var address by remember { mutableStateOf("") }
+        var user by remember { mutableStateOf<RegisterRequest?>(null) }
+
+        val datePickerState = rememberDatePickerState()
+        var showDatePicker by remember { mutableStateOf(false) }
+        var selectedDate by remember { mutableStateOf("01/01/2004") }
+        var name by remember { mutableStateOf("Sang Test") }
+        var email by remember { mutableStateOf("1234@gmail.com") }
+        var password by remember { mutableStateOf("afhj@A123") }
+        var confirmPassword by remember { mutableStateOf("afhj@A123") }
+        var phoneNumber by remember { mutableStateOf("0258963741") }
+        var address by remember { mutableStateOf("Ap 12132") }
         var avatarUri by remember { mutableStateOf<Uri?>(null) }
 
         var stage by remember { mutableStateOf(1) }
         var errorMessage by remember { mutableStateOf("") }
+
+        var profileImage by remember {mutableStateOf("")}
 
         val imagePickerLauncher =
             rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
                 uri?.let {
                     val mimeType = context.contentResolver.getType(it)
                     if (mimeType == "image/jpeg" || mimeType == "image/png") {
-                        avatarUri = it
+                        avatarUri = it // Lưu URI của ảnh
                         errorMessage = ""
+
+                        val maxSizeInKB = 25 // Giới hạn kích thước ảnh 100KB
+
+                        // Nén ảnh
+                        val compressedImage = compressImage(context, it, maxSizeInKB)
+                        if (compressedImage != null) {
+                            // Chuyển đổi ảnh đã nén sang Base64
+                            val base64Image = Base64.encodeToString(compressedImage, Base64.NO_WRAP)
+                            profileImage = base64Image
+                            Log.d("Base64", base64Image) // Log Base64 hoặc gửi lên API
+                        } else {
+                            // Ảnh vượt kích thước và không thể nén
+                            errorMessage = "Ảnh quá lớn, không thể nén đủ nhỏ!"
+                            Log.e("ImagePicker", "Không thể nén ảnh")
+                        }
                     } else {
+                        // MIME type không hợp lệ
                         errorMessage = "Chỉ chấp nhận định dạng JPEG hoặc PNG."
+                        Log.e("ImagePicker", "Định dạng file không hợp lệ: $mimeType")
                     }
                 }
             }
+
 
 
         fun validateInput(): Boolean {
@@ -276,6 +352,75 @@ fun SignUpScreen(navController: NavHostController) {
                             unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
                         )
                     )
+
+                    OutlinedTextField(
+                        value = selectedDate, // Chỗ này bị bug chưa load được ngày từ biến
+                        onValueChange = { /* Not needed for read-only fields */ },
+                        placeholder = { Text("Ngày sinh (dd/mm/yyyy)") },
+                        shape = RoundedCornerShape(25),
+                        singleLine = true,
+                        readOnly = true,
+                        trailingIcon = {
+                            // Nút chọn ngày
+                            IconButton(onClick = { showDatePicker = !showDatePicker }) {
+                                Icon(
+                                    imageVector = Icons.Default.DateRange,
+                                    contentDescription = "Chọn ngày"
+                                )
+                            }
+                        },
+                        modifier = Modifier
+                            .width(if (isTablet) 500.dp else 400.dp)
+                            .height(if (isTablet) 80.dp else 70.dp),
+                        colors = TextFieldDefaults.colors(
+                            focusedTextColor = colorScheme.onBackground,  // Màu text khi TextField được focus
+                            unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),  // Màu text khi TextField không được focus
+                            focusedContainerColor = colorScheme.onPrimary,
+                            unfocusedContainerColor = colorScheme.onPrimary,
+                            focusedIndicatorColor = colorScheme.primary,
+                            unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
+                        ),
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Filled.DateRange,
+                                contentDescription = null
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Next
+                        )
+                    )
+
+                    if (showDatePicker) {
+                        Popup(
+                            onDismissRequest = { showDatePicker = false },
+                            alignment = Alignment.TopStart
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .offset(y = 64.dp)
+                                    .shadow(elevation = 4.dp)
+                                    .background(colorScheme.background)
+                                    .padding(16.dp)
+                            ) {
+                                DatePicker(
+                                    state = datePickerState,
+                                    showModeToggle = false
+                                )
+                            }
+                        }
+                    }
+
+                    //Nếu thay dđổi ngày thì update
+                    LaunchedEffect(datePickerState.selectedDateMillis) {
+                        datePickerState.selectedDateMillis?.let { millis ->
+                            val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                            selectedDate = formatter.format(Date(millis))
+                            showDatePicker = false //Ẩn date picker
+                        }
+                    }
                 } else {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -511,8 +656,20 @@ fun SignUpScreen(navController: NavHostController) {
                                 stage = 2
                                 errorMessage = ""
                             } else if (stage == 2 && validateInput()) {
+                                val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                                val localDate = LocalDate.parse(selectedDate, formatter)
+                                Log.e("date", localDate.toString())
                                 // TODO: Xử lý sang màn hình xác thực OTP
-                                navController.navigate(Screens.Home.route)
+                                user = RegisterRequest(Name = name,
+                                    Email = email,
+                                    PasswordHash = password,
+                                    Phone= phoneNumber,
+                                    Address = address,
+                                    ProfileImage = profileImage,
+                                    DateOfBirth = localDate.toString())
+                                Log.e("User: ",user.toString())
+                                viewModel.signUp(user = user!!)
+
                             }
                         },
                         enabled = (stage == 1 || (stage == 2 && validateInput())),
@@ -555,7 +712,45 @@ fun SignUpScreen(navController: NavHostController) {
     }
 }
 
+private fun compressImage(context: Context, uri: Uri, maxSizeInKB: Int): ByteArray? {
+    return try {
+        val inputStream = context.contentResolver.openInputStream(uri)
+        val bitmap = android.graphics.BitmapFactory.decodeStream(inputStream)
+        inputStream?.close()
 
+        val outputStream = java.io.ByteArrayOutputStream()
+        var quality = 100
+
+        // Xác định định dạng gốc
+        val mimeType = context.contentResolver.getType(uri)
+        val compressFormat = when (mimeType) {
+            "image/png" -> android.graphics.Bitmap.CompressFormat.PNG
+            "image/jpeg" -> android.graphics.Bitmap.CompressFormat.JPEG
+            else -> return null // Không hỗ trợ định dạng khác
+        }
+
+        // Nén ảnh giữ nguyên định dạng
+        bitmap.compress(compressFormat, quality, outputStream)
+
+        // Nếu định dạng là JPEG, giảm chất lượng nếu vượt kích thước
+        if (compressFormat == android.graphics.Bitmap.CompressFormat.JPEG) {
+            while (outputStream.toByteArray().size / 1024 > maxSizeInKB && quality > 10) {
+                quality -= 10
+                outputStream.reset()
+                bitmap.compress(compressFormat, quality, outputStream)
+            }
+        }
+
+        if (outputStream.toByteArray().size / 1024 <= maxSizeInKB) {
+            outputStream.toByteArray()
+        } else {
+            null // Không thể nén ảnh đủ nhỏ
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+}
 
 
 @Preview(showBackground = true, showSystemUi = true)
