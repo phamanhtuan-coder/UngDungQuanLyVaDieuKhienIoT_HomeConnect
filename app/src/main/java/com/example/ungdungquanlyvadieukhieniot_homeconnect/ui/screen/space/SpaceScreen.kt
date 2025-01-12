@@ -162,10 +162,13 @@ fun SpaceScreen(
                                         .align(Alignment.Center)
                                 ) {
                                     HouseSelection(
-                                        houses = listOf("House 1", "House 2", "House 3"),
+                                        //houses = listOf("House 1", "House 2", "House 3"),
                                         onManageHouseClicked = {
                                             /* TODO: Navigate */
                                             navController.navigate(Screens.HouseManagement.route)
+                                        },
+                                        onTabSelected = {id ->
+
                                         }
                                     )
                                 }
