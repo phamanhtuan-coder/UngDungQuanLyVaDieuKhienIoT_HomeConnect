@@ -102,9 +102,9 @@ fun NavigationGraph(
 
             //Device Detail Screen
             //Todo: Tạm thời dẫn tới placeholder, sau này cần truyền Id của thiết bị vào để hiển thị thông tin chi tiết của thiết bị
-            composable(Screens.DeviceDetail.route) {
-                DeviceDetailScreen(navController)
-            }
+//            composable(Screens.DeviceDetail.route) {
+//                DeviceDetailScreen(navController)
+//            }
 
             //Access Point Screen
             //Todo: Lấy dữ lieu thiết bị để hiển thị thông tin kết nối
@@ -179,10 +179,18 @@ fun NavigationGraph(
                 UpdatePasswordScreen(navController)
             }
 
-            composable(Screens.FireAlarmDetail.route) {
-                FireAlarmDetailScreen(navController)
-            }
+//            composable(Screens.FireAlarmDetail.route) {
+//                FireAlarmDetailScreen(navController)
+//            }
 
+            composable("device/{typeID}/{id}") { backStackEntry ->
+                val typeID = backStackEntry.arguments?.getString("typeID")?.toIntOrNull()
+                val id = backStackEntry.arguments?.getString("id")?.toIntOrNull()
+
+                // Sử dụng Factory để ánh xạ typeID tới màn hình
+                val screen = DeviceScreenFactory.getScreen(typeID ?: 0)
+                screen(navController, id)
+            }
             // Todo:... other nested graphs (devices, profile, settings) ...
         }
     }
