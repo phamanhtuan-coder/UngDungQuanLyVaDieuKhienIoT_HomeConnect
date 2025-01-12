@@ -56,22 +56,28 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_poin
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.wifi_connection.WifiConnectionScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.ValidationUtils
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 /** Giao diện màn hình Tạo mật khẩu mới (NewPassword Screen)
  * -----------------------------------------
  * Người viết: Phạm Xuân Nhân
  * Ngày viết: 03/12/2024
- * Lần cập nhật cuối: 04/12/2024
+ * -------------------------
+ * Người cập nhật: Phạm Anh Tuấn
+ * Lần cập nhật cuối: 12/1/2025
  * -----------------------------------------
- * Input: Không có
+ * @param navController: Đối tượng điều khiển điều hướng
+ * @param email: Email người dùng
+ * @param viewModel: ViewModel chứa dữ liệu và xử lý logic
  *
- * Output: Column chứa các thành phần giao diện của màn hình Tạo mật khẩu mới
+ * @return Column chứa các thành phần giao diện của màn hình Tạo mật khẩu mới
  */
 
-// sửa lại các chỗ lỗi giống UpdatePasswordScreen
 @Composable
 fun NewPasswordScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    email: String,
+    viewModel: NewPasswordViewModel = viewModel()
 ) {
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
@@ -83,7 +89,7 @@ fun NewPasswordScreen(
         val passwordState2 = remember { mutableStateOf("") }
         var passwordVisible2 by remember { mutableStateOf(false) }
 
-// Biến trạng thái để lưu thông báo lỗi
+        // Biến trạng thái để lưu thông báo lỗi
         val passwordErrorState = remember { mutableStateOf("") }
         val passwordConfirmErrorState = remember { mutableStateOf("") }
 
@@ -96,13 +102,6 @@ fun NewPasswordScreen(
             screenWidthDp < 600.dp -> 16.dp
             else -> 32.dp
         }
-
-        val verticalSpacing = when {
-            screenHeightDp < 600.dp -> 8.dp
-            screenHeightDp < 800.dp -> 12.dp
-            else -> 16.dp
-        }
-        var bien=false
 
         Scaffold(
             modifier = Modifier
@@ -257,5 +256,5 @@ fun NewPasswordScreen(
 @Preview(showBackground = true,showSystemUi = true)
 @Composable
 fun NewPasswordScreenPreiview(){
-    NewPasswordScreen(navController = rememberNavController())
+    NewPasswordScreen(navController = rememberNavController(),"")
 }

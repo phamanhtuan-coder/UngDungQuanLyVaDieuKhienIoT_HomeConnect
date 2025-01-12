@@ -22,24 +22,42 @@ class OTPViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = OTPRepository()
 
     // StateFlow cho UI lắng nghe
-    private val _otpState = MutableStateFlow<OTPState>(OTPState.Idle)
-    val otpState = _otpState.asStateFlow()
 
-    // Hàm login
-    fun checkEmail(email: String) {
+    private val _verifyOtpState = MutableStateFlow<OTPState>(OTPState.Idle)
+    val verifyOtpState = _verifyOtpState.asStateFlow()
+    fun verifyOTP(email: String,otp: String) {
         // Reset state
-        _otpState.value = OTPState.Loading
-
+        _verifyOtpState.value = OTPState.Loading
         viewModelScope.launch {
             try {
-                val response = repository.checkEmail(email)
-
+                val response = repository.verifyOTP(email,otp)
                 // Bắn state về UI
-
+                _verifyOtpState.value = OTPState.Success(response.success, true, response.message)
             } catch (e: Exception) {
                 // Bắt lỗi (VD: 401, Network error, v.v.)
-                Log.e("LoginViewModel", "Login error: ${e.message}")
-                _otpState.value = OTPState.Error(false, e.message ?: "Đăng nhập thất bại!")
+                Log.e("OTPViewModel", "OTP verify error: ${e.message}")
+                _verifyOtpState.value = OTPState.Error(false, e.message ?: "Xác thực OTP thất bại!")
+            }
+        }
+    }
+
+
+
+    private val _sendOtpState = MutableStateFlow<OTPState>(OTPState.Idle)
+    val sendOtpState = _sendOtpState.asStateFlow()
+
+    fun sendOTP(email: String) {
+        // Reset state
+        _sendOtpState.value = OTPState.Loading
+        viewModelScope.launch {
+            try {
+                val response = repository.sendOTP(email)
+                // Bắn state về UI
+                _sendOtpState.value = OTPState.Success(response.success, true, response.message)
+            } catch (e: Exception) {
+                // Bắt lỗi (VD: 401, Network error, v.v.)
+                Log.e("OTPViewModel", "OTP send error: ${e.message}")
+                _sendOtpState.value = OTPState.Error(false, e.message ?: "Gửi OTP thất bại!")
             }
         }
     }

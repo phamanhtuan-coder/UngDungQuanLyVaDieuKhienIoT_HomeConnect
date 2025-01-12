@@ -16,4 +16,23 @@ class OTPRepository {
         // Gọi API
         return apiService.checkEmail(request)
     }
+
+    suspend fun sendOTP(email: String): EmailResponse {
+        // Tạo request
+        val request = EmailRequest(
+            email = email
+        )
+        // Gọi API
+        return apiService.sendOTP(request)
+    }
+
+    suspend fun verifyOTP(email: String,otp:String): EmailResponse {
+        // Tạo request
+        val request = EmailRequest(
+            email = email,
+            otp = otp
+        )
+        // Gọi API
+        return apiService.verifyOTP(request)
+    }
 }

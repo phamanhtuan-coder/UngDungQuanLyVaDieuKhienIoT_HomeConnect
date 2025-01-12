@@ -147,7 +147,6 @@ fun PasswordRecoveryScreen(
                 // Nút khôi phục mật khẩu
                 Button(
                     onClick = {
-                        /* TODO: Xử lý khôi phục mật khẩu kiểm tra email hợp lệ hay không? Email phải đã tồn tại trong database thì mới có thể gửi mã OTP*/
                         viewModel.checkEmail(emailState.value)
                     },
                     modifier = Modifier

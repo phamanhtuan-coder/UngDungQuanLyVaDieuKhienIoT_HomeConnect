@@ -179,9 +179,17 @@ fun NavigationGraph(
                 AddSpaceScreen(navController)
             }
 
-            //Todo: Lấy dữ liêu id để vào kết nối wifi
-            composable(Screens.NewPassword.route) {
-                NewPasswordScreen(navController)
+            composable(
+                route = "${Screens.NewPassword.route}?email={email}",
+                arguments = listOf(
+                    navArgument("email") {
+                        type = NavType.StringType
+                        defaultValue = ""
+                    }
+                )
+            ) {backStackEntry ->
+                val email = backStackEntry.arguments?.getString("email") ?: ""
+                NewPasswordScreen(navController, email)
             }
             //Password Authentication Screen
             composable(Screens.PasswordAuth.route) {

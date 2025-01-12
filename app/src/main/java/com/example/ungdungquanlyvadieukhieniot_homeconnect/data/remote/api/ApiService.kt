@@ -25,4 +25,10 @@ interface ApiService {
     @POST("/api/otp/check-email")
     suspend fun checkEmail(@Body request: EmailRequest): EmailResponse
 
+    @POST("/api/otp/send")
+    suspend fun sendOTP(@Body request: EmailRequest): EmailResponse
+
+    @POST("/api/otp/verify")
+    suspend fun verifyOTP(@Body request: EmailRequest): EmailResponse
+
 }

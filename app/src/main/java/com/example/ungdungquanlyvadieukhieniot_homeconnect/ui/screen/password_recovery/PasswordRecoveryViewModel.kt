@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 sealed class CheckEmailState {
     object Idle : CheckEmailState()               // Chưa làm gì
     object Loading : CheckEmailState()            // Đang loading
-    data class Success(val exists: Boolean, val message: String) : CheckEmailState()
+    data class Success(val exists: Boolean?, val message: String) : CheckEmailState()
     data class Error(val success: Boolean, val message: String) : CheckEmailState()
 }
 
@@ -24,7 +24,6 @@ class PasswordRecoveryViewModel(application: Application) : AndroidViewModel(app
     private val _checkEmailState = MutableStateFlow<CheckEmailState>(CheckEmailState.Idle)
     val checkEmailState = _checkEmailState.asStateFlow()
 
-    // Hàm login
     fun checkEmail(email: String) {
         // Reset state
         _checkEmailState.value = CheckEmailState.Loading
@@ -37,7 +36,7 @@ class PasswordRecoveryViewModel(application: Application) : AndroidViewModel(app
                 // Bắt lỗi (VD: 401, Network error, v.v.)
                 Log.e("PasswordRecoveryViewModel", "Login error: ${e.message}")
                 _checkEmailState.value =
-                    CheckEmailState.Error(false, e.message ?: "Đăng nhập thất bại!")
+                    CheckEmailState.Error(false, e.message ?: "Xác thực email thất bại!")
             }
         }
     }
