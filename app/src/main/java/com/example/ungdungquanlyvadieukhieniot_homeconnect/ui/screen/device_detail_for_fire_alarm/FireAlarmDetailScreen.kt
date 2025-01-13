@@ -1,5 +1,7 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail_for_fire_alarm
 
+import android.app.Application
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -44,6 +46,8 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,6 +62,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.PaintingStyle.Companion.Stroke
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -69,19 +74,23 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.isTablet
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.DayPicker
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.DeviceDetailPhoneScreen
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.DeviceDetailViewModel
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.EndlessRollingPadlockTimePicker
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.GradientSlider
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.getInfoDeviceState
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 @Composable
 fun FireAlarmDetailScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    deviceID: Int?,
 ) {
     AppTheme {
         var rowWidth by remember { mutableStateOf(0) }
@@ -92,6 +101,42 @@ fun FireAlarmDetailScreen(
         var switchState by remember { mutableStateOf(true) }
         val statusList = listOf("Bình thường", "Báo động", "Lỗi")// Trạng thái
         val status by remember { mutableStateOf(0) }
+
+        val context = LocalContext.current
+        val application = context.applicationContext as Application
+        val viewModel = remember {
+            FireAlarmDetailViewModel(application, context)
+        }
+
+        var infoDevice by remember { mutableStateOf<DeviceResponse?>(null) } // Lắng nghe danh sách thiết bị
+        val infoDeviceState by viewModel.infoDeviceState.collectAsState()
+
+        when(infoDeviceState){
+            is getInfoDeviceState.Error ->{
+                Log.d("Error",  (infoDeviceState as getInfoDeviceState.Error).error)
+            }
+            is getInfoDeviceState.Idle ->{
+                //Todo
+            }
+            is getInfoDeviceState.Loading -> {
+                //Todo
+            }
+            is getInfoDeviceState.Success -> {
+                infoDevice = (infoDeviceState as getInfoDeviceState.Success).device
+                Log.d("List Device", (infoDeviceState as getInfoDeviceState.Success).device.toString())
+            }
+        }
+
+        LaunchedEffect(1) {
+            viewModel.getInfoDevice(deviceID!!)
+        }
+
+        infoDevice = infoDevice ?: DeviceResponse(
+            DeviceID = 0,
+            TypeID = 0,
+            Name = "",
+            PowerStatus = false,
+        )
 
         val colorScheme = MaterialTheme.colorScheme
         Scaffold(
@@ -175,14 +220,14 @@ fun FireAlarmDetailScreen(
                                                     verticalArrangement = Arrangement.SpaceBetween // Các thành phần cách đều nhau
                                                 ) {
                                                     Text(
-                                                        text = "Dining Room",
+                                                        text = infoDevice!!.Name,
                                                         color = colorScheme.onPrimary // Màu chữ trắng
                                                     ) // Tiêu đề
                                                     Spacer(modifier = Modifier.height(4.dp)) // Khoảng cách giữa các thành phần
 
                                                     // Switch bật/tắt đèn
                                                     Switch(
-                                                        checked = switchState,
+                                                        checked = infoDevice!!.PowerStatus,
                                                         onCheckedChange = {
                                                             //Todo: Xử lý tắt mở thiết bị
                                                         },
@@ -514,12 +559,6 @@ fun FireAlarmDetailScreen(
             }
         )
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun FireAlarmDetailScreenPreview() {
-    FireAlarmDetailScreen(navController = rememberNavController())
 }
 
 @Composable
