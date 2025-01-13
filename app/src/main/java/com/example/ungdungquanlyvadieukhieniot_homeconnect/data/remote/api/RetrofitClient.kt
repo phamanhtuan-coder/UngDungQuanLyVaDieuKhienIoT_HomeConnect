@@ -4,7 +4,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    private const val BASE_URL = "https://homeconnect-api-ws-3a22df0bbfef.herokuapp.com/"
+    private const val BASE_URL = "https://homeconnect-api-ws-3a22df0bbfef.herokuapp.com"
 
     val apiService: ApiService by lazy {
         Retrofit.Builder()

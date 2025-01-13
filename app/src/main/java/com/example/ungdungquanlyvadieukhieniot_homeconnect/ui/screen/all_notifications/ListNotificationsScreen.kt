@@ -1,5 +1,6 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.all_notifications
 
+import android.app.Application
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +26,7 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -32,10 +34,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,6 +53,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AlertResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
@@ -66,8 +76,36 @@ private object NotificationStyle {
 @Composable
 fun NotificationScreen(
     navController: NavHostController,
-    notifications: List<Notification>
 ) {
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+    val viewModel = remember {
+        ListNotificationModel(application, context)
+    }
+    val notificationState by viewModel.alertListState.collectAsState()
+    var notifications by remember { mutableStateOf(emptyList<AlertResponse>()) }
+    var errorState by remember { mutableStateOf("") }
+    LaunchedEffect(Unit) {
+        viewModel.getAllByUser()
+    }
+
+    when (notificationState) {
+        is NotificationState.Success -> {
+            val successState = notificationState as NotificationState.Success
+            notifications = successState.alertList
+        }
+
+        is NotificationState.Error -> {
+            errorState = (notificationState as NotificationState.Error).error
+        }
+
+        is NotificationState.Loading -> {
+            CircularProgressIndicator()
+        }
+
+        is NotificationState.Idle -> {
+        }
+    }
 
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
@@ -90,10 +128,20 @@ fun NotificationScreen(
                         .fillMaxSize()
                         .padding(innerPadding)
                 ) {
-                    if (notifications.isEmpty()) {
-                        EmptyNotificationScreen()
+                    if (errorState.isNotEmpty()) {
+
+                        if (notifications.isEmpty()) {
+                            EmptyNotificationScreen()
+                        } else {
+                            NotificationList(notifications, navController)
+                        }
                     } else {
-                        NotificationList(notifications, navController)
+                        Text(
+                            text = errorState,
+                            color = colorScheme.error,
+                            fontSize = NotificationStyle.titleFontSize,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             }
@@ -139,9 +187,9 @@ fun EmptyNotificationScreen() {
 
 // Danh sách các thông báo
 @Composable
-fun NotificationList(notifications: List<Notification>, navController: NavHostController) {
+fun NotificationList(notifications: List<AlertResponse>, navController: NavHostController) {
     AppTheme {
-        val colorScheme= MaterialTheme.colorScheme
+        val colorScheme = MaterialTheme.colorScheme
         Column(
             modifier = Modifier
                 .fillMaxSize(), // Chiếm toàn bộ kích thước của màn hình
@@ -157,9 +205,7 @@ fun NotificationList(notifications: List<Notification>, navController: NavHostCo
                     .background(color = colorScheme.background)
             ) {
                 // Cột chứa các phần tử con
-                Column (
-
-                ) {
+                Column {
                     // Hộp màu xanh dương bo tròn góc dưới bên trái
                     Box(
                         modifier = Modifier
@@ -173,41 +219,41 @@ fun NotificationList(notifications: List<Notification>, navController: NavHostCo
                         // Nội dung bên dưới
 
                         // Cột chứa văn bản tiêu đề và các TextField
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth(), // Chiếm toàn bộ chiều rộng
-                                horizontalAlignment = Alignment.CenterHorizontally // Căn giữa các phần tử con theo chiều ngang
-                            ) {
-                                TextField(
-                                    value = "",
-                                    onValueChange = {
-                                        //Todo: Xử lý tiềm kiếm
-                                    },
-                                    leadingIcon = {
-                                        Icon(
-                                            imageVector = Icons.Default.Search,
-                                            contentDescription = "Search Icon",
-                                            tint = colorScheme.onSecondary
-                                        )
-                                    },
-                                    placeholder = {
-                                        Text(text = "Tìm kiếm ....", color = Color.Gray)
-                                    },
-                                    singleLine = true,
-                                    textStyle = TextStyle(fontSize = 16.sp),
-                                    modifier = Modifier
-                                        .width(500.dp)
-                                        .clip(RoundedCornerShape(24.dp))
-                                        .padding(12.dp),
-                                    colors = TextFieldDefaults.colors(
-                                        unfocusedContainerColor = colorScheme.onPrimary,
-                                        focusedContainerColor = colorScheme.onPrimary,
-                                        unfocusedTextColor = colorScheme.onSecondary,
-                                        focusedTextColor = colorScheme.onSecondary
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth(), // Chiếm toàn bộ chiều rộng
+                            horizontalAlignment = Alignment.CenterHorizontally // Căn giữa các phần tử con theo chiều ngang
+                        ) {
+                            TextField(
+                                value = "",
+                                onValueChange = {
+                                    //Todo: Xử lý tiềm kiếm
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        imageVector = Icons.Default.Search,
+                                        contentDescription = "Search Icon",
+                                        tint = colorScheme.onSecondary
                                     )
+                                },
+                                placeholder = {
+                                    Text(text = "Tìm kiếm ....", color = Color.Gray)
+                                },
+                                singleLine = true,
+                                textStyle = TextStyle(fontSize = 16.sp),
+                                modifier = Modifier
+                                    .width(500.dp)
+                                    .clip(RoundedCornerShape(24.dp))
+                                    .padding(12.dp),
+                                colors = TextFieldDefaults.colors(
+                                    unfocusedContainerColor = colorScheme.onPrimary,
+                                    focusedContainerColor = colorScheme.onPrimary,
+                                    unfocusedTextColor = colorScheme.onSecondary,
+                                    focusedTextColor = colorScheme.onSecondary
                                 )
-                                Spacer(modifier = Modifier.heightIn(16.dp))
-                            }
+                            )
+                            Spacer(modifier = Modifier.heightIn(16.dp))
+                        }
 
                     }
                     // Box chứa góc lõm màu xám
@@ -261,7 +307,7 @@ fun NotificationList(notifications: List<Notification>, navController: NavHostCo
 
 // Card cho từng thông báo
 @Composable
-fun NotificationCard(notification: Notification, navController: NavHostController) {
+fun NotificationCard(notification: AlertResponse, navController: NavHostController) {
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
         Card(
@@ -300,19 +346,19 @@ fun NotificationCard(notification: Notification, navController: NavHostControlle
                 // Nội dung thông báo
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = notification.title,
+                        text = "Thông báo của thiết bị ${notification.device.name}",
                         fontSize = NotificationStyle.titleFontSize,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = notification.description,
+                        text = notification.message,
                         fontSize = NotificationStyle.descriptionFontSize,
                         color = colorScheme.onPrimary,
                     )
                 }
 
                 // Icon trạng thái đã đọc
-                if (notification.isRead) {
+                if (notification.status) {
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = "Đã đọc",
@@ -324,24 +370,12 @@ fun NotificationCard(notification: Notification, navController: NavHostControlle
     }
 }
 
-// Dữ liệu giả thông báo Todo: Thay bằng Viwemodel
-data class Notification(
-    val title: String,
-    val description: String,
-    val isRead: Boolean
-)
-
-
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewNotification() {
     NotificationScreen(
-        rememberNavController(), listOf(
-            Notification("New Feature Alert!", "We've introduced new features.", false),
-            Notification("System Update", "Your app has been updated.", true),
-            Notification("Reminder", "Your meeting is scheduled at 3 PM.", false)
-        )
+        rememberNavController()
     )
 }
 
@@ -349,6 +383,6 @@ fun PreviewNotification() {
 @Composable
 fun PreviewEmptyNotification() {
     NotificationScreen(
-        rememberNavController(), listOf()
+        rememberNavController()
     )
 }

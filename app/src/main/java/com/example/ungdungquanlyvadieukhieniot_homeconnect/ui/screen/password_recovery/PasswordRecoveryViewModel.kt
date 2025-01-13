@@ -34,7 +34,7 @@ class PasswordRecoveryViewModel(application: Application) : AndroidViewModel(app
                 _checkEmailState.value = CheckEmailState.Success(response.exists, response.message)
             } catch (e: Exception) {
                 // Bắt lỗi (VD: 401, Network error, v.v.)
-                Log.e("PasswordRecoveryViewModel", "Login error: ${e.message}")
+                Log.e("PasswordRecoveryViewModel", "Check email error: ${e.message}")
                 _checkEmailState.value =
                     CheckEmailState.Error(false, e.message ?: "Xác thực email thất bại!")
             }

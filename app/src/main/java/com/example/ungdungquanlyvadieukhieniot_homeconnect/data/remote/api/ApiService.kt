@@ -1,5 +1,6 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.api
 
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AlertResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceTokenRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceTokenResponse
@@ -53,4 +54,6 @@ interface ApiService {
         @Body request: DeviceTokenRequest
     ): DeviceTokenResponse
 
+    @GET("/api/alerts/getAllByUser")
+    suspend fun getAllNotification(@Header("Authorization") token: String): List<AlertResponse>
 }
