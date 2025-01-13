@@ -8,8 +8,8 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_deta
 
 object DeviceScreenFactory {
     private val screenMap: Map<Int, @Composable (NavHostController, Int?) -> Unit> = mapOf(
-        1 to { navController, id -> DeviceDetailScreen(navController,id) },
-        2 to { navController, id -> FireAlarmDetailScreen(navController, id) },
+        1 to { navController, id -> FireAlarmDetailScreen(navController, id) },
+        2 to { navController, id -> DeviceDetailScreen(navController,id) },
     )
 
     fun getScreen(typeID: Int): @Composable (NavHostController, Int?) -> Unit {
