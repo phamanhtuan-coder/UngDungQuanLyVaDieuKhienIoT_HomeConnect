@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -174,6 +175,23 @@ fun FireAlarmDetailScreen(
         // Khởi tạo toggle
         var toggle by remember {
             mutableStateOf(ToggleRequest(powerStatus = powerStatus))
+        }
+
+        val unlinkState by viewModel.unlinkState.collectAsState()
+
+        when(unlinkState){
+            is UnlinkState.Error ->{
+                Log.e("Error Unlink Device",  (unlinkState as UnlinkState.Error).error)
+            }
+            is UnlinkState.Idle ->{
+                //Todo
+            }
+            is UnlinkState.Loading -> {
+                CircularProgressIndicator()
+            }
+            is UnlinkState.Success -> {
+                Log.d("Unlink Device", (unlinkState as UnlinkState.Success).message)
+            }
         }
 
         val colorScheme = MaterialTheme.colorScheme
@@ -581,6 +599,8 @@ fun FireAlarmDetailScreen(
                                 Button(
                                     onClick = {
                                         //Todo: Xử lý khi nhấn nút Gỡ kết nối
+                                        viewModel.unlinkDevice(safeDevice.DeviceID)
+                                        navController.popBackStack()
                                     },
                                     modifier = Modifier
                                         .weight(0.5f) // Chia đều không gian
