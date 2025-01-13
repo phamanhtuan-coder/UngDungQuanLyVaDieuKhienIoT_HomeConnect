@@ -80,7 +80,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Attribute
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AttributeRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleResponse
@@ -201,7 +201,7 @@ fun DeviceDetailPhoneScreen(
             }
         }
 
-        var attribute by remember { mutableStateOf(Attribute(brightness = 0, color = "#000000")) }
+        var attribute by remember { mutableStateOf(AttributeRequest(brightness = 0, color = "#000000")) }
 
         var safeDevice = infoDevice ?: DeviceResponse(
             DeviceID = 0,
@@ -233,7 +233,7 @@ fun DeviceDetailPhoneScreen(
             Log.e("attributeJson",attributeJson.toString())
 
             val gson = Gson()
-            attribute = gson.fromJson(attributeJson, Attribute::class.java)
+            attribute = gson.fromJson(attributeJson, AttributeRequest::class.java)
 
             Log.e("attributeJson", attribute.toString())
         }
@@ -787,7 +787,7 @@ fun DeviceDetailTabletScreen(
         }
     }
 
-    var attribute by remember { mutableStateOf(Attribute(brightness = 0, color = "#000000")) }
+    var attribute by remember { mutableStateOf(AttributeRequest(brightness = 0, color = "#000000")) }
 
     var safeDevice = infoDevice ?: DeviceResponse(
         DeviceID = 0,
@@ -819,7 +819,7 @@ fun DeviceDetailTabletScreen(
         Log.e("attributeJson",attributeJson.toString())
 
         val gson = Gson()
-        attribute = gson.fromJson(attributeJson, Attribute::class.java)
+        attribute = gson.fromJson(attributeJson, AttributeRequest::class.java)
 
         Log.e("attributeJson", attribute.toString())
     }
