@@ -7,6 +7,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Attri
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UnlinkResponse
 
 class DeviceRepository (private val context: Context) {
     private val apiService = RetrofitClient.apiService
@@ -27,5 +28,11 @@ class DeviceRepository (private val context: Context) {
         val sharedPrefs =context.getSharedPreferences("MY_APP_PREFS", Context.MODE_PRIVATE)
         val token=  sharedPrefs.getString("JWT_TOKEN", "") ?: ""
         return apiService.postAttributes(deviceId, attributeRequest, token = "Bearer $token")
+    }
+
+    suspend fun postUnlink(deviceId: Int): UnlinkResponse {
+        val sharedPrefs =context.getSharedPreferences("MY_APP_PREFS", Context.MODE_PRIVATE)
+        val token=  sharedPrefs.getString("JWT_TOKEN", "") ?: ""
+        return apiService.postUnlink(deviceId, token = "Bearer $token")
     }
 }
