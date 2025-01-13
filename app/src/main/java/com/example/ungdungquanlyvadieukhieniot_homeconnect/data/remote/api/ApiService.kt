@@ -7,6 +7,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Login
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RegisterRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RegisterResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -34,5 +35,5 @@ interface ApiService {
     suspend fun getInfoDevice(@Path("deviceId") deviceId: Int, @Header("Authorization") token: String) : DeviceResponse
 
     @POST("/api/devices/{deviceId}/toggle")
-    suspend fun toggleDevice(@Path("deviceId") deviceId: Int, @Body toggle: RegisterRequest, @Header("Authorization") token: String) : ToggleResponse
+    suspend fun toggleDevice(@Path("deviceId") deviceId: Int, @Body toggle: ToggleRequest, @Header("Authorization") token: String) : ToggleResponse
 }
