@@ -1,5 +1,7 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.api
 
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AttributeRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AttributeResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.HouseResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LoginRequest
@@ -36,4 +38,7 @@ interface ApiService {
 
     @POST("/api/devices/{deviceId}/toggle")
     suspend fun toggleDevice(@Path("deviceId") deviceId: Int, @Body toggle: ToggleRequest, @Header("Authorization") token: String) : ToggleResponse
+
+    @POST("/api/devices/{deviceId}/attributes")
+    suspend fun postAttributes(@Path("deviceId") deviceId: Int, @Body attribute: AttributeRequest, @Header("Authorization") token: String) : AttributeResponse
 }
