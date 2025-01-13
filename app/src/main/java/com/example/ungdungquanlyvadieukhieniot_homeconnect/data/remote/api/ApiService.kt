@@ -7,6 +7,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Login
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RegisterRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RegisterResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -27,5 +28,8 @@ interface ApiService {
     suspend fun register(@Body request: RegisterRequest) : RegisterResponse
 
     @GET("/api/houses")
-    suspend fun  getListHome(@Header("Authorization") token: String): List<HouseResponse>
+    suspend fun getListHome(@Header("Authorization") token: String): List<HouseResponse>
+
+    @GET("/api/devices/{deviceId}")
+    suspend fun getInfoDevice(@Path("deviceId") deviceId: Int, @Header("Authorization") token: String) : DeviceResponse
 }
