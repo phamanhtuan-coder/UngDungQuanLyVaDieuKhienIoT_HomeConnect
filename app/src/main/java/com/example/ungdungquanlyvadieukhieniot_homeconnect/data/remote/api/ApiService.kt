@@ -1,5 +1,7 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.api
 
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AttributeRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AttributeResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceTokenRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceTokenResponse
@@ -13,6 +15,9 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.NewPa
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RegisterRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RegisterResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UnlinkResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -53,4 +58,17 @@ interface ApiService {
         @Body request: DeviceTokenRequest
     ): DeviceTokenResponse
 
+    suspend fun getListHome(@Header("Authorization") token: String): List<HouseResponse>
+
+    @GET("/api/devices/{deviceId}")
+    suspend fun getInfoDevice(@Path("deviceId") deviceId: Int, @Header("Authorization") token: String) : DeviceResponse
+
+    @POST("/api/devices/{deviceId}/toggle")
+    suspend fun toggleDevice(@Path("deviceId") deviceId: Int, @Body toggle: ToggleRequest, @Header("Authorization") token: String) : ToggleResponse
+
+    @POST("/api/devices/{deviceId}/attributes")
+    suspend fun postAttributes(@Path("deviceId") deviceId: Int, @Body attribute: AttributeRequest, @Header("Authorization") token: String) : AttributeResponse
+
+    @POST("/api/devices/{deviceId}/unlink")
+    suspend fun postUnlink(@Path("deviceId") deviceId: Int, @Header("Authorization") token: String) : UnlinkResponse
 }

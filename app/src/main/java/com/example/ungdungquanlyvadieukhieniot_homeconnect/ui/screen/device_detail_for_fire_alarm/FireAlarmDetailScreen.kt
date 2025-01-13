@@ -1,9 +1,10 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail_for_fire_alarm
 
+import android.app.Application
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,7 +22,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -44,6 +45,8 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,36 +55,34 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.PaintingStyle.Companion.Stroke
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.isTablet
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.DayPicker
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.DeviceDetailPhoneScreen
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.EndlessRollingPadlockTimePicker
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.GradientSlider
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.getInfoDeviceState
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
+import kotlin.toString
 
 @Composable
 fun FireAlarmDetailScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    deviceID: Int?,
 ) {
     AppTheme {
         var rowWidth by remember { mutableStateOf(0) }
@@ -92,6 +93,106 @@ fun FireAlarmDetailScreen(
         var switchState by remember { mutableStateOf(true) }
         val statusList = listOf("Bình thường", "Báo động", "Lỗi")// Trạng thái
         val status by remember { mutableStateOf(0) }
+
+        val context = LocalContext.current
+        val application = context.applicationContext as Application
+        val viewModel = remember {
+            FireAlarmDetailViewModel(application, context)
+        }
+
+        var infoDevice by remember { mutableStateOf<DeviceResponse?>(null) } // Lắng nghe danh sách thiết bị
+        val infoDeviceState by viewModel.infoDeviceState.collectAsState()
+
+        when(infoDeviceState){
+            is getInfoDeviceState.Error ->{
+                Log.d("Error",  (infoDeviceState as getInfoDeviceState.Error).error)
+            }
+            is getInfoDeviceState.Idle ->{
+                //Todo
+            }
+            is getInfoDeviceState.Loading -> {
+                //Todo
+            }
+            is getInfoDeviceState.Success -> {
+                infoDevice = (infoDeviceState as getInfoDeviceState.Success).device
+                Log.d("List Device", (infoDeviceState as getInfoDeviceState.Success).device.toString())
+            }
+        }
+
+        LaunchedEffect(1) {
+            viewModel.getInfoDevice(deviceID!!)
+        }
+
+        var toggleDevice by remember { mutableStateOf<ToggleResponse?>(null) } // Lắng nghe danh sách thiết bị
+        val toggleDeviceState by viewModel.toggleState.collectAsState()
+
+        when(toggleDeviceState){
+            is toggletate.Error ->{
+                Log.e("Error", (toggleDeviceState as toggletate.Error).error)
+            }
+            is toggletate.Idle ->{
+                //Todo
+            }
+            is toggletate.Loading -> {
+                //Todo
+            }
+            is toggletate.Success -> {
+                val successState = toggleDeviceState as toggletate.Success
+                toggleDevice = successState.toggle
+                Log.e("toggle Device", toggleDevice.toString())
+            }
+        }
+
+
+        var safeDevice = infoDevice ?: DeviceResponse(
+            DeviceID = 0,
+            TypeID = 0,
+            Name = "",
+            PowerStatus = false,
+            SpaceID = 0,
+            Attribute = ""
+        )
+
+        Log.e("safeDevice", safeDevice.toString())
+
+        LaunchedEffect(toggleDevice) {
+            safeDevice = infoDevice ?: DeviceResponse(
+                DeviceID = 0,
+                TypeID = 0,
+                Name = "",
+                PowerStatus = false,
+                SpaceID = 0,
+                Attribute = ""
+            )
+        }
+
+        var powerStatus by remember { mutableStateOf(false)}
+
+        LaunchedEffect(safeDevice) {
+            powerStatus = safeDevice.PowerStatus
+        }
+
+        // Khởi tạo toggle
+        var toggle by remember {
+            mutableStateOf(ToggleRequest(powerStatus = powerStatus))
+        }
+
+        val unlinkState by viewModel.unlinkState.collectAsState()
+
+        when(unlinkState){
+            is UnlinkState.Error ->{
+                Log.e("Error Unlink Device",  (unlinkState as UnlinkState.Error).error)
+            }
+            is UnlinkState.Idle ->{
+                //Todo
+            }
+            is UnlinkState.Loading -> {
+                CircularProgressIndicator()
+            }
+            is UnlinkState.Success -> {
+                Log.d("Unlink Device", (unlinkState as UnlinkState.Success).message)
+            }
+        }
 
         val colorScheme = MaterialTheme.colorScheme
         Scaffold(
@@ -175,16 +276,21 @@ fun FireAlarmDetailScreen(
                                                     verticalArrangement = Arrangement.SpaceBetween // Các thành phần cách đều nhau
                                                 ) {
                                                     Text(
-                                                        text = "Dining Room",
-                                                        color = colorScheme.onPrimary // Màu chữ trắng
+                                                        text = safeDevice.Name,
+                                                        color = colorScheme.onPrimary, // Màu chữ trắng
+                                                        lineHeight = 32.sp,
+                                                        fontSize = 30.sp
                                                     ) // Tiêu đề
                                                     Spacer(modifier = Modifier.height(4.dp)) // Khoảng cách giữa các thành phần
 
                                                     // Switch bật/tắt đèn
                                                     Switch(
-                                                        checked = switchState,
+                                                        checked = powerStatus,
                                                         onCheckedChange = {
                                                             //Todo: Xử lý tắt mở thiết bị
+                                                            powerStatus = !powerStatus
+                                                            toggle = ToggleRequest(powerStatus = powerStatus) // Cập nhật toggl
+                                                            viewModel.toggleDevice(safeDevice.DeviceID, toggle)
                                                         },
                                                         thumbContent = {
                                                             Icon(
@@ -493,6 +599,8 @@ fun FireAlarmDetailScreen(
                                 Button(
                                     onClick = {
                                         //Todo: Xử lý khi nhấn nút Gỡ kết nối
+                                        viewModel.unlinkDevice(safeDevice.DeviceID)
+                                        navController.popBackStack()
                                     },
                                     modifier = Modifier
                                         .weight(0.5f) // Chia đều không gian
@@ -514,12 +622,6 @@ fun FireAlarmDetailScreen(
             }
         )
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun FireAlarmDetailScreenPreview() {
-    FireAlarmDetailScreen(navController = rememberNavController())
 }
 
 @Composable
