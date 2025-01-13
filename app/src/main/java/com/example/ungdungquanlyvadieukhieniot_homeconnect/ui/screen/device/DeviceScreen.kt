@@ -554,8 +554,8 @@ fun SmartCard(
 fun DeviceInfoSection(typeID: Int, fromTime: String, toTime: String, endPadding: Dp) {
     fun getIconForType(typeId: Int): String {
         return when (typeId) {
-            1 -> "\uD83D\uDCA1" // Light
-            2 -> "\uD83D\uDD25" // Fire
+            1 -> "\uD83D\uDD25" // Fire
+            2 -> "\uD83D\uDCA1" // Light
             else -> "❓"         // Biểu tượng mặc định
         }
     }
