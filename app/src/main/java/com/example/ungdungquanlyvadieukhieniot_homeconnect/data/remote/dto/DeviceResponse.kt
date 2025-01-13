@@ -4,5 +4,6 @@ data class DeviceResponse(
     val DeviceID: Int,
     val TypeID: Int,
     val Name: String,
-    val PowerStatus: Boolean
+    val PowerStatus: Boolean,
+    val Attribute: String
 )
