@@ -32,4 +32,7 @@ interface ApiService {
 
     @GET("/api/devices/{deviceId}")
     suspend fun getInfoDevice(@Path("deviceId") deviceId: Int, @Header("Authorization") token: String) : DeviceResponse
+
+    @POST("/api/devices/{deviceId}/toggle")
+    suspend fun toggleDevice(@Path("deviceId") deviceId: Int, @Body toggle: RegisterRequest, @Header("Authorization") token: String) : ToggleResponse
 }
