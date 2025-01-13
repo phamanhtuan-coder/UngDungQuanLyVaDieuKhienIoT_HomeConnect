@@ -211,6 +211,7 @@ fun DeviceDetailPhoneScreen(
             TypeID = 0,
             Name = "",
             PowerStatus = false,
+            SpaceID = 0,
             Attribute = ""
         )
 
@@ -222,6 +223,7 @@ fun DeviceDetailPhoneScreen(
                 TypeID = 0,
                 Name = "",
                 PowerStatus = false,
+                SpaceID = 0,
                 Attribute = ""
             )
         }
@@ -816,6 +818,7 @@ fun DeviceDetailTabletScreen(
         TypeID = 0,
         Name = "",
         PowerStatus = false,
+        SpaceID = 0,
         Attribute = ""
     )
 
@@ -827,6 +830,7 @@ fun DeviceDetailTabletScreen(
             TypeID = 0,
             Name = "",
             PowerStatus = false,
+            SpaceID = 0,
             Attribute = ""
         )
     }

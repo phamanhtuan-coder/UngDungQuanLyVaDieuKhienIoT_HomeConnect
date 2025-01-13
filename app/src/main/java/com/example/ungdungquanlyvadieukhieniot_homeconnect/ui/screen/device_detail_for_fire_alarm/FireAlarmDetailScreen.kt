@@ -148,6 +148,7 @@ fun FireAlarmDetailScreen(
             TypeID = 0,
             Name = "",
             PowerStatus = false,
+            SpaceID = 0,
             Attribute = ""
         )
 
@@ -159,6 +160,7 @@ fun FireAlarmDetailScreen(
                 TypeID = 0,
                 Name = "",
                 PowerStatus = false,
+                SpaceID = 0,
                 Attribute = ""
             )
         }
