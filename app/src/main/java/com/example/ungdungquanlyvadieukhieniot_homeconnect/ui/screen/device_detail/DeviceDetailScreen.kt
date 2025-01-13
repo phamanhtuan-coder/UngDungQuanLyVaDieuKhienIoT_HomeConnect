@@ -2,6 +2,8 @@ package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_det
 
 
 import android.annotation.SuppressLint
+import android.app.Application
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -40,6 +42,7 @@ import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -50,10 +53,10 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,29 +65,34 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.lerp
+import com.google.gson.Gson
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AttributeRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.DeviceScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlin.Int
 
 /** Giao diện màn hình Device Detail (DeviceDetailScreen)
  * -----------------------------------------
@@ -110,26 +118,58 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun DeviceDetailScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    deviceID: Int?
 ) {
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+    val viewModel = remember {
+        DeviceDetailViewModel(application, context)
+    }
+
+    var infoDevice by remember { mutableStateOf<DeviceResponse?>(null) } // Lắng nghe danh sách thiết bị
+    val infoDeviceState by viewModel.infoDeviceState.collectAsState()
+
+    when(infoDeviceState){
+        is getInfoDeviceState.Error ->{
+            Log.d("Error",  (infoDeviceState as getInfoDeviceState.Error).error)
+        }
+        is getInfoDeviceState.Idle ->{
+            //Todo
+        }
+        is getInfoDeviceState.Loading -> {
+            //Todo
+        }
+        is getInfoDeviceState.Success -> {
+            infoDevice = (infoDeviceState as getInfoDeviceState.Success).device
+            Log.d("List Device", (infoDeviceState as getInfoDeviceState.Success).device.toString())
+        }
+    }
+
+    LaunchedEffect(1) {
+        viewModel.getInfoDevice(deviceID!!)
+    }
+
     val configuration = LocalConfiguration.current
     val screenWidthDp = configuration.screenWidthDp
 
     // Theo hướng dẫn Material Design, thường 600dp trở lên được xem là tablet
     if (screenWidthDp >= 600) {
         // Layout dành cho tablet
-        DeviceDetailTabletScreen(navController)
+        DeviceDetailTabletScreen(navController, infoDevice)
     } else {
         // Layout dành cho phone
-        DeviceDetailPhoneScreen(navController)
+        DeviceDetailPhoneScreen(navController, infoDevice)
     }
 }
 
 @Composable
 fun DeviceDetailPhoneScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    infoDevice: DeviceResponse?
 ) {
     AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
         var rowWidth by remember { mutableStateOf(0) }
         var selectedTimeBegin by remember { mutableStateOf("12:00 AM") }
         var selectedTimeEnd by remember { mutableStateOf("12:00 AM") }
@@ -138,7 +178,120 @@ fun DeviceDetailPhoneScreen(
         var showDialog by remember { mutableStateOf(false) }
         var switchState by remember { mutableStateOf(true) }
 
-        val colorScheme = MaterialTheme.colorScheme
+        val context = LocalContext.current
+        val application = context.applicationContext as Application
+        val viewModel = remember {
+            DeviceDetailViewModel(application, context)
+        }
+
+        var toggleDevice by remember { mutableStateOf<ToggleResponse?>(null) }
+        val toggleDeviceState by viewModel.toggleState.collectAsState()
+
+        when(toggleDeviceState){
+            is toggletate.Error ->{
+                Log.e("Error", (toggleDeviceState as toggletate.Error).error)
+            }
+            is toggletate.Idle ->{
+                //Todo
+            }
+            is toggletate.Loading -> {
+                //Todo
+            }
+            is toggletate.Success -> {
+                val successState = toggleDeviceState as toggletate.Success
+                toggleDevice = successState.toggle
+                Log.e("toggle Device", toggleDevice.toString())
+            }
+        }
+
+        var attribute by remember { mutableStateOf(AttributeRequest(brightness = 0, color = "#000000")) }
+
+        var safeDevice = infoDevice ?: DeviceResponse(
+            DeviceID = 0,
+            TypeID = 0,
+            Name = "",
+            PowerStatus = false,
+            SpaceID = 0,
+            Attribute = ""
+        )
+
+        Log.e("safeDevice", safeDevice.toString())
+
+        LaunchedEffect(toggleDevice) {
+            safeDevice = infoDevice ?: DeviceResponse(
+                DeviceID = 0,
+                TypeID = 0,
+                Name = "",
+                PowerStatus = false,
+                SpaceID = 0,
+                Attribute = ""
+            )
+        }
+
+        LaunchedEffect(safeDevice.Attribute) {
+            val attributeJson = if (safeDevice.Attribute.isNullOrEmpty()) {
+                """{"brightness":0, "color":"#000000"}""" // Giá trị mặc định
+            } else {
+                safeDevice.Attribute
+            }
+
+            Log.e("attributeJson",attributeJson.toString())
+
+            val gson = Gson()
+            attribute = gson.fromJson(attributeJson, AttributeRequest::class.java)
+
+            Log.e("attributeJson", attribute.toString())
+        }
+
+        var powerStatus by remember { mutableStateOf(false)}
+
+        LaunchedEffect(safeDevice) {
+            powerStatus = safeDevice.PowerStatus
+        }
+
+        Log.e("powerStatus", powerStatus.toString())
+        // Khởi tạo toggle
+        var toggle by remember {
+            mutableStateOf(ToggleRequest(powerStatus = powerStatus))
+        }
+
+        val attributeState by viewModel.attributeState.collectAsState()
+
+        when(attributeState){
+            is AttributeState.Error ->{
+                Log.e("Error",  (attributeState as AttributeState.Error).error)
+            }
+            is AttributeState.Idle ->{
+                //Todo
+            }
+            is AttributeState.Loading -> {
+                CircularProgressIndicator()
+            }
+            is AttributeState.Success -> {
+                val successState = attributeState as AttributeState.Success
+                safeDevice = successState.device
+                Log.d("Attribute Device", (attributeState as AttributeState.Success).message)
+                Log.d("Attribute Device - toggleDevice", safeDevice.toString())
+            }
+        }
+
+        val unlinkState by viewModel.unlinkState.collectAsState()
+
+        when(unlinkState){
+            is UnlinkState.Error ->{
+                Log.e("Error Unlink Device",  (unlinkState as UnlinkState.Error).error)
+            }
+            is UnlinkState.Idle ->{
+                //Todo
+            }
+            is UnlinkState.Loading -> {
+                CircularProgressIndicator()
+            }
+            is UnlinkState.Success -> {
+                Log.d("Unlink Device", (unlinkState as UnlinkState.Success).message)
+            }
+        }
+
         Scaffold(
             topBar = {
                 /*
@@ -220,16 +373,22 @@ fun DeviceDetailPhoneScreen(
                                                     verticalArrangement = Arrangement.SpaceBetween // Các thành phần cách đều nhau
                                                 ) {
                                                     Text(
-                                                        text = "Dining Room",
-                                                        color = colorScheme.onPrimary // Màu chữ trắng
+                                                        text = safeDevice.Name,
+                                                        color = colorScheme.onPrimary, // Màu chữ trắng
+                                                        lineHeight = 32.sp,
+                                                        fontSize = 30.sp
                                                     ) // Tiêu đề
                                                     Spacer(modifier = Modifier.height(4.dp)) // Khoảng cách giữa các thành phần
 
                                                     // Switch bật/tắt đèn
                                                     Switch(
-                                                        checked = switchState,
+                                                        checked = powerStatus,
                                                         onCheckedChange = {
                                                             //Todo: Xử lý tắt mở thiết bị
+                                                            powerStatus = !powerStatus
+                                                            Log.e("powerStatus click",  powerStatus.toString())
+                                                            toggle = ToggleRequest(powerStatus = powerStatus) // Cập nhật toggl
+                                                            viewModel.toggleDevice(safeDevice.DeviceID, toggle)
                                                         },
                                                         thumbContent = {
                                                             Icon(
@@ -257,7 +416,7 @@ fun DeviceDetailPhoneScreen(
                                                         verticalAlignment = Alignment.Bottom // Canh các thành phần theo đáy
                                                     ) {
                                                         Text(
-                                                            "80",
+                                                            text = attribute.brightness.toString(),
                                                             fontWeight = FontWeight.Bold,
                                                             fontSize = 50.sp,
                                                             color = colorScheme.onPrimary
@@ -313,12 +472,18 @@ fun DeviceDetailPhoneScreen(
                                                         colorFilter = ColorFilter.tint(colorScheme.onPrimary) // Màu chữ trắng
                                                     )
                                                     Slider(
-                                                        value = 80f,
+                                                        value = attribute.brightness!!.toFloat(),
                                                         onValueChange = {
                                                             //Todo: Xử lý khi thay đổi giá trị
+                                                            // Cập nhật giá trị độ sáng
+                                                            attribute = attribute.copy(brightness = it.toInt())
                                                         }, // Thanh trượt giá trị mặc định là 80
-                                                        steps = 50,
-                                                        valueRange = 0f..100f,
+                                                        onValueChangeFinished = {
+                                                            // Gửi dữ liệu lên server khi người dùng dừng thao tác kéo thanh trượt
+                                                            sendColorToServer(viewModel, safeDevice.DeviceID, attribute)
+                                                        },
+                                                        steps = 10,
+                                                        valueRange = 0f..255f,
                                                         modifier = Modifier.width(300.dp),
                                                         colors = SliderDefaults.colors(
                                                             thumbColor = colorScheme.onPrimary,
@@ -359,7 +524,11 @@ fun DeviceDetailPhoneScreen(
                                                 horizontalAlignment = Alignment.Start,
                                                 verticalArrangement = Arrangement.Top
                                             ) {
-                                                GradientSlider()
+                                                if (attribute.color != null) {
+                                                    SliderWith16BasicColors(safeDevice.DeviceID, attribute)
+                                                } else {
+                                                    SliderWith16BasicColors(safeDevice.DeviceID ,AttributeRequest(brightness = 0, color = "#000000"))
+                                                }
                                             }
                                         }
                                     }
@@ -453,6 +622,14 @@ fun DeviceDetailPhoneScreen(
                                                     )
                                                 }
                                                 if (showDialog) {
+                                                    fun getIconForType(typeId: Int): String {
+                                                        return when (typeId) {
+                                                            1 -> "Fire Alarm" // Light
+                                                            2 -> "LED Light" // Fire
+                                                            else -> ""         // Biểu tượng mặc định
+                                                        }
+                                                    }
+
                                                     AlertDialog(
                                                         onDismissRequest = {
                                                             showDialog = false
@@ -460,9 +637,9 @@ fun DeviceDetailPhoneScreen(
                                                         title = { Text(text = "Thông tin thiết bị") },
                                                         text = {
                                                             Column {
-                                                                Text("ID Thiết bị: 001")
-                                                                Text("Tên thiết bị: Đèn LED phòng khách")
-                                                                Text("Loại thiết bị: Đèn chiếu sáng")
+                                                                Text("ID Thiết bị: ${safeDevice.DeviceID}")
+                                                                Text("Tên thiết bị: ${safeDevice.Name}")
+                                                                Text("Loại thiết bị: ${getIconForType(safeDevice.TypeID)}")
                                                             }
                                                         },
                                                         confirmButton = {
@@ -598,6 +775,8 @@ fun DeviceDetailPhoneScreen(
                                 Button(
                                     onClick = {
                                         //Todo: Xử lý khi nhấn nút Gỡ kết nối
+                                        viewModel.unlinkDevice(safeDevice.DeviceID)
+                                        navController.popBackStack()
                                     },
                                     modifier = Modifier
                                         .weight(1f) // Chia đều không gian
@@ -622,7 +801,10 @@ fun DeviceDetailPhoneScreen(
 }
 
 @Composable
-fun DeviceDetailTabletScreen(navController: NavHostController) {
+fun DeviceDetailTabletScreen(
+    navController: NavHostController,
+    infoDevice: DeviceResponse?
+) {
     var rowWidth by remember { mutableStateOf<Int?>(null) }
     var selectedTimeBegin by remember { mutableStateOf("12:00 AM") }
     var selectedTimeEnd by remember { mutableStateOf("12:00 AM") }
@@ -632,6 +814,117 @@ fun DeviceDetailTabletScreen(navController: NavHostController) {
 
     var switchState by remember { mutableStateOf(true) }
 
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+    val viewModel = remember {
+        DeviceDetailViewModel(application, context)
+    }
+
+    var toggleDevice by remember { mutableStateOf<ToggleResponse?>(null) } // Lắng nghe danh sách thiết bị
+    val toggleDeviceState by viewModel.toggleState.collectAsState()
+
+    when(toggleDeviceState){
+        is toggletate.Error ->{
+            Log.e("Error", (toggleDeviceState as toggletate.Error).error)
+        }
+        is toggletate.Idle ->{
+            //Todo
+        }
+        is toggletate.Loading -> {
+            //Todo
+        }
+        is toggletate.Success -> {
+            val successState = toggleDeviceState as toggletate.Success
+            toggleDevice = successState.toggle
+            Log.e("toggle Device", toggleDevice.toString())
+        }
+    }
+
+    var attribute by remember { mutableStateOf(AttributeRequest(brightness = 0, color = "#000000")) }
+
+    var safeDevice = infoDevice ?: DeviceResponse(
+        DeviceID = 0,
+        TypeID = 0,
+        Name = "",
+        PowerStatus = false,
+        SpaceID = 0,
+        Attribute = ""
+    )
+
+    Log.e("safeDevice", safeDevice.toString())
+
+    LaunchedEffect(toggleDevice) {
+        safeDevice = infoDevice ?: DeviceResponse(
+            DeviceID = 0,
+            TypeID = 0,
+            Name = "",
+            PowerStatus = false,
+            SpaceID = 0,
+            Attribute = ""
+        )
+    }
+
+    LaunchedEffect(safeDevice.Attribute) {
+        val attributeJson = if (safeDevice.Attribute.isNullOrEmpty()) {
+            """{"brightness":0, "color":"#000000"}""" // Giá trị mặc định
+        } else {
+            safeDevice.Attribute
+        }
+
+        Log.e("attributeJson",attributeJson.toString())
+
+        val gson = Gson()
+        attribute = gson.fromJson(attributeJson, AttributeRequest::class.java)
+
+        Log.e("attributeJson", attribute.toString())
+    }
+
+
+
+    var powerStatus by remember { mutableStateOf(false)}
+
+    LaunchedEffect(safeDevice) {
+        powerStatus = safeDevice.PowerStatus
+    }
+
+    // Khởi tạo toggle
+    var toggle by remember {
+        mutableStateOf(ToggleRequest(powerStatus = powerStatus))
+    }
+
+    val attributeState by viewModel.attributeState.collectAsState()
+
+    when(attributeState){
+        is AttributeState.Error ->{
+            Log.e("Error",  (attributeState as AttributeState.Error).error)
+        }
+        is AttributeState.Idle ->{
+            //Todo
+        }
+        is AttributeState.Loading -> {
+            CircularProgressIndicator()
+        }
+        is AttributeState.Success -> {
+            Log.d("Attribute Device", (attributeState as AttributeState.Success).message)
+        }
+    }
+
+    val unlinkState by viewModel.unlinkState.collectAsState()
+
+    when(unlinkState){
+        is UnlinkState.Error ->{
+            Log.e("Error",  (unlinkState as UnlinkState.Error).error)
+        }
+        is UnlinkState.Idle ->{
+            //Todo
+        }
+        is UnlinkState.Loading -> {
+            CircularProgressIndicator()
+        }
+        is UnlinkState.Success -> {
+            Log.d("Unlink Device", (unlinkState as UnlinkState.Success).message)
+        }
+    }
 
     AppTheme {
 
@@ -719,16 +1012,22 @@ fun DeviceDetailTabletScreen(navController: NavHostController) {
                                                     verticalArrangement = Arrangement.SpaceBetween // Phân bố các thành phần cách đều nhau
                                                 ) {
                                                     Text(
-                                                        text = "Dining Room",
+                                                        text = safeDevice.Name,
                                                         color = colorScheme.onPrimary,
+                                                        lineHeight = 32.sp,
+                                                        fontSize = 30.sp
                                                     ) // Tiêu đề
                                                     Spacer(modifier = Modifier.height(4.dp)) // Khoảng cách
 
                                                     // Switch bật/tắt đèn với icon
                                                     Switch(
-                                                        checked = switchState,
+                                                        checked = powerStatus,
                                                         onCheckedChange = {
                                                             //Todo: Xử lý khi tắt mở
+                                                            powerStatus = !powerStatus
+                                                            toggle = ToggleRequest(powerStatus = powerStatus) // Cập nhật toggl
+                                                            viewModel.toggleDevice(safeDevice.DeviceID, toggle)
+
                                                         }, // Hàm xử lý khi thay đổi trạng thái (để trống)
                                                         thumbContent = {
                                                             Icon(
@@ -756,7 +1055,7 @@ fun DeviceDetailTabletScreen(navController: NavHostController) {
                                                         verticalAlignment = Alignment.Bottom // Căn dưới
                                                     ) {
                                                         Text(
-                                                            "80",
+                                                            text = attribute.brightness.toString(),
                                                             fontWeight = FontWeight.Bold,
                                                             fontSize = 50.sp,
                                                             color = colorScheme.onPrimary
@@ -825,13 +1124,19 @@ fun DeviceDetailTabletScreen(navController: NavHostController) {
 
                                                         // Thanh trượt (Slider) giá trị 80
                                                         Slider(
-                                                            value = 80f,
+                                                            value = attribute.brightness!!.toFloat(),
                                                             onValueChange = {
-                                                                //Todo: Xử lý logic chọn độ sáng
-                                                            }, // Xử lý khi trượt (để trống)
-                                                            steps = 50,
-                                                            valueRange = 0f..100f,
-                                                            modifier = Modifier.width(400.dp),
+                                                                //Todo: Xử lý khi thay đổi giá trị
+                                                                // Cập nhật giá trị độ sáng
+                                                                attribute = attribute.copy(brightness = it.toInt())
+                                                            }, // Thanh trượt giá trị mặc định là 80
+                                                            onValueChangeFinished = {
+                                                                // Gửi dữ liệu lên server khi người dùng dừng thao tác kéo thanh trượt
+                                                                sendColorToServer(viewModel, safeDevice.DeviceID, attribute)
+                                                            },
+                                                            steps = 10,
+                                                            valueRange = 0f..255f,
+                                                            modifier = Modifier.fillMaxWidth(),
                                                             colors = SliderDefaults.colors(
                                                                 thumbColor = colorScheme.onPrimary,
                                                                 activeTrackColor = colorScheme.onPrimary,
@@ -880,7 +1185,11 @@ fun DeviceDetailTabletScreen(navController: NavHostController) {
                                                     horizontalAlignment = Alignment.CenterHorizontally,
                                                     verticalArrangement = Arrangement.Center
                                                 ) {
-                                                    GradientSlider()
+                                                    if (attribute.color != null) {
+                                                        SliderWith16BasicColors(safeDevice.DeviceID, attribute)
+                                                    } else {
+                                                        SliderWith16BasicColors(safeDevice.DeviceID ,AttributeRequest(brightness = 0, color = "#000000"))
+                                                    }
                                                 }
                                             }
                                         }
@@ -973,6 +1282,13 @@ fun DeviceDetailTabletScreen(navController: NavHostController) {
                                                     )
                                                 }
                                                 if (showDialog) {
+                                                    fun getIconForType(typeId: Int): String {
+                                                        return when (typeId) {
+                                                            1 -> "Fire Alarm" // Light
+                                                            2 -> "LED Light" // Fire
+                                                            else -> ""         // Biểu tượng mặc định
+                                                        }
+                                                    }
                                                     AlertDialog(
                                                         onDismissRequest = {
                                                             showDialog = false
@@ -980,9 +1296,9 @@ fun DeviceDetailTabletScreen(navController: NavHostController) {
                                                         title = { Text(text = "Thông tin thiết bị") },
                                                         text = {
                                                             Column {
-                                                                Text("ID Thiết bị: 001")
-                                                                Text("Tên thiết bị: Đèn LED phòng khách")
-                                                                Text("Loại thiết bị: Đèn chiếu sáng")
+                                                                Text("ID Thiết bị: ${safeDevice.DeviceID}")
+                                                                Text("Tên thiết bị: ${safeDevice.Name}")
+                                                                Text("Loại thiết bị: ${getIconForType(safeDevice.TypeID)}")
                                                             }
                                                         },
                                                         confirmButton = {
@@ -1122,6 +1438,8 @@ fun DeviceDetailTabletScreen(navController: NavHostController) {
                                     Button(
                                         onClick = {
                                             //Todo: Xử lý khi nhấn nút gỡ liên kết
+                                            viewModel.unlinkDevice(safeDevice.DeviceID)
+                                            navController.popBackStack()
                                         },
                                         modifier = Modifier
                                             .weight(1f) // Chia đều không gian
@@ -1148,72 +1466,153 @@ fun DeviceDetailTabletScreen(navController: NavHostController) {
 }
 
 @Composable
-fun GradientSlider() {
-    var sliderPosition by remember { mutableStateOf(0f) } // Giá trị thanh kéo từ 0 đến 1
+fun SliderWith16BasicColors(deviceID: Int, attribute: AttributeRequest) {
+    val colors = listOf(
+        Pair(Color.Black, "Black"),
+        Pair(Color.Gray, "Gray"),
+        Pair(Color.LightGray, "Light Gray"),
+        Pair(Color.White, "White"),
+        Pair(Color(0xFF800000), "Maroon"),
+        Pair(Color.Red, "Red"),
+        Pair(Color(0xFFFFA500), "Orange"),
+        Pair(Color.Yellow, "Yellow"),
+        Pair(Color(0xFF808000), "Olive"),
+        Pair(Color.Green, "Green"),
+        Pair(Color(0xFF00FF00), "Lime"),
+        Pair(Color.Cyan, "Cyan"),
+        Pair(Color(0xFF0000FF), "Blue"),
+        Pair(Color.Blue, "Navy"),
+        Pair(Color(0xFF800080), "Purple"),
+        Pair(Color.Magenta, "Fuchsia")
+    )
 
-    AppTheme {
-        val colorScheme = MaterialTheme.colorScheme
-        Column(
+    // Quản lý trạng thái sliderPosition và khởi tạo theo `inputColor`
+    var sliderPosition by remember {
+        mutableStateOf(findClosestColorPosition(parseHexToColor(attribute.color.toString()) ?: Color.Black, colors.map { it.first }))
+    }
+    var isSending by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+    val viewModel = remember {
+        DeviceDetailViewModel(application, context)
+    }
+
+    LaunchedEffect(attribute.color.toString()) {
+        // Cập nhật vị trí slider khi `inputColor` thay đổi
+        sliderPosition = findClosestColorPosition(parseHexToColor(attribute.color.toString()) ?: Color.Black, colors.map { it.first })
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Thanh gradient với 16 màu cơ bản
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .height(8.dp)
+                .drawWithCache {
+                    val gradient = Brush.horizontalGradient(
+                        colors = colors.map { it.first },
+                        startX = 0f,
+                        endX = size.width
+                    )
+                    onDrawBehind {
+                        drawRect(brush = gradient, size = size)
+                    }
+                }
         ) {
-            // Thanh Slider có nền gradient (kích thước nhỏ)
-            Box(
+            Slider(
+                value = sliderPosition,
+                onValueChange = { sliderPosition = it },
+                onValueChangeFinished = {
+                    val currentColorIndex = (sliderPosition * (colors.size - 1)).toInt()
+                    val selectedColor = colors[currentColorIndex].first
+
+                    attribute.color = colorToHex(selectedColor)
+
+                    println("Selected color: ${colorToHex(selectedColor)}")
+                    isSending = true
+                    sendColorToServer(viewModel, deviceID, attribute)
+                    isSending = false
+                },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(8.dp) // Điều chỉnh chiều cao của thanh Gradient
-                    .drawWithCache {
-                        val gradient = Brush.horizontalGradient(
-                            colors = listOf(
-                                Color.Red,
-                                Color.Yellow,
-                                Color.Green,
-                                Color.Cyan,
-                                Color.Blue,
-                                Color.Magenta,
-                                Color.Red
-                            ),
-                            startX = 0f,
-                            endX = size.width
-                        )
-                        onDrawBehind {
-                            drawRect(brush = gradient, size = size)
-                        }
-                    }
-            ) {
-                Slider(
-                    value = sliderPosition,
-                    onValueChange = { sliderPosition = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(8.dp), // Kích thước Slider (track bar nhỏ hơn)
-                    colors = SliderDefaults.colors(
-                        thumbColor = colorScheme.onPrimary,
-                        activeTrackColor = colorScheme.onPrimary,
-                        activeTickColor = colorScheme.secondary,
-                        inactiveTrackColor = colorScheme.secondary,
-                        inactiveTickColor = colorScheme.onSecondary
-                    )
+                    .height(8.dp),
+                colors = SliderDefaults.colors(
+                    thumbColor = Color.Black,
+                    activeTrackColor = Color.Transparent,
+                    inactiveTrackColor = Color.Transparent
                 )
-            }
+            )
+        }
+
+        // Hiển thị màu hiện tại từ slider
+        val currentColorIndex = (sliderPosition * (colors.size - 1)).toInt()
+        val currentColor = colors[currentColorIndex].first
+        val colorName = colors[currentColorIndex].second
+        val colorHex = colorToHex(currentColor)
+
+        Text(
+            text = "Màu hiện tại: $colorName ($colorHex)",
+            color = currentColor,
+            modifier = Modifier.padding(top = 16.dp)
+        )
+    }
+}
+
+// Hàm giả lập gửi màu lên server
+fun sendColorToServer(viewModel: DeviceDetailViewModel, deviceID: Int, attributeDevice: AttributeRequest) {
+    viewModel.viewModelScope.launch {
+        viewModel.attributeDevice(deviceID, attributeDevice)
+        println("Data sent successfully.")
+    }
+}
+
+// Hàm chuyển đổi mã hex sang Color
+fun parseHexToColor(hex: String): Color? {
+    return try {
+        val colorInt = android.graphics.Color.parseColor(hex)
+        Color(colorInt)
+    } catch (e: IllegalArgumentException) {
+        null // Trả về null nếu mã màu không hợp lệ
+    }
+}
+
+// Hàm tìm vị trí gần nhất của màu trong danh sách
+fun findClosestColorPosition(targetColor: Color, colors: List<Color>): Float {
+    var closestIndex = 0
+    var minDistance = Float.MAX_VALUE
+
+    colors.forEachIndexed { index, color ->
+        val distance = colorDistance(targetColor, color)
+        if (distance < minDistance) {
+            minDistance = distance
+            closestIndex = index
         }
     }
 
+    return closestIndex.toFloat() / (colors.size - 1)
 }
 
-// Hàm tính màu tại vị trí slider
-@Composable
-fun calculateGradientColor(position: Float): Color {
-    val colors = listOf(
-        Color.Red, Color.Yellow, Color.Green, Color.Cyan, Color.Blue, Color.Magenta, Color.Red
-    )
-    val index = (position * (colors.size - 1)).toInt()
-    val startColor = colors[index]
-    val endColor = colors[(index + 1).coerceAtMost(colors.size - 1)]
-    val fraction = position * (colors.size - 1) - index
-    return lerp(startColor, endColor, fraction)
+// Hàm tính khoảng cách giữa hai màu
+fun colorDistance(color1: Color, color2: Color): Float {
+    val rDiff = color1.red - color2.red
+    val gDiff = color1.green - color2.green
+    val bDiff = color1.blue - color2.blue
+    return rDiff * rDiff + gDiff * gDiff + bDiff * bDiff
+}
+
+// Hàm chuyển đổi Color sang mã hex
+fun colorToHex(color: Color): String {
+    val argb = color.toArgb()
+    val r = (argb shr 16) and 0xFF
+    val g = (argb shr 8) and 0xFF
+    val b = argb and 0xFF
+    return String.format("#%02X%02X%02X", r, g, b)
 }
 
 @SuppressLint("FrequentlyChangedStateReadInComposition")
@@ -1487,17 +1886,4 @@ fun DayItem(day: String, isSelected: Boolean, onDayClicked: () -> Unit) {
             textAlign = TextAlign.Center
         )
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PhonePreview() {
-    DeviceDetailPhoneScreen(navController = rememberNavController())
-}
-
-
-@Preview(showBackground = true, showSystemUi = true, device = Devices.PIXEL_TABLET)
-@Composable
-fun TabletPreview() {
-    DeviceDetailTabletScreen(navController = rememberNavController())
 }

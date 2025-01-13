@@ -69,10 +69,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.HouseSelection
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.DeviceDetailViewModel
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.toggletate
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.login.LoginUiState
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
@@ -355,9 +359,10 @@ fun DeviceScreen(
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     items(devices) {device ->
+                                        val matchedSpace = spaces.find { it.SpaceID == device.SpaceID }
                                         SmartCard(
                                             device = device,
-                                            isTablet = true,
+                                            nameSpace = matchedSpace!!.Name,
                                             navController = navController
                                         )
                                     }
@@ -417,10 +422,43 @@ fun CustomScrollableTabRow(
 @Composable
 fun SmartCard(
     device: DeviceResponse, // Nhận thông tin thiết bị từ ViewModel
-    isTablet: Boolean,
-    switchState: Boolean = true,
+    nameSpace: String,
     navController: NavHostController) {
     val endPadding = 32.dp
+
+    var powerStatus by remember { mutableStateOf(device.PowerStatus)}
+
+    // Khởi tạo toggle
+    var toggle by remember {
+        mutableStateOf(ToggleRequest(powerStatus = powerStatus))
+    }
+
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+    val viewModel = remember {
+        DeviceViewModel(application, context)
+    }
+
+    var toggleDevice by remember { mutableStateOf<ToggleResponse?>(null) }
+    val toggleDeviceState by viewModel.toggleState.collectAsState()
+
+    when(toggleDeviceState){
+        is ToggleState.Error ->{
+            Log.e("Error", (toggleDeviceState as ToggleState.Error).error)
+        }
+        is ToggleState.Idle ->{
+            //Todo
+        }
+        is ToggleState.Loading -> {
+            //Todo
+        }
+        is ToggleState.Success -> {
+            val successState = toggleDeviceState as ToggleState.Success
+            toggleDevice = successState.toggle
+            Log.e("toggle Device", toggleDevice.toString())
+        }
+    }
+
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
         Card(
@@ -432,7 +470,8 @@ fun SmartCard(
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
             onClick = {
                 //Todo: Xử lý chuyển tới trang chi tiết thiết bị
-                navController.navigate("device_detail")
+                navController.navigate("device/${device.TypeID}/${device.DeviceID}")
+
             }
         ) {
             Column(
@@ -451,7 +490,7 @@ fun SmartCard(
                             color = colorScheme.onPrimary
                         )
                         Text(
-                            text = "Dining Room | Tue Thu",
+                            text = "$nameSpace | Tue Thu",
                             fontSize = 12.sp,
                             color = colorScheme.onSecondary
                         )
@@ -463,15 +502,18 @@ fun SmartCard(
                         contentAlignment = Alignment.Center
                     ) {
                         Switch(
-                            checked = switchState,
+                            checked = powerStatus,
                             onCheckedChange = {
                                 //Todo: Xử lý tắt mở thiết bị
+                                powerStatus = !powerStatus
+                                toggle = ToggleRequest(powerStatus = powerStatus)
+                                viewModel.toggleDevice(device.DeviceID, toggle)
                             },
                             thumbContent = {
                                 Icon(
-                                    imageVector = if (switchState) Icons.Filled.Check else Icons.Filled.Close,
+                                    imageVector = if (powerStatus) Icons.Filled.Check else Icons.Filled.Close,
                                     contentDescription = "On/Off Switch",
-                                    tint = if (switchState) colorScheme.onPrimary else colorScheme.onSecondary.copy(
+                                    tint = if (powerStatus) colorScheme.onPrimary else colorScheme.onSecondary.copy(
                                         alpha = 0.8f
                                     )
                                 )
@@ -491,7 +533,7 @@ fun SmartCard(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.wrapContentWidth()
                 ) {
-                    DeviceInfoSection("8 pm", "8 am", endPadding)
+                    DeviceInfoSection(device.TypeID, "8 pm", "8 am", endPadding)
 
                     Column(
                         horizontalAlignment = Alignment.End,
@@ -508,18 +550,23 @@ fun SmartCard(
     }
 }
 
-
-
-
 @Composable
-fun DeviceInfoSection(fromTime: String, toTime: String, endPadding: Dp) {
+fun DeviceInfoSection(typeID: Int, fromTime: String, toTime: String, endPadding: Dp) {
+    fun getIconForType(typeId: Int): String {
+        return when (typeId) {
+            1 -> "\uD83D\uDD25" // Fire
+            2 -> "\uD83D\uDCA1" // Light
+            else -> "❓"         // Biểu tượng mặc định
+        }
+    }
+
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
         Row(
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconBox("\uD83D\uDCA1", colorScheme.background)
+            IconBox(getIconForType(typeID), colorScheme.background)
             TimeInfo("from", fromTime)
             DividerLine(endPadding)
             TimeInfo("to", toTime)
@@ -543,7 +590,6 @@ fun ExtraInfoSection(label: String, value: String, endPadding: Dp) {
         DividerLine(endPadding)
     }
 }
-
 
 @Composable
 fun IconBox(icon: String, color: Color) {
