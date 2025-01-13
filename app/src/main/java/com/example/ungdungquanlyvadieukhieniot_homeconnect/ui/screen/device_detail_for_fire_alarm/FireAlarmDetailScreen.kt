@@ -259,7 +259,9 @@ fun FireAlarmDetailScreen(
                                                 ) {
                                                     Text(
                                                         text = safeDevice.Name,
-                                                        color = colorScheme.onPrimary // Màu chữ trắng
+                                                        color = colorScheme.onPrimary, // Màu chữ trắng
+                                                        lineHeight = 32.sp,
+                                                        fontSize = 30.sp
                                                     ) // Tiêu đề
                                                     Spacer(modifier = Modifier.height(4.dp)) // Khoảng cách giữa các thành phần
 
