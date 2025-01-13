@@ -42,6 +42,7 @@ import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -78,6 +79,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AttributeRequest
@@ -167,6 +169,7 @@ fun DeviceDetailPhoneScreen(
     infoDevice: DeviceResponse?
 ) {
     AppTheme {
+        val colorScheme = MaterialTheme.colorScheme
         var rowWidth by remember { mutableStateOf(0) }
         var selectedTimeBegin by remember { mutableStateOf("12:00 AM") }
         var selectedTimeEnd by remember { mutableStateOf("12:00 AM") }
@@ -181,7 +184,7 @@ fun DeviceDetailPhoneScreen(
             DeviceDetailViewModel(application, context)
         }
 
-        var toggleDevice by remember { mutableStateOf<ToggleResponse?>(null) } // Lắng nghe danh sách thiết bị
+        var toggleDevice by remember { mutableStateOf<ToggleResponse?>(null) }
         val toggleDeviceState by viewModel.toggleState.collectAsState()
 
         when(toggleDeviceState){
@@ -250,7 +253,26 @@ fun DeviceDetailPhoneScreen(
             mutableStateOf(ToggleRequest(powerStatus = powerStatus))
         }
 
-        val colorScheme = MaterialTheme.colorScheme
+        val attributeState by viewModel.attributeState.collectAsState()
+
+        when(attributeState){
+            is AttributeState.Error ->{
+                Log.e("Error",  (attributeState as AttributeState.Error).error)
+            }
+            is AttributeState.Idle ->{
+                //Todo
+            }
+            is AttributeState.Loading -> {
+                CircularProgressIndicator()
+            }
+            is AttributeState.Success -> {
+                val successState = attributeState as AttributeState.Success
+                safeDevice = successState.device
+                Log.d("Attribute Device", (attributeState as AttributeState.Success).message)
+                Log.d("Attribute Device - toggleDevice", safeDevice.toString())
+            }
+        }
+
         Scaffold(
             topBar = {
                 /*
@@ -437,7 +459,7 @@ fun DeviceDetailPhoneScreen(
                                                         }, // Thanh trượt giá trị mặc định là 80
                                                         onValueChangeFinished = {
                                                             // Gửi dữ liệu lên server khi người dùng dừng thao tác kéo thanh trượt
-                                                            println("Gửi độ sáng lên server: ${attribute.brightness}")
+                                                            sendColorToServer(viewModel, safeDevice.DeviceID, attribute)
                                                         },
                                                         steps = 10,
                                                         valueRange = 0f..255f,
@@ -482,9 +504,9 @@ fun DeviceDetailPhoneScreen(
                                                 verticalArrangement = Arrangement.Top
                                             ) {
                                                 if (attribute.color != null) {
-                                                    SliderWith16BasicColors(attribute.color.toString())
+                                                    SliderWith16BasicColors(safeDevice.DeviceID, attribute)
                                                 } else {
-                                                    SliderWith16BasicColors("#000000")
+                                                    SliderWith16BasicColors(safeDevice.DeviceID ,AttributeRequest(brightness = 0, color = "#000000"))
                                                 }
                                             }
                                         }
@@ -837,6 +859,23 @@ fun DeviceDetailTabletScreen(
         mutableStateOf(ToggleRequest(powerStatus = powerStatus))
     }
 
+    val attributeState by viewModel.attributeState.collectAsState()
+
+    when(attributeState){
+        is AttributeState.Error ->{
+            Log.e("Error",  (attributeState as AttributeState.Error).error)
+        }
+        is AttributeState.Idle ->{
+            //Todo
+        }
+        is AttributeState.Loading -> {
+            CircularProgressIndicator()
+        }
+        is AttributeState.Success -> {
+            Log.d("Attribute Device", (attributeState as AttributeState.Success).message)
+        }
+    }
+
     AppTheme {
 
         val colorScheme = MaterialTheme.colorScheme
@@ -1089,9 +1128,9 @@ fun DeviceDetailTabletScreen(
                                                     verticalArrangement = Arrangement.Center
                                                 ) {
                                                     if (attribute.color != null) {
-                                                        SliderWith16BasicColors(attribute.color.toString())
+                                                        SliderWith16BasicColors(safeDevice.DeviceID, attribute)
                                                     } else {
-                                                        SliderWith16BasicColors("#000000")
+                                                        SliderWith16BasicColors(safeDevice.DeviceID ,AttributeRequest(brightness = 0, color = "#000000"))
                                                     }
                                                 }
                                             }
@@ -1360,7 +1399,7 @@ fun DeviceDetailTabletScreen(
 }
 
 @Composable
-fun SliderWith16BasicColors(inputColor: String) {
+fun SliderWith16BasicColors(deviceID: Int, attribute: AttributeRequest) {
     val colors = listOf(
         Pair(Color.Black, "Black"),
         Pair(Color.Gray, "Gray"),
@@ -1382,13 +1421,19 @@ fun SliderWith16BasicColors(inputColor: String) {
 
     // Quản lý trạng thái sliderPosition và khởi tạo theo `inputColor`
     var sliderPosition by remember {
-        mutableStateOf(findClosestColorPosition(parseHexToColor(inputColor) ?: Color.Black, colors.map { it.first }))
+        mutableStateOf(findClosestColorPosition(parseHexToColor(attribute.color.toString()) ?: Color.Black, colors.map { it.first }))
     }
     var isSending by remember { mutableStateOf(false) }
 
-    LaunchedEffect(inputColor) {
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+    val viewModel = remember {
+        DeviceDetailViewModel(application, context)
+    }
+
+    LaunchedEffect(attribute.color.toString()) {
         // Cập nhật vị trí slider khi `inputColor` thay đổi
-        sliderPosition = findClosestColorPosition(parseHexToColor(inputColor) ?: Color.Black, colors.map { it.first })
+        sliderPosition = findClosestColorPosition(parseHexToColor(attribute.color.toString()) ?: Color.Black, colors.map { it.first })
     }
 
     Column(
@@ -1420,11 +1465,12 @@ fun SliderWith16BasicColors(inputColor: String) {
                     val currentColorIndex = (sliderPosition * (colors.size - 1)).toInt()
                     val selectedColor = colors[currentColorIndex].first
 
-                    // Gửi dữ liệu lên server khi kéo xong
+                    attribute.color = colorToHex(selectedColor)
+
+                    println("Selected color: ${colorToHex(selectedColor)}")
                     isSending = true
-                    sendColorToServer(colorToHex(selectedColor)) {
-                        isSending = false
-                    }
+                    sendColorToServer(viewModel, deviceID, attribute)
+                    isSending = false
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -1435,11 +1481,6 @@ fun SliderWith16BasicColors(inputColor: String) {
                     inactiveTrackColor = Color.Transparent
                 )
             )
-        }
-
-        // Hiển thị trạng thái gửi
-        if (isSending) {
-            Text("Đang gửi dữ liệu...")
         }
 
         // Hiển thị màu hiện tại từ slider
@@ -1457,9 +1498,11 @@ fun SliderWith16BasicColors(inputColor: String) {
 }
 
 // Hàm giả lập gửi màu lên server
-fun sendColorToServer(colorHex: String, onComplete: () -> Unit) {
-    println("Gửi màu lên server: $colorHex")
-    onComplete()
+fun sendColorToServer(viewModel: DeviceDetailViewModel, deviceID: Int, attributeDevice: AttributeRequest) {
+    viewModel.viewModelScope.launch {
+        viewModel.attributeDevice(deviceID, attributeDevice)
+        println("Data sent successfully.")
+    }
 }
 
 // Hàm chuyển đổi mã hex sang Color
