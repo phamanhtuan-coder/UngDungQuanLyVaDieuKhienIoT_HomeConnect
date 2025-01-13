@@ -275,6 +275,23 @@ fun DeviceDetailPhoneScreen(
             }
         }
 
+        val unlinkState by viewModel.unlinkState.collectAsState()
+
+        when(unlinkState){
+            is UnlinkState.Error ->{
+                Log.e("Error Unlink Device",  (unlinkState as UnlinkState.Error).error)
+            }
+            is UnlinkState.Idle ->{
+                //Todo
+            }
+            is UnlinkState.Loading -> {
+                CircularProgressIndicator()
+            }
+            is UnlinkState.Success -> {
+                Log.d("Unlink Device", (unlinkState as UnlinkState.Success).message)
+            }
+        }
+
         Scaffold(
             topBar = {
                 /*
@@ -758,6 +775,8 @@ fun DeviceDetailPhoneScreen(
                                 Button(
                                     onClick = {
                                         //Todo: Xử lý khi nhấn nút Gỡ kết nối
+                                        viewModel.unlinkDevice(safeDevice.DeviceID)
+                                        navController.popBackStack()
                                     },
                                     modifier = Modifier
                                         .weight(1f) // Chia đều không gian
@@ -887,6 +906,23 @@ fun DeviceDetailTabletScreen(
         }
         is AttributeState.Success -> {
             Log.d("Attribute Device", (attributeState as AttributeState.Success).message)
+        }
+    }
+
+    val unlinkState by viewModel.unlinkState.collectAsState()
+
+    when(unlinkState){
+        is UnlinkState.Error ->{
+            Log.e("Error",  (unlinkState as UnlinkState.Error).error)
+        }
+        is UnlinkState.Idle ->{
+            //Todo
+        }
+        is UnlinkState.Loading -> {
+            CircularProgressIndicator()
+        }
+        is UnlinkState.Success -> {
+            Log.d("Unlink Device", (unlinkState as UnlinkState.Success).message)
         }
     }
 
@@ -1402,6 +1438,8 @@ fun DeviceDetailTabletScreen(
                                     Button(
                                         onClick = {
                                             //Todo: Xử lý khi nhấn nút gỡ liên kết
+                                            viewModel.unlinkDevice(safeDevice.DeviceID)
+                                            navController.popBackStack()
                                         },
                                         modifier = Modifier
                                             .weight(1f) // Chia đều không gian
