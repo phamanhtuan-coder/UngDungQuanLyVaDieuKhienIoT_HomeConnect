@@ -2,6 +2,8 @@ package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_det
 
 
 import android.annotation.SuppressLint
+import android.app.Application
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -50,6 +52,7 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,6 +68,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -78,6 +82,7 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
@@ -85,6 +90,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.Devi
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlin.Int
 
 /** Giao diện màn hình Device Detail (DeviceDetailScreen)
  * -----------------------------------------
@@ -110,24 +116,58 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun DeviceDetailScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    deviceID: Int?
 ) {
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+    val viewModel = remember {
+        DeviceDetailViewModel(application, context)
+    }
+
+    var infoDevice by remember { mutableStateOf<DeviceResponse?>(null) } // Lắng nghe danh sách thiết bị
+    val infoDeviceState by viewModel.infoDeviceState.collectAsState()
+
+    when(infoDeviceState){
+        is getInfoDeviceState.Error ->{
+            Log.d("Error",  (infoDeviceState as getInfoDeviceState.Error).error)
+        }
+        is getInfoDeviceState.Idle ->{
+            //Todo
+        }
+        is getInfoDeviceState.Loading -> {
+            //Todo
+        }
+        is getInfoDeviceState.Success -> {
+            infoDevice = (infoDeviceState as getInfoDeviceState.Success).device
+            Log.d("List Device", (infoDeviceState as getInfoDeviceState.Success).device.toString())
+        }
+    }
+
+    LaunchedEffect(1) {
+//        selectedSpaceId?.let { spaceId ->
+//            viewModel.loadDevices(spaceId) // Tải danh sách thiết bị khi Space thay đổi
+//        }
+        viewModel.getInfoDevice(deviceID!!)
+    }
+
     val configuration = LocalConfiguration.current
     val screenWidthDp = configuration.screenWidthDp
 
     // Theo hướng dẫn Material Design, thường 600dp trở lên được xem là tablet
     if (screenWidthDp >= 600) {
         // Layout dành cho tablet
-        DeviceDetailTabletScreen(navController)
+        DeviceDetailTabletScreen(navController, infoDevice)
     } else {
         // Layout dành cho phone
-        DeviceDetailPhoneScreen(navController)
+        DeviceDetailPhoneScreen(navController, infoDevice)
     }
 }
 
 @Composable
 fun DeviceDetailPhoneScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    infoDevice: DeviceResponse?
 ) {
     AppTheme {
         var rowWidth by remember { mutableStateOf(0) }
@@ -137,6 +177,13 @@ fun DeviceDetailPhoneScreen(
         var showDialogTimePickerEnd by remember { mutableStateOf(false) }
         var showDialog by remember { mutableStateOf(false) }
         var switchState by remember { mutableStateOf(true) }
+
+        val safeDevice = infoDevice ?: DeviceResponse(
+            DeviceID = 0,
+            TypeID = 0,
+            Name = "",
+            PowerStatus = false,
+        )
 
         val colorScheme = MaterialTheme.colorScheme
         Scaffold(
@@ -220,14 +267,14 @@ fun DeviceDetailPhoneScreen(
                                                     verticalArrangement = Arrangement.SpaceBetween // Các thành phần cách đều nhau
                                                 ) {
                                                     Text(
-                                                        text = "Dining Room",
+                                                        text = safeDevice.Name,
                                                         color = colorScheme.onPrimary // Màu chữ trắng
                                                     ) // Tiêu đề
                                                     Spacer(modifier = Modifier.height(4.dp)) // Khoảng cách giữa các thành phần
 
                                                     // Switch bật/tắt đèn
                                                     Switch(
-                                                        checked = switchState,
+                                                        checked = safeDevice.PowerStatus,
                                                         onCheckedChange = {
                                                             //Todo: Xử lý tắt mở thiết bị
                                                         },
@@ -622,7 +669,10 @@ fun DeviceDetailPhoneScreen(
 }
 
 @Composable
-fun DeviceDetailTabletScreen(navController: NavHostController) {
+fun DeviceDetailTabletScreen(
+    navController: NavHostController,
+    infoDevice: DeviceResponse?
+) {
     var rowWidth by remember { mutableStateOf<Int?>(null) }
     var selectedTimeBegin by remember { mutableStateOf("12:00 AM") }
     var selectedTimeEnd by remember { mutableStateOf("12:00 AM") }
@@ -632,6 +682,12 @@ fun DeviceDetailTabletScreen(navController: NavHostController) {
 
     var switchState by remember { mutableStateOf(true) }
 
+    val safeDevice = infoDevice ?: DeviceResponse(
+        DeviceID = 0,
+        TypeID = 0,
+        Name = "",
+        PowerStatus = false,
+    )
 
     AppTheme {
 
@@ -719,14 +775,14 @@ fun DeviceDetailTabletScreen(navController: NavHostController) {
                                                     verticalArrangement = Arrangement.SpaceBetween // Phân bố các thành phần cách đều nhau
                                                 ) {
                                                     Text(
-                                                        text = "Dining Room",
+                                                        text = safeDevice.Name,
                                                         color = colorScheme.onPrimary,
                                                     ) // Tiêu đề
                                                     Spacer(modifier = Modifier.height(4.dp)) // Khoảng cách
 
                                                     // Switch bật/tắt đèn với icon
                                                     Switch(
-                                                        checked = switchState,
+                                                        checked = safeDevice.PowerStatus,
                                                         onCheckedChange = {
                                                             //Todo: Xử lý khi tắt mở
                                                         }, // Hàm xử lý khi thay đổi trạng thái (để trống)
@@ -1487,17 +1543,4 @@ fun DayItem(day: String, isSelected: Boolean, onDayClicked: () -> Unit) {
             textAlign = TextAlign.Center
         )
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PhonePreview() {
-    DeviceDetailPhoneScreen(navController = rememberNavController())
-}
-
-
-@Preview(showBackground = true, showSystemUi = true, device = Devices.PIXEL_TABLET)
-@Composable
-fun TabletPreview() {
-    DeviceDetailTabletScreen(navController = rememberNavController())
 }
