@@ -5,13 +5,11 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AttributeRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RegisterRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.repository.DeviceRepository
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.repository.SpaceRepository
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.SpaceState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -29,6 +27,14 @@ sealed class toggletate {
     data class Success(val toggle: ToggleResponse) : toggletate()
     data class Error(val error: String) : toggletate()
 }
+
+sealed class AttributeState {
+    object Idle : AttributeState()               // Chưa làm gì
+    object Loading : AttributeState()           // Đang loading
+    data class Success(val message: String, val device: DeviceResponse) :AttributeState()
+    data class Error(val error: String) : AttributeState()
+}
+
 
 class DeviceDetailViewModel(application: Application, context: Context) : AndroidViewModel(application) {
     private val repository = DeviceRepository(context) // Repository để quản lý cả Spaces và Devices
@@ -63,6 +69,22 @@ class DeviceDetailViewModel(application: Application, context: Context) : Androi
             } catch (e: Exception) {
                 Log.e("DeviceDetailViewModel", "Error fetching toggle: ${e.message}")
                 _toggleState.value = toggletate.Error(e.message ?: "Load thất bại!")
+            }
+        }
+    }
+
+    private val _attributeState = MutableStateFlow<AttributeState>(AttributeState.Idle)
+    val attributeState = _attributeState.asStateFlow()
+
+    fun attributeDevice(deviceId: Int, attribute: AttributeRequest) {
+        viewModelScope.launch {
+            try {
+                _attributeState.value = AttributeState.Loading
+                val response = repository.postAttributeDevice(deviceId, attribute)
+                _attributeState.value = AttributeState.Success(response.message, response.device)
+            } catch (e: Exception) {
+                Log.e("DeviceDetailViewModel", "Error fetching attribute: ${e.message}")
+                _attributeState.value = AttributeState.Error(e.message ?: "Load thất bại!")
             }
         }
     }
