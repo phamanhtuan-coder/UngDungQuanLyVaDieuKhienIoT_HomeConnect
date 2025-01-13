@@ -148,6 +148,7 @@ fun FireAlarmDetailScreen(
             TypeID = 0,
             Name = "",
             PowerStatus = false,
+            Attribute = ""
         )
 
         Log.e("safeDevice", safeDevice.toString())
@@ -158,6 +159,7 @@ fun FireAlarmDetailScreen(
                 TypeID = 0,
                 Name = "",
                 PowerStatus = false,
+                Attribute = ""
             )
         }
 
