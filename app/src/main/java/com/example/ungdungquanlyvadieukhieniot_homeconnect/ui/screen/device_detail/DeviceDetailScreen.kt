@@ -56,7 +56,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -72,7 +71,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -80,13 +78,13 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.DeviceScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -178,12 +176,61 @@ fun DeviceDetailPhoneScreen(
         var showDialog by remember { mutableStateOf(false) }
         var switchState by remember { mutableStateOf(true) }
 
-        val safeDevice = infoDevice ?: DeviceResponse(
+        val context = LocalContext.current
+        val application = context.applicationContext as Application
+        val viewModel = remember {
+            DeviceDetailViewModel(application, context)
+        }
+
+        var toggleDevice by remember { mutableStateOf<ToggleResponse?>(null) } // Lắng nghe danh sách thiết bị
+        val toggleDeviceState by viewModel.toggleState.collectAsState()
+
+        when(toggleDeviceState){
+            is toggletate.Error ->{
+                Log.e("Error", (toggleDeviceState as toggletate.Error).error)
+            }
+            is toggletate.Idle ->{
+                //Todo
+            }
+            is toggletate.Loading -> {
+                //Todo
+            }
+            is toggletate.Success -> {
+                val successState = toggleDeviceState as toggletate.Success
+                toggleDevice = successState.toggle
+                Log.e("toggle Device", toggleDevice.toString())
+            }
+        }
+
+        var safeDevice = infoDevice ?: DeviceResponse(
             DeviceID = 0,
             TypeID = 0,
             Name = "",
             PowerStatus = false,
         )
+
+        Log.e("safeDevice", safeDevice.toString())
+
+        LaunchedEffect(toggleDevice) {
+            safeDevice = infoDevice ?: DeviceResponse(
+                DeviceID = 0,
+                TypeID = 0,
+                Name = "",
+                PowerStatus = false,
+            )
+        }
+
+        var powerStatus by remember { mutableStateOf(false)}
+
+        LaunchedEffect(safeDevice) {
+            powerStatus = safeDevice.PowerStatus
+        }
+
+        Log.e("powerStatus", powerStatus.toString())
+        // Khởi tạo toggle
+        var toggle by remember {
+            mutableStateOf(ToggleRequest(powerStatus = powerStatus))
+        }
 
         val colorScheme = MaterialTheme.colorScheme
         Scaffold(
@@ -274,9 +321,13 @@ fun DeviceDetailPhoneScreen(
 
                                                     // Switch bật/tắt đèn
                                                     Switch(
-                                                        checked = safeDevice.PowerStatus,
+                                                        checked = powerStatus,
                                                         onCheckedChange = {
                                                             //Todo: Xử lý tắt mở thiết bị
+                                                            powerStatus = !powerStatus
+                                                            Log.e("powerStatus click",  powerStatus.toString())
+                                                            toggle = ToggleRequest(powerStatus = powerStatus) // Cập nhật toggl
+                                                            viewModel.toggleDevice(safeDevice.DeviceID, toggle)
                                                         },
                                                         thumbContent = {
                                                             Icon(
@@ -682,12 +733,61 @@ fun DeviceDetailTabletScreen(
 
     var switchState by remember { mutableStateOf(true) }
 
-    val safeDevice = infoDevice ?: DeviceResponse(
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+    val viewModel = remember {
+        DeviceDetailViewModel(application, context)
+    }
+
+    var toggleDevice by remember { mutableStateOf<ToggleResponse?>(null) } // Lắng nghe danh sách thiết bị
+    val toggleDeviceState by viewModel.toggleState.collectAsState()
+
+    when(toggleDeviceState){
+        is toggletate.Error ->{
+            Log.e("Error", (toggleDeviceState as toggletate.Error).error)
+        }
+        is toggletate.Idle ->{
+            //Todo
+        }
+        is toggletate.Loading -> {
+            //Todo
+        }
+        is toggletate.Success -> {
+            val successState = toggleDeviceState as toggletate.Success
+            toggleDevice = successState.toggle
+            Log.e("toggle Device", toggleDevice.toString())
+        }
+    }
+
+
+    var safeDevice = infoDevice ?: DeviceResponse(
         DeviceID = 0,
         TypeID = 0,
         Name = "",
         PowerStatus = false,
     )
+
+    Log.e("safeDevice", safeDevice.toString())
+
+    LaunchedEffect(toggleDevice) {
+        safeDevice = infoDevice ?: DeviceResponse(
+            DeviceID = 0,
+            TypeID = 0,
+            Name = "",
+            PowerStatus = false,
+        )
+    }
+
+    var powerStatus by remember { mutableStateOf(false)}
+
+    LaunchedEffect(safeDevice) {
+        powerStatus = safeDevice.PowerStatus
+    }
+
+    // Khởi tạo toggle
+    var toggle by remember {
+        mutableStateOf(ToggleRequest(powerStatus = powerStatus))
+    }
 
     AppTheme {
 
@@ -782,9 +882,13 @@ fun DeviceDetailTabletScreen(
 
                                                     // Switch bật/tắt đèn với icon
                                                     Switch(
-                                                        checked = safeDevice.PowerStatus,
+                                                        checked = powerStatus,
                                                         onCheckedChange = {
                                                             //Todo: Xử lý khi tắt mở
+                                                            powerStatus = !powerStatus
+                                                            toggle = ToggleRequest(powerStatus = powerStatus) // Cập nhật toggl
+                                                            viewModel.toggleDevice(safeDevice.DeviceID, toggle)
+
                                                         }, // Hàm xử lý khi thay đổi trạng thái (để trống)
                                                         thumbContent = {
                                                             Icon(
