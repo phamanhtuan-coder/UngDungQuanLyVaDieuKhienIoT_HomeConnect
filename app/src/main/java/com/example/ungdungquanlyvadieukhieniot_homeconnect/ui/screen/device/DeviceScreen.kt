@@ -424,6 +424,7 @@ fun SmartCard(
     switchState: Boolean = true,
     navController: NavHostController) {
     val endPadding = 32.dp
+
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
         Card(
@@ -495,7 +496,7 @@ fun SmartCard(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.wrapContentWidth()
                 ) {
-                    DeviceInfoSection("8 pm", "8 am", endPadding)
+                    DeviceInfoSection(device.TypeID, "8 pm", "8 am", endPadding)
 
                     Column(
                         horizontalAlignment = Alignment.End,
@@ -512,18 +513,23 @@ fun SmartCard(
     }
 }
 
-
-
-
 @Composable
-fun DeviceInfoSection(fromTime: String, toTime: String, endPadding: Dp) {
+fun DeviceInfoSection(typeID: Int, fromTime: String, toTime: String, endPadding: Dp) {
+    fun getIconForType(typeId: Int): String {
+        return when (typeId) {
+            1 -> "\uD83D\uDCA1" // Light
+            2 -> "\uD83D\uDD25" // Fire
+            else -> "❓"         // Biểu tượng mặc định
+        }
+    }
+
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
         Row(
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconBox("\uD83D\uDCA1", colorScheme.background)
+            IconBox(getIconForType(typeID), colorScheme.background)
             TimeInfo("from", fromTime)
             DividerLine(endPadding)
             TimeInfo("to", toTime)
@@ -547,7 +553,6 @@ fun ExtraInfoSection(label: String, value: String, endPadding: Dp) {
         DividerLine(endPadding)
     }
 }
-
 
 @Composable
 fun IconBox(icon: String, color: Color) {
