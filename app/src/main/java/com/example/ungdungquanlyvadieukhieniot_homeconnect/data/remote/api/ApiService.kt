@@ -58,8 +58,6 @@ interface ApiService {
         @Body request: DeviceTokenRequest
     ): DeviceTokenResponse
 
-    suspend fun getListHome(@Header("Authorization") token: String): List<HouseResponse>
-
     @GET("/api/devices/{deviceId}")
     suspend fun getInfoDevice(@Path("deviceId") deviceId: Int, @Header("Authorization") token: String) : DeviceResponse
 
