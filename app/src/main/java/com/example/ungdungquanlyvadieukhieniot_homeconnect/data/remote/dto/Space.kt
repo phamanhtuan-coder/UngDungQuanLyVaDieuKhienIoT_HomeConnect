@@ -1,11 +1,11 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto
 
 data class Space(
-    val spaceID: Int,
-    val houseID: Int,
-    val name: String,
-    val isDeleted: Int,
-    val createdAt: String,
-    val updatedAt: String,
-    val house: House
+    val SpaceID: Int,
+    val HouseID: Int,
+    val Name: String,
+    val IsDeleted: Int,
+    val CreatedAt: String,
+    val UpdatedAt: String,
+    val House: House
 )

@@ -14,6 +14,6 @@ class AlertRepository(private val context: Context) {
         val token = sharedPrefs.getString("JWT_TOKEN", "") ?: ""
 
         // Gọi API
-        return apiService.getAllNotification(token = token)
+        return apiService.getAllNotification(token = "Bearer $token")
     }
 }

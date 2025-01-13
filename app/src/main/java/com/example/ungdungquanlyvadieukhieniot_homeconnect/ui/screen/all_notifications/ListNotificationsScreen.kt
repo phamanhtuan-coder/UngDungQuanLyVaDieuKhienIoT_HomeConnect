@@ -128,21 +128,14 @@ fun NotificationScreen(
                         .fillMaxSize()
                         .padding(innerPadding)
                 ) {
-                    if (errorState.isNotEmpty()) {
+
 
                         if (notifications.isEmpty()) {
                             EmptyNotificationScreen()
                         } else {
                             NotificationList(notifications, navController)
                         }
-                    } else {
-                        Text(
-                            text = errorState,
-                            color = colorScheme.error,
-                            fontSize = NotificationStyle.titleFontSize,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+
                 }
             }
         )
@@ -315,7 +308,6 @@ fun NotificationCard(notification: AlertResponse, navController: NavHostControll
                 .width(500.dp)
                 .padding(NotificationStyle.cardPadding)
                 .clickable {
-                    //Todo: Lấy id thông báo để đi tới chi tiết thông báo
                     navController.navigate("notification_detail")
                 },
             elevation = CardDefaults.cardElevation(NotificationStyle.cardElevation),
@@ -346,19 +338,19 @@ fun NotificationCard(notification: AlertResponse, navController: NavHostControll
                 // Nội dung thông báo
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Thông báo của thiết bị ${notification.device.name}",
+                        text = notification.Device.Name,
                         fontSize = NotificationStyle.titleFontSize,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = notification.message,
+                        text = notification.Message,
                         fontSize = NotificationStyle.descriptionFontSize,
                         color = colorScheme.onPrimary,
                     )
                 }
 
                 // Icon trạng thái đã đọc
-                if (notification.status) {
+                if (notification.Status) {
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = "Đã đọc",

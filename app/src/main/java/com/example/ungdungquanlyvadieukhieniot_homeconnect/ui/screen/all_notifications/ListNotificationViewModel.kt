@@ -34,6 +34,7 @@ class ListNotificationModel(application: Application, context: Context) :
             try {
                 _alertListState.value = NotificationState.Loading
                 val response = repository.getAllByUser()
+                Log.d("ListNotificationModel", "Alerts: $response")
                 _alertListState.value = NotificationState.Success(response)
             } catch (e: Exception) {
                 Log.e("ListNotificationModel", "Error fetching alerts: ${e.message}")

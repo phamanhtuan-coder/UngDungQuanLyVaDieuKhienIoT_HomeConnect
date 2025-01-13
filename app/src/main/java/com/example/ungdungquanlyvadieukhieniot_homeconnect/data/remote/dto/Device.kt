@@ -1,18 +1,18 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto
 
 data class Device(
-    val deviceID: Int,
-    val typeID: Int,
-    val spaceID: Int,
-    val userID: Int,
-    val name: String,
-    val powerStatus: Boolean,
-    val attribute: String,
-    val wifiSSID: String,
-    val wifiPassword: String,
-    val isDeleted: Boolean,
-    val createdAt: String,
-    val updatedAt: String,
-    val deviceType: DeviceType,
-    val space: Space
+    val DeviceID: Int,
+    val TypeID: Int,
+    val SpaceID: Int,
+    val UserID: Int,
+    val Name: String,
+    val PowerStatus: Boolean,
+    val Attribute: String,
+    val WifiSSID: String,
+    val WifiPassword: String,
+    val IsDeleted: Boolean,
+    val CreatedAt: String,
+    val UpdatedAt: String,
+    val DeviceType: DeviceType,
+    val Space: Space
 )

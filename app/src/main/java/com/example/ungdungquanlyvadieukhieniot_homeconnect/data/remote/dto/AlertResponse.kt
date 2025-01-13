@@ -1,13 +1,13 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto
 
 data class AlertResponse(
-    val alertID: Int,
-    val deviceID: Int,
-    val spaceID: Int,
-    val typeID: Int,
-    val message: String,
-    val timestamp: String,
-    val status: Boolean,
-    val alertTypeID: Int,
-    val device: Device
+    val AlertID: Int,
+    val DeviceID: Int,
+    val SpaceID: Int,
+    val TypeID: Int,
+    val Message: String,
+    val Timestamp: String,
+    val Status: Boolean,
+    val AlertTypeID: Int,
+    val Device: Device
 )

@@ -87,9 +87,9 @@ fun LoginScreen(
         val colorScheme = MaterialTheme.colorScheme
         // Biến trạng thái để lưu giá trị email và mật khẩu
         val emailState =
-            remember { mutableStateOf("john.doe@example.com") } //Todo: xoá email debug khi hoàn thiên app
+            remember { mutableStateOf("0306221391@caothang.edu.vn") } //Todo: xoá email debug khi hoàn thiên app
         val passwordState =
-            remember { mutableStateOf("Test123!") } //Todo: xoá password debug khi hoàn thiên app
+            remember { mutableStateOf("Tu@n1234") } //Todo: xoá password debug khi hoàn thiên app
         var passwordVisible by remember { mutableStateOf(false) }
 
         // Biến trạng thái để lưu thông báo lỗi

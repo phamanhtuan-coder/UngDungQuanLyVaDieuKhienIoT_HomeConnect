@@ -13,7 +13,6 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.activity_de
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.activity_history.ActivityHistoryScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.add_device.AddDeviceScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.add_space.AddSpaceScreen
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.all_notifications.Notification
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.all_notifications.NotificationScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.DeviceScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.DeviceDetailScreen
@@ -136,11 +135,7 @@ fun NavigationGraph(
             //Todo: Lấy dữ liệu thông báo từ server
             composable(Screens.AllNotifications.route) {
                 NotificationScreen(
-                    navController, listOf(
-                        Notification("New Feature Alert!", "We've introduced new features.", false),
-                        Notification("System Update", "Your app has been updated.", true),
-                        Notification("Reminder", "Your meeting is scheduled at 3 PM.", false)
-                    )
+                    navController
                 )
             }
 
