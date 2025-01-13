@@ -35,6 +35,12 @@ sealed class AttributeState {
     data class Error(val error: String) : AttributeState()
 }
 
+sealed class UnlinkState {
+    object Idle : UnlinkState()               // Chưa làm gì
+    object Loading : UnlinkState()           // Đang loading
+    data class Success(val message: String) : UnlinkState()
+    data class Error(val error: String) : UnlinkState()
+}
 
 class DeviceDetailViewModel(application: Application, context: Context) : AndroidViewModel(application) {
     private val repository = DeviceRepository(context) // Repository để quản lý cả Spaces và Devices
@@ -85,6 +91,22 @@ class DeviceDetailViewModel(application: Application, context: Context) : Androi
             } catch (e: Exception) {
                 Log.e("DeviceDetailViewModel", "Error fetching attribute: ${e.message}")
                 _attributeState.value = AttributeState.Error(e.message ?: "Load thất bại!")
+            }
+        }
+    }
+
+    private val _unlinkState = MutableStateFlow<UnlinkState>(UnlinkState.Idle)
+    val unlinkState = _unlinkState.asStateFlow()
+
+    fun unlinkDevice(deviceId: Int) {
+        viewModelScope.launch {
+            try {
+                _unlinkState.value = UnlinkState.Loading
+                val response = repository.postUnlink(deviceId)
+                _unlinkState.value = UnlinkState.Success(response.message)
+            } catch (e: Exception) {
+                Log.e("DeviceDetailViewModel", "Error fetching unlink: ${e.message}")
+                _unlinkState.value = UnlinkState.Error(e.message ?: "Load thất bại!")
             }
         }
     }
