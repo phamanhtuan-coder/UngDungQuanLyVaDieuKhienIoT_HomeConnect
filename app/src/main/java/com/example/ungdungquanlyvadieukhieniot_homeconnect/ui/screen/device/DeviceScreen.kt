@@ -69,10 +69,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.HouseSelection
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.DeviceDetailViewModel
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.toggletate
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.login.LoginUiState
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
@@ -359,7 +363,6 @@ fun DeviceScreen(
                                         SmartCard(
                                             device = device,
                                             nameSpace = matchedSpace!!.Name,
-                                            isTablet = true,
                                             navController = navController
                                         )
                                     }
@@ -419,11 +422,42 @@ fun CustomScrollableTabRow(
 @Composable
 fun SmartCard(
     device: DeviceResponse, // Nhận thông tin thiết bị từ ViewModel
-    isTablet: Boolean,
     nameSpace: String,
-    switchState: Boolean = true,
     navController: NavHostController) {
     val endPadding = 32.dp
+
+    var powerStatus by remember { mutableStateOf(device.PowerStatus)}
+
+    // Khởi tạo toggle
+    var toggle by remember {
+        mutableStateOf(ToggleRequest(powerStatus = powerStatus))
+    }
+
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+    val viewModel = remember {
+        DeviceViewModel(application, context)
+    }
+
+    var toggleDevice by remember { mutableStateOf<ToggleResponse?>(null) }
+    val toggleDeviceState by viewModel.toggleState.collectAsState()
+
+    when(toggleDeviceState){
+        is ToggleState.Error ->{
+            Log.e("Error", (toggleDeviceState as ToggleState.Error).error)
+        }
+        is ToggleState.Idle ->{
+            //Todo
+        }
+        is ToggleState.Loading -> {
+            //Todo
+        }
+        is ToggleState.Success -> {
+            val successState = toggleDeviceState as ToggleState.Success
+            toggleDevice = successState.toggle
+            Log.e("toggle Device", toggleDevice.toString())
+        }
+    }
 
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
@@ -468,15 +502,18 @@ fun SmartCard(
                         contentAlignment = Alignment.Center
                     ) {
                         Switch(
-                            checked = switchState,
+                            checked = powerStatus,
                             onCheckedChange = {
                                 //Todo: Xử lý tắt mở thiết bị
+                                powerStatus = !powerStatus
+                                toggle = ToggleRequest(powerStatus = powerStatus)
+                                viewModel.toggleDevice(device.DeviceID, toggle)
                             },
                             thumbContent = {
                                 Icon(
-                                    imageVector = if (switchState) Icons.Filled.Check else Icons.Filled.Close,
+                                    imageVector = if (powerStatus) Icons.Filled.Check else Icons.Filled.Close,
                                     contentDescription = "On/Off Switch",
-                                    tint = if (switchState) colorScheme.onPrimary else colorScheme.onSecondary.copy(
+                                    tint = if (powerStatus) colorScheme.onPrimary else colorScheme.onSecondary.copy(
                                         alpha = 0.8f
                                     )
                                 )
