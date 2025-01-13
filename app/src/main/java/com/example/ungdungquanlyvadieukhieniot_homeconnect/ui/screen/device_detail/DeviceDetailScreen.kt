@@ -64,7 +64,8 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.lerp
+import com.google.gson.Gson
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -79,6 +80,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Attribute
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleResponse
@@ -143,9 +145,6 @@ fun DeviceDetailScreen(
     }
 
     LaunchedEffect(1) {
-//        selectedSpaceId?.let { spaceId ->
-//            viewModel.loadDevices(spaceId) // Tải danh sách thiết bị khi Space thay đổi
-//        }
         viewModel.getInfoDevice(deviceID!!)
     }
 
@@ -202,11 +201,14 @@ fun DeviceDetailPhoneScreen(
             }
         }
 
+        var attribute by remember { mutableStateOf(Attribute(brightness = 0, color = "#000000")) }
+
         var safeDevice = infoDevice ?: DeviceResponse(
             DeviceID = 0,
             TypeID = 0,
             Name = "",
             PowerStatus = false,
+            Attribute = ""
         )
 
         Log.e("safeDevice", safeDevice.toString())
@@ -217,7 +219,23 @@ fun DeviceDetailPhoneScreen(
                 TypeID = 0,
                 Name = "",
                 PowerStatus = false,
+                Attribute = ""
             )
+        }
+
+        LaunchedEffect(safeDevice.Attribute) {
+            val attributeJson = if (safeDevice.Attribute.isNullOrEmpty()) {
+                """{"brightness":0, "color":"#000000"}""" // Giá trị mặc định
+            } else {
+                safeDevice.Attribute
+            }
+
+            Log.e("attributeJson",attributeJson.toString())
+
+            val gson = Gson()
+            attribute = gson.fromJson(attributeJson, Attribute::class.java)
+
+            Log.e("attributeJson", attribute.toString())
         }
 
         var powerStatus by remember { mutableStateOf(false)}
@@ -355,7 +373,7 @@ fun DeviceDetailPhoneScreen(
                                                         verticalAlignment = Alignment.Bottom // Canh các thành phần theo đáy
                                                     ) {
                                                         Text(
-                                                            "80",
+                                                            text = attribute.brightness.toString(),
                                                             fontWeight = FontWeight.Bold,
                                                             fontSize = 50.sp,
                                                             color = colorScheme.onPrimary
@@ -411,12 +429,18 @@ fun DeviceDetailPhoneScreen(
                                                         colorFilter = ColorFilter.tint(colorScheme.onPrimary) // Màu chữ trắng
                                                     )
                                                     Slider(
-                                                        value = 80f,
+                                                        value = attribute.brightness!!.toFloat(),
                                                         onValueChange = {
                                                             //Todo: Xử lý khi thay đổi giá trị
+                                                            // Cập nhật giá trị độ sáng
+                                                            attribute = attribute.copy(brightness = it.toInt())
                                                         }, // Thanh trượt giá trị mặc định là 80
-                                                        steps = 50,
-                                                        valueRange = 0f..100f,
+                                                        onValueChangeFinished = {
+                                                            // Gửi dữ liệu lên server khi người dùng dừng thao tác kéo thanh trượt
+                                                            println("Gửi độ sáng lên server: ${attribute.brightness}")
+                                                        },
+                                                        steps = 10,
+                                                        valueRange = 0f..255f,
                                                         modifier = Modifier.width(300.dp),
                                                         colors = SliderDefaults.colors(
                                                             thumbColor = colorScheme.onPrimary,
@@ -457,7 +481,11 @@ fun DeviceDetailPhoneScreen(
                                                 horizontalAlignment = Alignment.Start,
                                                 verticalArrangement = Arrangement.Top
                                             ) {
-                                                GradientSlider()
+                                                if (attribute.color != null) {
+                                                    SliderWith16BasicColors(attribute.color.toString())
+                                                } else {
+                                                    SliderWith16BasicColors("#000000")
+                                                }
                                             }
                                         }
                                     }
@@ -759,12 +787,14 @@ fun DeviceDetailTabletScreen(
         }
     }
 
+    var attribute by remember { mutableStateOf(Attribute(brightness = 0, color = "#000000")) }
 
     var safeDevice = infoDevice ?: DeviceResponse(
         DeviceID = 0,
         TypeID = 0,
         Name = "",
         PowerStatus = false,
+        Attribute = ""
     )
 
     Log.e("safeDevice", safeDevice.toString())
@@ -775,8 +805,26 @@ fun DeviceDetailTabletScreen(
             TypeID = 0,
             Name = "",
             PowerStatus = false,
+            Attribute = ""
         )
     }
+
+    LaunchedEffect(safeDevice.Attribute) {
+        val attributeJson = if (safeDevice.Attribute.isNullOrEmpty()) {
+            """{"brightness":0, "color":"#000000"}""" // Giá trị mặc định
+        } else {
+            safeDevice.Attribute
+        }
+
+        Log.e("attributeJson",attributeJson.toString())
+
+        val gson = Gson()
+        attribute = gson.fromJson(attributeJson, Attribute::class.java)
+
+        Log.e("attributeJson", attribute.toString())
+    }
+
+
 
     var powerStatus by remember { mutableStateOf(false)}
 
@@ -1040,7 +1088,11 @@ fun DeviceDetailTabletScreen(
                                                     horizontalAlignment = Alignment.CenterHorizontally,
                                                     verticalArrangement = Arrangement.Center
                                                 ) {
-                                                    GradientSlider()
+                                                    if (attribute.color != null) {
+                                                        SliderWith16BasicColors(attribute.color.toString())
+                                                    } else {
+                                                        SliderWith16BasicColors("#000000")
+                                                    }
                                                 }
                                             }
                                         }
@@ -1308,72 +1360,149 @@ fun DeviceDetailTabletScreen(
 }
 
 @Composable
-fun GradientSlider() {
-    var sliderPosition by remember { mutableStateOf(0f) } // Giá trị thanh kéo từ 0 đến 1
+fun SliderWith16BasicColors(inputColor: String) {
+    val colors = listOf(
+        Pair(Color.Black, "Black"),
+        Pair(Color.Gray, "Gray"),
+        Pair(Color.LightGray, "Light Gray"),
+        Pair(Color.White, "White"),
+        Pair(Color(0xFF800000), "Maroon"),
+        Pair(Color.Red, "Red"),
+        Pair(Color(0xFFFFA500), "Orange"),
+        Pair(Color.Yellow, "Yellow"),
+        Pair(Color(0xFF808000), "Olive"),
+        Pair(Color.Green, "Green"),
+        Pair(Color(0xFF00FF00), "Lime"),
+        Pair(Color.Cyan, "Cyan"),
+        Pair(Color(0xFF0000FF), "Blue"),
+        Pair(Color.Blue, "Navy"),
+        Pair(Color(0xFF800080), "Purple"),
+        Pair(Color.Magenta, "Fuchsia")
+    )
 
-    AppTheme {
-        val colorScheme = MaterialTheme.colorScheme
-        Column(
+    // Quản lý trạng thái sliderPosition và khởi tạo theo `inputColor`
+    var sliderPosition by remember {
+        mutableStateOf(findClosestColorPosition(parseHexToColor(inputColor) ?: Color.Black, colors.map { it.first }))
+    }
+    var isSending by remember { mutableStateOf(false) }
+
+    LaunchedEffect(inputColor) {
+        // Cập nhật vị trí slider khi `inputColor` thay đổi
+        sliderPosition = findClosestColorPosition(parseHexToColor(inputColor) ?: Color.Black, colors.map { it.first })
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Thanh gradient với 16 màu cơ bản
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .height(8.dp)
+                .drawWithCache {
+                    val gradient = Brush.horizontalGradient(
+                        colors = colors.map { it.first },
+                        startX = 0f,
+                        endX = size.width
+                    )
+                    onDrawBehind {
+                        drawRect(brush = gradient, size = size)
+                    }
+                }
         ) {
-            // Thanh Slider có nền gradient (kích thước nhỏ)
-            Box(
+            Slider(
+                value = sliderPosition,
+                onValueChange = { sliderPosition = it },
+                onValueChangeFinished = {
+                    val currentColorIndex = (sliderPosition * (colors.size - 1)).toInt()
+                    val selectedColor = colors[currentColorIndex].first
+
+                    // Gửi dữ liệu lên server khi kéo xong
+                    isSending = true
+                    sendColorToServer(colorToHex(selectedColor)) {
+                        isSending = false
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(8.dp) // Điều chỉnh chiều cao của thanh Gradient
-                    .drawWithCache {
-                        val gradient = Brush.horizontalGradient(
-                            colors = listOf(
-                                Color.Red,
-                                Color.Yellow,
-                                Color.Green,
-                                Color.Cyan,
-                                Color.Blue,
-                                Color.Magenta,
-                                Color.Red
-                            ),
-                            startX = 0f,
-                            endX = size.width
-                        )
-                        onDrawBehind {
-                            drawRect(brush = gradient, size = size)
-                        }
-                    }
-            ) {
-                Slider(
-                    value = sliderPosition,
-                    onValueChange = { sliderPosition = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(8.dp), // Kích thước Slider (track bar nhỏ hơn)
-                    colors = SliderDefaults.colors(
-                        thumbColor = colorScheme.onPrimary,
-                        activeTrackColor = colorScheme.onPrimary,
-                        activeTickColor = colorScheme.secondary,
-                        inactiveTrackColor = colorScheme.secondary,
-                        inactiveTickColor = colorScheme.onSecondary
-                    )
+                    .height(8.dp),
+                colors = SliderDefaults.colors(
+                    thumbColor = Color.Black,
+                    activeTrackColor = Color.Transparent,
+                    inactiveTrackColor = Color.Transparent
                 )
-            }
+            )
+        }
+
+        // Hiển thị trạng thái gửi
+        if (isSending) {
+            Text("Đang gửi dữ liệu...")
+        }
+
+        // Hiển thị màu hiện tại từ slider
+        val currentColorIndex = (sliderPosition * (colors.size - 1)).toInt()
+        val currentColor = colors[currentColorIndex].first
+        val colorName = colors[currentColorIndex].second
+        val colorHex = colorToHex(currentColor)
+
+        Text(
+            text = "Màu hiện tại: $colorName ($colorHex)",
+            color = currentColor,
+            modifier = Modifier.padding(top = 16.dp)
+        )
+    }
+}
+
+// Hàm giả lập gửi màu lên server
+fun sendColorToServer(colorHex: String, onComplete: () -> Unit) {
+    println("Gửi màu lên server: $colorHex")
+    onComplete()
+}
+
+// Hàm chuyển đổi mã hex sang Color
+fun parseHexToColor(hex: String): Color? {
+    return try {
+        val colorInt = android.graphics.Color.parseColor(hex)
+        Color(colorInt)
+    } catch (e: IllegalArgumentException) {
+        null // Trả về null nếu mã màu không hợp lệ
+    }
+}
+
+// Hàm tìm vị trí gần nhất của màu trong danh sách
+fun findClosestColorPosition(targetColor: Color, colors: List<Color>): Float {
+    var closestIndex = 0
+    var minDistance = Float.MAX_VALUE
+
+    colors.forEachIndexed { index, color ->
+        val distance = colorDistance(targetColor, color)
+        if (distance < minDistance) {
+            minDistance = distance
+            closestIndex = index
         }
     }
 
+    return closestIndex.toFloat() / (colors.size - 1)
 }
 
-// Hàm tính màu tại vị trí slider
-@Composable
-fun calculateGradientColor(position: Float): Color {
-    val colors = listOf(
-        Color.Red, Color.Yellow, Color.Green, Color.Cyan, Color.Blue, Color.Magenta, Color.Red
-    )
-    val index = (position * (colors.size - 1)).toInt()
-    val startColor = colors[index]
-    val endColor = colors[(index + 1).coerceAtMost(colors.size - 1)]
-    val fraction = position * (colors.size - 1) - index
-    return lerp(startColor, endColor, fraction)
+// Hàm tính khoảng cách giữa hai màu
+fun colorDistance(color1: Color, color2: Color): Float {
+    val rDiff = color1.red - color2.red
+    val gDiff = color1.green - color2.green
+    val bDiff = color1.blue - color2.blue
+    return rDiff * rDiff + gDiff * gDiff + bDiff * bDiff
+}
+
+// Hàm chuyển đổi Color sang mã hex
+fun colorToHex(color: Color): String {
+    val argb = color.toArgb()
+    val r = (argb shr 16) and 0xFF
+    val g = (argb shr 8) and 0xFF
+    val b = argb and 0xFF
+    return String.format("#%02X%02X%02X", r, g, b)
 }
 
 @SuppressLint("FrequentlyChangedStateReadInComposition")
