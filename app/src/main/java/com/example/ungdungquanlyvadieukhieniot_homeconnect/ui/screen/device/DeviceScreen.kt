@@ -355,8 +355,10 @@ fun DeviceScreen(
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     items(devices) {device ->
+                                        val matchedSpace = spaces.find { it.SpaceID == device.SpaceID }
                                         SmartCard(
                                             device = device,
+                                            nameSpace = matchedSpace!!.Name,
                                             isTablet = true,
                                             navController = navController
                                         )
@@ -418,6 +420,7 @@ fun CustomScrollableTabRow(
 fun SmartCard(
     device: DeviceResponse, // Nhận thông tin thiết bị từ ViewModel
     isTablet: Boolean,
+    nameSpace: String,
     switchState: Boolean = true,
     navController: NavHostController) {
     val endPadding = 32.dp
@@ -452,7 +455,7 @@ fun SmartCard(
                             color = colorScheme.onPrimary
                         )
                         Text(
-                            text = "Dining Room | Tue Thu",
+                            text = "$nameSpace | Tue Thu",
                             fontSize = 12.sp,
                             color = colorScheme.onSecondary
                         )
