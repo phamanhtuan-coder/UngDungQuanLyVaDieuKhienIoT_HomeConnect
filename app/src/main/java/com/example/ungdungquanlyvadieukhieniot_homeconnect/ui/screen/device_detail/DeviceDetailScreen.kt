@@ -357,7 +357,9 @@ fun DeviceDetailPhoneScreen(
                                                 ) {
                                                     Text(
                                                         text = safeDevice.Name,
-                                                        color = colorScheme.onPrimary // Màu chữ trắng
+                                                        color = colorScheme.onPrimary, // Màu chữ trắng
+                                                        lineHeight = 32.sp,
+                                                        fontSize = 30.sp
                                                     ) // Tiêu đề
                                                     Spacer(modifier = Modifier.height(4.dp)) // Khoảng cách giữa các thành phần
 
@@ -603,6 +605,14 @@ fun DeviceDetailPhoneScreen(
                                                     )
                                                 }
                                                 if (showDialog) {
+                                                    fun getIconForType(typeId: Int): String {
+                                                        return when (typeId) {
+                                                            1 -> "Fire Alarm" // Light
+                                                            2 -> "LED Light" // Fire
+                                                            else -> ""         // Biểu tượng mặc định
+                                                        }
+                                                    }
+
                                                     AlertDialog(
                                                         onDismissRequest = {
                                                             showDialog = false
@@ -610,9 +620,9 @@ fun DeviceDetailPhoneScreen(
                                                         title = { Text(text = "Thông tin thiết bị") },
                                                         text = {
                                                             Column {
-                                                                Text("ID Thiết bị: 001")
-                                                                Text("Tên thiết bị: Đèn LED phòng khách")
-                                                                Text("Loại thiết bị: Đèn chiếu sáng")
+                                                                Text("ID Thiết bị: ${safeDevice.DeviceID}")
+                                                                Text("Tên thiết bị: ${safeDevice.Name}")
+                                                                Text("Loại thiết bị: ${getIconForType(safeDevice.TypeID)}")
                                                             }
                                                         },
                                                         confirmButton = {
@@ -968,6 +978,8 @@ fun DeviceDetailTabletScreen(
                                                     Text(
                                                         text = safeDevice.Name,
                                                         color = colorScheme.onPrimary,
+                                                        lineHeight = 32.sp,
+                                                        fontSize = 30.sp
                                                     ) // Tiêu đề
                                                     Spacer(modifier = Modifier.height(4.dp)) // Khoảng cách
 
@@ -1007,7 +1019,7 @@ fun DeviceDetailTabletScreen(
                                                         verticalAlignment = Alignment.Bottom // Căn dưới
                                                     ) {
                                                         Text(
-                                                            "80",
+                                                            text = attribute.brightness.toString(),
                                                             fontWeight = FontWeight.Bold,
                                                             fontSize = 50.sp,
                                                             color = colorScheme.onPrimary
@@ -1076,13 +1088,19 @@ fun DeviceDetailTabletScreen(
 
                                                         // Thanh trượt (Slider) giá trị 80
                                                         Slider(
-                                                            value = 80f,
+                                                            value = attribute.brightness!!.toFloat(),
                                                             onValueChange = {
-                                                                //Todo: Xử lý logic chọn độ sáng
-                                                            }, // Xử lý khi trượt (để trống)
-                                                            steps = 50,
-                                                            valueRange = 0f..100f,
-                                                            modifier = Modifier.width(400.dp),
+                                                                //Todo: Xử lý khi thay đổi giá trị
+                                                                // Cập nhật giá trị độ sáng
+                                                                attribute = attribute.copy(brightness = it.toInt())
+                                                            }, // Thanh trượt giá trị mặc định là 80
+                                                            onValueChangeFinished = {
+                                                                // Gửi dữ liệu lên server khi người dùng dừng thao tác kéo thanh trượt
+                                                                sendColorToServer(viewModel, safeDevice.DeviceID, attribute)
+                                                            },
+                                                            steps = 10,
+                                                            valueRange = 0f..255f,
+                                                            modifier = Modifier.fillMaxWidth(),
                                                             colors = SliderDefaults.colors(
                                                                 thumbColor = colorScheme.onPrimary,
                                                                 activeTrackColor = colorScheme.onPrimary,
@@ -1228,6 +1246,13 @@ fun DeviceDetailTabletScreen(
                                                     )
                                                 }
                                                 if (showDialog) {
+                                                    fun getIconForType(typeId: Int): String {
+                                                        return when (typeId) {
+                                                            1 -> "Fire Alarm" // Light
+                                                            2 -> "LED Light" // Fire
+                                                            else -> ""         // Biểu tượng mặc định
+                                                        }
+                                                    }
                                                     AlertDialog(
                                                         onDismissRequest = {
                                                             showDialog = false
@@ -1235,9 +1260,9 @@ fun DeviceDetailTabletScreen(
                                                         title = { Text(text = "Thông tin thiết bị") },
                                                         text = {
                                                             Column {
-                                                                Text("ID Thiết bị: 001")
-                                                                Text("Tên thiết bị: Đèn LED phòng khách")
-                                                                Text("Loại thiết bị: Đèn chiếu sáng")
+                                                                Text("ID Thiết bị: ${safeDevice.DeviceID}")
+                                                                Text("Tên thiết bị: ${safeDevice.Name}")
+                                                                Text("Loại thiết bị: ${getIconForType(safeDevice.TypeID)}")
                                                             }
                                                         },
                                                         confirmButton = {
