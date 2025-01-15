@@ -164,8 +164,14 @@ fun NavigationGraph(
 
             //Notification Detail Screen
             //Todo: Lấy id notification để hiển thị thông tin chi tiết
-            composable(Screens.NotificationDetail.route) {
-                DetailNotification(navController)
+            composable(
+                route = Screens.NotificationDetail.route + "?id={id}",
+                arguments = listOf(navArgument("id") {
+                    type = NavType.IntType
+                })
+            ) { backStackEntry ->
+                val id = backStackEntry.arguments?.getInt("id") ?: 0
+                DetailNotification(navController, id)
             }
 
             //Todo: Lấy dữ liêu id để hiển thị chi tiết thông tin lịch sử

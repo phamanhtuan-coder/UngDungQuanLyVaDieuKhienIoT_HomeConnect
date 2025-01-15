@@ -56,6 +56,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AlertResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 
@@ -308,7 +309,7 @@ fun NotificationCard(notification: AlertResponse, navController: NavHostControll
                 .width(500.dp)
                 .padding(NotificationStyle.cardPadding)
                 .clickable {
-                    navController.navigate("notification_detail")
+                    navController.navigate(Screens.NotificationDetail.route + "?id=${notification.AlertID}")
                 },
             elevation = CardDefaults.cardElevation(NotificationStyle.cardElevation),
             shape = RoundedCornerShape(NotificationStyle.cardCornerRadius),
