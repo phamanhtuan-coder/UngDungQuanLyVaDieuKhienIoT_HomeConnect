@@ -1,11 +1,19 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.profile
 
-//import com.vmadalin.easypermissions.EasyPermissions
-import android.Manifest
 import android.app.Application
+import android.content.Context
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Build
+import android.util.Base64
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,9 +36,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddLocation
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.CheckCircleOutline
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material3.Button
@@ -47,6 +55,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,6 +66,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -67,9 +78,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import coil.compose.AsyncImage
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.User
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UserRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UserResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.WarningDialog
@@ -77,10 +91,11 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.isTablet
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.ValidationUtils
+import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
+import java.util.TimeZone
 
 /***
  * Người viết: Nguyễn Thanh Sang
@@ -115,12 +130,91 @@ fun ProfileScreen(
         val emailState = remember { mutableStateOf("example@gmail.com") }
         var selectedDate by remember { mutableStateOf("01/01/2004") }
         val imageUrl = remember { mutableStateOf("") }
-        val isVerified = remember { mutableStateOf(true) }
+        val isVerified = remember { mutableStateOf(false) }
         val dateCreated = remember { mutableStateOf("01/12/2024") }
 
         var showDatePicker by remember { mutableStateOf(false) }
-        val datePickerState = rememberDatePickerState()
+        val initialDateMillis = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            .parse(dateCreated.value)?.time ?: System.currentTimeMillis()
+
+        val datePickerState = rememberDatePickerState(initialSelectedDateMillis = initialDateMillis)
+
         var showAlertDialog by remember { mutableStateOf(false) }
+
+        var avatarUri by remember { mutableStateOf<Uri?>(null) }
+        var errorMessage by remember { mutableStateOf("") }
+        var profileImage by remember {mutableStateOf("")}
+        val avatarBitmapState = remember { mutableStateOf<Bitmap?>(null) }
+
+        val requiredPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arrayOf(android.Manifest.permission.READ_MEDIA_IMAGES)
+        } else {
+            arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
+
+        val isPermissionGranted = remember {
+            mutableStateOf(
+                requiredPermissions.all {
+                    ContextCompat.checkSelfPermission(
+                        context,
+                        it
+                    ) == PackageManager.PERMISSION_GRANTED
+                }
+            )
+        }
+
+        val permissionLauncher = rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            isPermissionGranted.value = permissions.all { it.value }
+        }
+
+        val openSettingsLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.StartActivityForResult()
+        ) { /* Không cần xử lý thêm */ }
+
+        val imagePickerLauncher =
+            rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+                uri?.let {
+                    val mimeType = context.contentResolver.getType(it)
+                    if (mimeType == "image/jpeg" || mimeType == "image/png") {
+                        avatarUri = it // Lưu URI của ảnh
+                        errorMessage = ""
+
+                        val maxSizeInKB = 25 // Giới hạn kích thước ảnh 92KB
+
+                        // Chuyển URI thành ByteArray
+                        val inputImage = uriToByteArray(context, it)
+
+                        if (inputImage != null) {
+                            // Nén ảnh
+                            val compressedImage =
+                                compressImage(
+                                    inputImage = inputImage, // Ảnh gốc dạng ByteArray
+                                    quality = 90, // Chất lượng khởi đầu (90%)
+                                    maxFileSizeKB = 25 // Kích thước mong muốn (25 KB)
+                                )
+                            if (compressedImage != null && compressedImage.size / 1024 <= maxSizeInKB) {
+                                // Chuyển đổi ảnh đã nén sang Base64
+                                val base64Image = Base64.encodeToString(compressedImage, Base64.NO_WRAP)
+                                profileImage = base64Image
+                                Log.d("Base64", base64Image) // Log Base64 hoặc gửi lên API
+                            } else {
+                                // Ảnh vượt kích thước hoặc không thể nén đủ nhỏ
+                                errorMessage = "Ảnh quá lớn, không thể nén đủ nhỏ!"
+                                Log.e("ImagePicker", "Không thể nén ảnh")
+                            }
+                        } else {
+                            errorMessage = "Không thể đọc ảnh từ thiết bị!"
+                            Log.e("ImagePicker", "Không thể chuyển URI thành ByteArray")
+                        }
+                    } else {
+                        // MIME type không hợp lệ
+                        errorMessage = "Chỉ chấp nhận định dạng JPEG hoặc PNG."
+                        Log.e("ImagePicker", "Định dạng file không hợp lệ: $mimeType")
+                    }
+                }
+            }
 
         // Họ và tên
         val nameErrorState = remember { mutableStateOf("") }
@@ -140,6 +234,128 @@ fun ProfileScreen(
                 },
                 onDismiss = { showAlertDialog = false }
             )
+        }
+
+        var profile by remember { mutableStateOf<User?>(null) } // Lắng nghe danh sách thiết bị
+        val infoProfileState by viewModel.infoProfileState.collectAsState()
+
+        when(infoProfileState){
+            is InfoProfileState.Error ->{
+                Log.d("Error Profile",  (infoProfileState as InfoProfileState.Error).error)
+            }
+            is InfoProfileState.Idle ->{
+                //Todo
+            }
+            is InfoProfileState.Loading -> {
+                //Todo
+            }
+            is InfoProfileState.Success -> {
+                val successState = infoProfileState as InfoProfileState.Success
+                profile = successState.user
+                Log.d("Thành công", "Dữ liệu user: ${profile.toString()}")
+            }
+        }
+
+        LaunchedEffect(1) {
+            viewModel.getInfoProfile()
+        }
+
+        LaunchedEffect(profile) { // Lắng nghe thay đổi của profile
+            profile?.let {
+                nameState.value = it.Name
+                phoneState.value = it.Phone
+                locationState.value = it.Address
+                emailState.value = it.Email
+                dateCreated.value = it.DateOfBirth
+                Log.e("dateCreated.value 1", dateCreated.value.toString())
+                isVerified.value = it.EmailVerified
+                if (!it.DateOfBirth.isNullOrEmpty()) {
+                    try {
+                        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).apply {
+                            timeZone = TimeZone.getTimeZone("UTC") // Xác định múi giờ của server
+                        }
+                        val parsedDate = dateFormat.parse(it.DateOfBirth)
+
+                        val outputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
+                            timeZone = TimeZone.getDefault() // Múi giờ hiển thị trên client
+                        }
+                        dateCreated.value = outputFormat.format(parsedDate)
+                        Log.e("FormattedDate", dateCreated.value) // Kiểm tra kết quả
+                    } catch (e: Exception) {
+                        Log.e("DateError", "Lỗi chuyển đổi ngày: ${e.message}")
+                    }
+                }
+
+                Log.d("ServerDate", "Ngày từ server: ${it.DateOfBirth}")
+                Log.d("FormattedDate", "Ngày hiển thị: ${dateCreated.value}")
+
+                // Xử lý ảnh đại diện (Base64)
+                if (!it.ProfileImage.isNullOrEmpty()) {
+                    val bitmap = base64ToBitmap(it.ProfileImage) // Chuyển đổi Base64 thành Bitmap
+                    if (bitmap != null) {
+                        avatarBitmapState.value = bitmap // Cập nhật trạng thái Bitmap
+                    }
+                }
+            }
+        }
+
+        var userResponse by remember { mutableStateOf<UserResponse?>(null) } // Lắng nghe user
+        val putInfoProfileState by viewModel.putInfoProfileState.collectAsState()
+
+        when(putInfoProfileState){
+            is PutInfoProfileState.Error ->{
+                Log.d("Error Profile",  (putInfoProfileState as PutInfoProfileState.Error).error)
+            }
+            is PutInfoProfileState.Idle ->{
+                //Todo
+            }
+            is PutInfoProfileState.Loading -> {
+                //Todo
+            }
+            is PutInfoProfileState.Success -> {
+                val successState = putInfoProfileState as PutInfoProfileState.Success
+                userResponse = successState.userResponse
+                Log.d("Thành công", "Dữ liệu user: ${userResponse.toString()}")
+            }
+        }
+
+        LaunchedEffect(userResponse) { // Lắng nghe thay đổi của userResponse
+            userResponse?.let { response ->
+                // Kiểm tra xem response.user có null không
+                response.user?.let { user ->
+                    nameState.value = user.Name
+                    phoneState.value = user.Phone
+                    locationState.value = user.Address
+                    emailState.value = user.Email
+                    dateCreated.value = user.DateOfBirth
+                    Log.e("dateCreated.value 3", dateCreated.value.toString())
+                    isVerified.value = user.EmailVerified
+
+                    if (!user.DateOfBirth.isNullOrEmpty()) {
+                        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                        dateFormat.timeZone = TimeZone.getTimeZone("UTC") // Hoặc múi giờ phù hợp
+                        val parsedDate = dateFormat.parse(user.DateOfBirth)
+
+                        val outputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.US)
+                        outputFormat.timeZone = TimeZone.getDefault() // Hoặc múi giờ bạn muốn
+                        dateCreated.value = outputFormat.format(parsedDate)
+
+                        Log.e("dateCreated.value 4", dateCreated.value.toString())
+                    }
+
+                    // Xử lý ảnh đại diện (Base64)
+                    if (!user.ProfileImage.isNullOrEmpty()) {
+                        val bitmap = base64ToBitmap(user.ProfileImage) // Chuyển đổi Base64 thành Bitmap
+                        if (bitmap != null) {
+                            avatarBitmapState.value = bitmap // Cập nhật trạng thái Bitmap
+                        }
+                    }
+                } ?: run {
+                    Log.e("LaunchedEffect", "User data is null in UserResponse.")
+                }
+            } ?: run {
+                Log.e("LaunchedEffect", "UserResponse is null.")
+            }
         }
 
         Scaffold(
@@ -194,46 +410,38 @@ fun ProfileScreen(
                                 .offset(y = if (isTablet) (-40).dp else (-20).dp)
                                 .background(color = Color.White, shape = CircleShape)
                                 .clickable {
-                                    val permissions = when {
-                                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
-                                            arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
-                                        }
-
-                                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
-                                            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
-                                        }
-
-                                        else -> {
-                                            arrayOf(
-                                                Manifest.permission.READ_EXTERNAL_STORAGE,
-                                                Manifest.permission.WRITE_EXTERNAL_STORAGE
-                                            )
-                                        }
+                                    if (isPermissionGranted.value) {
+                                        // Nếu đã có quyền, mở bộ chọn ảnh
+                                        imagePickerLauncher.launch("image/*")
+                                    } else {
+                                        // Nếu chưa có quyền, yêu cầu cấp quyền
+                                        permissionLauncher.launch(requiredPermissions)
                                     }
-
-//                                    if (EasyPermissions.hasPermissions(context, *permissions)) {
-//                                        // TODO: Mở màn hình chọn hình ảnh từ bộ nhớ thiết bị
-//                                    } else {
-//                                        EasyPermissions.requestPermissions(
-//                                            context as androidx.fragment.app.FragmentActivity,
-//                                            "Ứng dụng cần quyền truy cập bộ nhớ để tải hình ảnh",
-//                                            123, // Mã request
-//                                            *permissions
-//                                        )
-//                                    }
                                 },
                             contentAlignment = Alignment.Center
                         ) {
-                            if (imageUrl.value.isBlank().not()) {
-                                AsyncImage(
-                                    model = imageUrl,
-                                    contentDescription = "Avatar",
+                            avatarBitmapState.value?.let { bitmap ->
+                                Box(
                                     modifier = Modifier
                                         .size(if (isTablet) 120.dp else 70.dp)
-                                        .background(color = Color.Gray, shape = CircleShape)
-                                )
-                            } else {
-                                Box(
+                                        .background(
+                                            color = colorScheme.primary.copy(alpha = 0.8f),
+                                            shape = CircleShape
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Image(
+                                        bitmap = bitmap.asImageBitmap(),
+                                        contentDescription = "Avatar Preview",
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier
+                                            .size(120.dp)
+                                            .clip(CircleShape)
+                                            .border(2.dp, colorScheme.primary, CircleShape)
+                                            .background(colorScheme.onSurface.copy(alpha = 0.1f))
+                                    )
+                                }
+                            } ?: Box(
                                     modifier = Modifier
                                         .size(if (isTablet) 120.dp else 70.dp)
                                         .background(
@@ -249,7 +457,6 @@ fun ProfileScreen(
                                         modifier = Modifier.size(if (isTablet) 70.dp else 40.dp)
                                     )
                                 }
-                            }
 
                             Box(
                                 modifier = Modifier
@@ -261,9 +468,9 @@ fun ProfileScreen(
                                 contentAlignment = Alignment.TopEnd
                             ) {
                                 Icon(
-                                    imageVector = if (isVerified.value) Icons.Default.CheckCircle else Icons.Default.CheckCircleOutline,
+                                    imageVector = if (isVerified.value) Icons.Default.CheckCircle else Icons.Default.Error,
                                     contentDescription = "Verified",
-                                    tint = Color.Green,
+                                    tint =  if (isVerified.value) Color.Green else Color.Red,
                                     modifier = Modifier
                                         .size((if (isTablet) 70 else 40).dp)
                                         .padding(
@@ -296,7 +503,7 @@ fun ProfileScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "Ngày tạo tài khoản: " + dateCreated.value,
+                                    text = "Ngày sinh: " + dateCreated.value,
                                     color = colorScheme.onSecondary,
                                     fontSize = if (isTablet) 24.sp else 20.sp
                                 )
@@ -520,9 +727,9 @@ fun ProfileScreen(
                         readOnly = true,
                         trailingIcon = {
                             Icon(
-                                imageVector = Icons.Default.CheckCircle,
+                                imageVector =if (isVerified.value) Icons.Default.CheckCircle else Icons.Default.Error,
                                 contentDescription = "Verified",
-                                tint = colorScheme.primary
+                                tint = if (isVerified.value) Color.Green else Color.Red
                             )
                         },
                         modifier = Modifier
@@ -551,9 +758,9 @@ fun ProfileScreen(
 
                     // Trường ngày sinh
                     OutlinedTextField(
-                        value = selectedDate, // Chỗ này bị bug chưa load được ngày từ biến
-                        onValueChange = { /* Not needed for read-only fields */ },
-                        placeholder = { Text("Ngày sinh (dd/mm/yyyy)") },
+                        value = dateCreated.value, // Chỗ này bị bug chưa load được ngày từ biến
+                        onValueChange = { /* Không cần xử lý vì đây là trường chỉ đọc */ },
+                        placeholder = { Text("Ngày sinh (dd/MM/yyyy)") },
                         shape = RoundedCornerShape(25),
                         singleLine = true,
                         readOnly = true,
@@ -589,10 +796,12 @@ fun ProfileScreen(
                         )
                     )
 
+                    Log.e("dateCreated.value 5", dateCreated.value.toString())
+
                     if (showDatePicker) {
                         Popup(
                             onDismissRequest = { showDatePicker = false },
-                            alignment = Alignment.TopStart
+                            alignment = Alignment.Center
                         ) {
                             Box(
                                 modifier = Modifier
@@ -613,15 +822,37 @@ fun ProfileScreen(
                     //Nếu thay dđổi ngày thì update
                     LaunchedEffect(datePickerState.selectedDateMillis) {
                         datePickerState.selectedDateMillis?.let { millis ->
-                            val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                            selectedDate = formatter.format(Date(millis))
-                            showDatePicker = false //Ẩn date picker
+                            try {
+                                val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                                selectedDate = formatter.format(Date(millis)) // Hiển thị theo định dạng
+                                dateCreated.value = selectedDate // Cập nhật giá trị trường nhập
+                                Log.e("SelectedDate", "Ngày chọn: $selectedDate")
+                            } catch (e: Exception) {
+                                Log.e("DatePickerError", "Lỗi xử lý ngày chọn: ${e.message}")
+                            }
                         }
                     }
+
                     // Save Button
                     Button(
                         onClick = {
-                            // TODO: Xử lý lưu thông tin
+                            try {
+                                val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                                val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                                val formattedDate = outputFormat.format(inputFormat.parse(dateCreated.value) ?: Date())
+
+                                val userRequest = UserRequest(
+                                    Name = nameState.value.ifBlank { "Tên không được để trống" },
+                                    Email = emailState.value.ifBlank { "example@gmail.com" },
+                                    Phone = phoneState.value.ifBlank { "0123456789" },
+                                    Address = locationState.value.ifBlank { "Chưa nhập địa chỉ" },
+                                    DateOfBirth = formattedDate
+                                )
+                                Log.e("DateToServer", "Ngày gửi lên server: $formattedDate")
+                                viewModel.putInfoProfile(profile!!.UserID, userRequest)
+                            } catch (e: Exception) {
+                                Log.e("SaveError", "Lỗi lưu thông tin: ${e.message}")
+                            }
                         },
                         modifier = Modifier
                             .width(if (isTablet()) 300.dp else 200.dp)
@@ -639,6 +870,57 @@ fun ProfileScreen(
                 }
             }
         }
+    }
+}
+
+fun compressImage(inputImage: ByteArray, quality: Int, maxFileSizeKB: Int): ByteArray? {
+    // Decode ảnh từ byte array
+    var bitmap = BitmapFactory.decodeByteArray(inputImage, 0, inputImage.size)
+    val outputStream = ByteArrayOutputStream()
+
+    var currentQuality = quality
+
+    do {
+        outputStream.reset() // Xóa dữ liệu cũ trong bộ nhớ
+
+        // Nén ảnh với chất lượng hiện tại
+        bitmap.compress(Bitmap.CompressFormat.JPEG, currentQuality, outputStream)
+
+        // Nếu kích thước vẫn lớn hơn maxFileSizeKB, giảm độ phân giải
+        if (outputStream.size() / 1024 > maxFileSizeKB) {
+            bitmap = resizeBitmap(bitmap, bitmap.width / 2, bitmap.height / 2) // Thu nhỏ ảnh
+        }
+
+        currentQuality -= 10 // Giảm chất lượng ảnh
+    } while (outputStream.size() / 1024 > maxFileSizeKB && currentQuality > 10)
+
+    return outputStream.toByteArray()
+}
+
+// Hàm thu nhỏ độ phân giải của ảnh
+fun resizeBitmap(bitmap: Bitmap, newWidth: Int, newHeight: Int): Bitmap {
+    return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
+}
+
+fun uriToByteArray(context: Context, uri: Uri): ByteArray? {
+    return try {
+        val inputStream = context.contentResolver.openInputStream(uri)
+        val byteArray = inputStream?.readBytes()
+        inputStream?.close()
+        byteArray
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+}
+
+fun base64ToBitmap(base64String: String): Bitmap? {
+    return try {
+        val decodedBytes = Base64.decode(base64String, Base64.DEFAULT)
+        BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+    } catch (e: IllegalArgumentException) {
+        e.printStackTrace()
+        null
     }
 }
 
