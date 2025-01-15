@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION", "NAME_SHADOWING")
+
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection
 
 import android.Manifest
@@ -60,6 +62,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -86,7 +89,6 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.ValidationUtils
 
 /** Giao diện màn hình Access Point Connection Screen (AccessPointConnectionScreen
  * -----------------------------------------
@@ -116,16 +118,11 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.Validat
 
 @Composable
 fun AccessPointConnectionScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    deviceId: String="",
+    deviceName: String="",
 ) {
     val context = LocalContext.current
-    // Biến trạng thái để lưu giá trị nhập
-    var deviceId by remember { mutableStateOf("") }
-    var deviceName by remember { mutableStateOf("") }
-
-    // Biến trạng thái để hiển thị thông báo lỗi
-    var deviceIdError by remember { mutableStateOf("") }
-    var deviceNameError by remember { mutableStateOf("") }
     val layoutConfig = rememberResponsiveLayoutConfig() // Lấy LayoutConfig
     var showDialog by remember { mutableStateOf(false) }
     var connectionStatus by remember { mutableStateOf<String?>(null) }
@@ -182,7 +179,14 @@ fun AccessPointConnectionScreen(
         onResult(scanResults)
     }
 
+
+
     AppTheme {
+        LaunchedEffect(1) {
+            scanWifiNetworks(context) { scanResults ->
+                wifiList = scanResults
+            }
+        }
         val colorScheme = MaterialTheme.colorScheme
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -250,14 +254,10 @@ fun AccessPointConnectionScreen(
                                         // Ô nhập liệu đầu tiên - ID thiết bị
                                         // TextField để nhập ID thiết bị
                                         OutlinedTextField(
-                                            value = deviceId,
-                                            onValueChange = {
-                                                deviceId = it
-                                                // Kiểm tra ID thiết bị ngay khi thay đổi
-                                                deviceIdError = ValidationUtils.validateDeviceId(it)
-                                            },
+                                            value = "ID thiết bị của bạn là: $deviceId",
+                                            onValueChange = {},
+                                            readOnly = true,
                                             shape = RoundedCornerShape(25),
-                                            placeholder = { Text("ID thiết bị của bạn là:") },
                                             singleLine = true,
                                             modifier = Modifier
                                                 .width(if (isTablet()) 400.dp else 300.dp)
@@ -280,14 +280,11 @@ fun AccessPointConnectionScreen(
 
                                         // TextField nhập tên thiết bị
                                         OutlinedTextField(
-                                            value = deviceName,
-                                            onValueChange = {
-                                                deviceName = it
-                                                deviceNameError = ValidationUtils.validateDeviceName(it) // Kiểm tra tên thiết bị
-                                            },
+                                            value = "Tên thiết bị của bạn là: $deviceName",
+                                            onValueChange = {},
                                             shape = RoundedCornerShape(25),
-                                            placeholder = { Text("Tên thiết bị của bạn là:") },
                                             singleLine = true,
+                                            readOnly = true,
                                             modifier = Modifier
                                                 .width(if (isTablet()) 400.dp else 300.dp)
                                                 .height(if (isTablet()) 80.dp else 70.dp),
@@ -463,7 +460,7 @@ fun AccessPointConnectionScreen(
                                     // Đoạn văn bản mô tả hướng dẫn truy cập
                                     Text(
                                         "Bạn hãy chọn điểm truy cập (Access Point) của thiết bị bạn muốn kết nối.\n" +
-                                                "Tên của điểm truy cập sẽ có cú pháp: AP-{Tên_thiết_bị}-{ID_thiết_bị}.",
+                                                "Tên của điểm truy cập sẽ có cú pháp: AP-{ID_thiết_bị}.",
                                         fontSize = layoutConfig.textFontSize,
                                         lineHeight = layoutConfig.textFontSize * 1.2,
                                         color = colorScheme.onSecondary,
@@ -488,7 +485,7 @@ fun AccessPointConnectionScreen(
                                         color =  colorScheme.onSecondary,
                                     )
                                     Text(
-                                        "AP-DenThongMinh_A1-SLB_001",
+                                        "AP-SLB_001",
                                         fontSize = layoutConfig.textFontSize,
                                         lineHeight = layoutConfig.textFontSize * 1.2,
                                         color =  colorScheme.onSecondary,
@@ -906,6 +903,3 @@ fun bindToNetwork(context: Context, network: Network) {
     connectivityManager.bindProcessToNetwork(network)
     println("Network bound to process.")
 }
-
-
-

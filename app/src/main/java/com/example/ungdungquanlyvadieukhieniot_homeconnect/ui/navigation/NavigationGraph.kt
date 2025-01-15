@@ -121,10 +121,24 @@ fun NavigationGraph(
 //            }
 
             //Access Point Screen
-            //Todo: Lấy dữ lieu thiết bị để hiển thị thông tin kết nối
-            composable(Screens.AccessPoint.route) {
-                AccessPointConnectionScreen(navController)
+            composable(
+                route = "${Screens.AccessPoint.route}?id={id}&name={name}",
+                arguments = listOf(
+                    navArgument("id") {
+                        type = NavType.StringType
+                        defaultValue = ""
+                    },
+                    navArgument("name") {
+                        type = NavType.StringType
+                        defaultValue = ""
+                    }
+                )
+            ) { backStackEntry ->
+                val id = backStackEntry.arguments?.getString("id") ?: ""
+                val name = backStackEntry.arguments?.getString("name") ?: ""
+                AccessPointConnectionScreen(navController, id, name)
             }
+
 
             //Add Device Screen
             composable(Screens.AddDevice.route) {

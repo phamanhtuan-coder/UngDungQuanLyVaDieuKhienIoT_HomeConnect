@@ -82,11 +82,11 @@ class DeviceDetailViewModel(application: Application, context: Context) : Androi
     private val _attributeState = MutableStateFlow<AttributeState>(AttributeState.Idle)
     val attributeState = _attributeState.asStateFlow()
 
-    fun attributeDevice(deviceId: Int, attribute: AttributeRequest) {
+    fun attributeDevice(deviceId: Int, brightness: Int, color: String) {
         viewModelScope.launch {
             try {
                 _attributeState.value = AttributeState.Loading
-                val response = repository.postAttributeDevice(deviceId, attribute)
+                val response = repository.postAttributeDevice(deviceId, brightness, color)
                 _attributeState.value = AttributeState.Success(response.message, response.device)
             } catch (e: Exception) {
                 Log.e("DeviceDetailViewModel", "Error fetching attribute: ${e.message}")

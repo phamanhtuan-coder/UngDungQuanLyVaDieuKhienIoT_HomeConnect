@@ -204,7 +204,8 @@ fun DeviceDetailPhoneScreen(
             }
         }
 
-        var attribute by remember { mutableStateOf(AttributeRequest(brightness = 0, color = "#000000")) }
+
+        var attribute by remember { mutableStateOf(AttributeRequest(brightness = 1, color = "#ffffff"))}
 
         var safeDevice = infoDevice ?: DeviceResponse(
             DeviceID = 0,
@@ -230,7 +231,7 @@ fun DeviceDetailPhoneScreen(
 
         LaunchedEffect(safeDevice.Attribute) {
             val attributeJson = if (safeDevice.Attribute.isNullOrEmpty()) {
-                """{"brightness":0, "color":"#000000"}""" // Giá trị mặc định
+                """{"brightness":1, "color":"#ffffff"}""" // Giá trị mặc định
             } else {
                 safeDevice.Attribute
             }
@@ -430,7 +431,7 @@ fun DeviceDetailPhoneScreen(
                                                         )
                                                     }
                                                     Text(
-                                                        "Brightness",
+                                                        "Độ sáng",
                                                         color = colorScheme.onPrimary,
                                                         fontSize = 20.sp
                                                     ) // Nhãn cho độ sáng
@@ -454,7 +455,7 @@ fun DeviceDetailPhoneScreen(
                                                     .background(color = colorScheme.primary) // Nền màu xanh dương
                                             ) {
                                                 Text(
-                                                    "Insensity",
+                                                    "Cường độ",
                                                     color = colorScheme.onPrimary
                                                 ) // Tiêu đề cường độ sáng
                                                 Row(
@@ -474,16 +475,15 @@ fun DeviceDetailPhoneScreen(
                                                     Slider(
                                                         value = attribute.brightness!!.toFloat(),
                                                         onValueChange = {
-                                                            //Todo: Xử lý khi thay đổi giá trị
-                                                            // Cập nhật giá trị độ sáng
-                                                            attribute = attribute.copy(brightness = it.toInt())
+                                                            attribute.brightness =it.toInt()
                                                         }, // Thanh trượt giá trị mặc định là 80
                                                         onValueChangeFinished = {
-                                                            // Gửi dữ liệu lên server khi người dùng dừng thao tác kéo thanh trượt
-                                                            sendColorToServer(viewModel, safeDevice.DeviceID, attribute)
+                                                            viewModel.attributeDevice(safeDevice.DeviceID, attribute.brightness, attribute.color)
+                                                            Log.d("Color B Slider", attribute.color)
+                                                            Log.d("Brightness B Slider", attribute.brightness.toString())
                                                         },
                                                         steps = 10,
-                                                        valueRange = 0f..255f,
+                                                        valueRange = 1f..255f,
                                                         modifier = Modifier.width(300.dp),
                                                         colors = SliderDefaults.colors(
                                                             thumbColor = colorScheme.onPrimary,
@@ -527,7 +527,7 @@ fun DeviceDetailPhoneScreen(
                                                 if (attribute.color != null) {
                                                     SliderWith16BasicColors(safeDevice.DeviceID, attribute)
                                                 } else {
-                                                    SliderWith16BasicColors(safeDevice.DeviceID ,AttributeRequest(brightness = 0, color = "#000000"))
+                                                    SliderWith16BasicColors(safeDevice.DeviceID ,AttributeRequest(brightness = 1, color = "#ffffff"))
                                                 }
                                             }
                                         }
@@ -600,8 +600,7 @@ fun DeviceDetailPhoneScreen(
                                                 }
                                                 Button(
                                                     onClick = {
-                                                        //Todo: Xử lý khi nhấn nút Wifi
-                                                        navController.navigate(Screens.AccessPoint.route)
+                                                        navController.navigate(Screens.AccessPoint.route + "?id=${safeDevice.DeviceID}&name=${safeDevice.Name}")
                                                     },
                                                     modifier = Modifier
                                                         .size(24.dp), // Kích thước tổng thể của Button
@@ -625,7 +624,7 @@ fun DeviceDetailPhoneScreen(
                                                     fun getIconForType(typeId: Int): String {
                                                         return when (typeId) {
                                                             1 -> "Fire Alarm" // Light
-                                                            2 -> "LED Light" // Fire
+                                                            2,3 -> "LED Light" // Fire
                                                             else -> ""         // Biểu tượng mặc định
                                                         }
                                                     }
@@ -1069,7 +1068,7 @@ fun DeviceDetailTabletScreen(
                                                         )
                                                     }
                                                     Text(
-                                                        "Brightness",
+                                                        "Độ sanng",
                                                         color = colorScheme.onPrimary,
                                                         fontSize = 20.sp
                                                     ) // Nhãn Brightness
@@ -1093,7 +1092,7 @@ fun DeviceDetailTabletScreen(
                                                     .background(color = colorScheme.primary) // Nền xanh
                                             ) {
                                                 Text(
-                                                    "Insensity",
+                                                    "Cường độ",
                                                     color = colorScheme.onPrimary,
                                                 ) // Tiêu đề cường độ
 
@@ -1126,13 +1125,10 @@ fun DeviceDetailTabletScreen(
                                                         Slider(
                                                             value = attribute.brightness!!.toFloat(),
                                                             onValueChange = {
-                                                                //Todo: Xử lý khi thay đổi giá trị
-                                                                // Cập nhật giá trị độ sáng
-                                                                attribute = attribute.copy(brightness = it.toInt())
+
                                                             }, // Thanh trượt giá trị mặc định là 80
                                                             onValueChangeFinished = {
                                                                 // Gửi dữ liệu lên server khi người dùng dừng thao tác kéo thanh trượt
-                                                                sendColorToServer(viewModel, safeDevice.DeviceID, attribute)
                                                             },
                                                             steps = 10,
                                                             valueRange = 0f..255f,
@@ -1188,7 +1184,7 @@ fun DeviceDetailTabletScreen(
                                                     if (attribute.color != null) {
                                                         SliderWith16BasicColors(safeDevice.DeviceID, attribute)
                                                     } else {
-                                                        SliderWith16BasicColors(safeDevice.DeviceID ,AttributeRequest(brightness = 0, color = "#000000"))
+                                                        SliderWith16BasicColors(safeDevice.DeviceID ,AttributeRequest(brightness =0, color = "#000000"))
                                                     }
                                                 }
                                             }
@@ -1488,7 +1484,7 @@ fun SliderWith16BasicColors(deviceID: Int, attribute: AttributeRequest) {
 
     // Quản lý trạng thái sliderPosition và khởi tạo theo `inputColor`
     var sliderPosition by remember {
-        mutableStateOf(findClosestColorPosition(parseHexToColor(attribute.color.toString()) ?: Color.Black, colors.map { it.first }))
+        mutableStateOf(findClosestColorPosition(parseHexToColor(attribute.color) ?: Color.Black, colors.map { it.first }))
     }
     var isSending by remember { mutableStateOf(false) }
 
@@ -1532,11 +1528,12 @@ fun SliderWith16BasicColors(deviceID: Int, attribute: AttributeRequest) {
                     val currentColorIndex = (sliderPosition * (colors.size - 1)).toInt()
                     val selectedColor = colors[currentColorIndex].first
 
-                    attribute.color = colorToHex(selectedColor)
+                    attribute.color =colorToHex(selectedColor)
 
-                    println("Selected color: ${colorToHex(selectedColor)}")
                     isSending = true
-                    sendColorToServer(viewModel, deviceID, attribute)
+                    viewModel.attributeDevice(deviceID, attribute.brightness, attribute.color)
+                    Log.d("Color", attribute.color)
+                    Log.d("Brightness", attribute.brightness.toString())
                     isSending = false
                 },
                 modifier = Modifier
@@ -1564,13 +1561,7 @@ fun SliderWith16BasicColors(deviceID: Int, attribute: AttributeRequest) {
     }
 }
 
-// Hàm giả lập gửi màu lên server
-fun sendColorToServer(viewModel: DeviceDetailViewModel, deviceID: Int, attributeDevice: AttributeRequest) {
-    viewModel.viewModelScope.launch {
-        viewModel.attributeDevice(deviceID, attributeDevice)
-        println("Data sent successfully.")
-    }
-}
+
 
 // Hàm chuyển đổi mã hex sang Color
 fun parseHexToColor(hex: String): Color? {
