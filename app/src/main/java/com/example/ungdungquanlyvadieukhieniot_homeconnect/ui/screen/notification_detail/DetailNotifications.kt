@@ -1,5 +1,6 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.notification_detail
 
+import android.app.Application
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -21,15 +22,21 @@ import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,6 +46,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AlertResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Device
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceType
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.House
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Space
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
@@ -55,21 +67,108 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
  */
 @Composable
 fun DetailNotification(
-    navController: NavHostController
+    navController: NavHostController,
+    AlertID: Int
 ) {
+
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+    val viewModel = remember {
+        NotificationViewModel(application, context)
+    }
+
+    val notificationState by viewModel.alertState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.getAllByUser(AlertID)
+    }
+
+    var Alert by remember {
+        mutableStateOf(
+            AlertResponse(
+                AlertID = 0,
+                DeviceID = 0,
+                SpaceID = 0,
+                TypeID = 0,
+                Message = "",
+                Timestamp = "",
+                Status = false,
+                AlertTypeID = 0,
+                Device = Device(
+                    DeviceID = 0,
+                    Name = "",
+                    TypeID = 0,
+                    SpaceID = 0,
+                    UserID = 0,
+                    PowerStatus = false,
+                    Attribute = "",
+                    WifiSSID = "",
+                    WifiPassword = "",
+                    IsDeleted = false,
+                    CreatedAt = "",
+                    UpdatedAt = "",
+                    DeviceType = DeviceType(
+                        typeID = 0,
+                        typeName = "",
+                        attributes = "",
+                        rules = "",
+                        isDeleted = false,
+                        createdAt = "",
+                        updatedAt = "",
+                    ),
+                    Space = Space(
+                        SpaceID = 0,
+                        Name = "",
+                        HouseID = 0,
+                        IsDeleted = 0,
+                        CreatedAt = "",
+                        UpdatedAt = "",
+                        House = House(
+                            HouseID = 0,
+                            UserID = 0,
+                            Name = "",
+                            Address = "",
+                            IconName = "",
+                            IconColor = "",
+                            IsDeleted = 0,
+                            CreatedAt = "",
+                            UpdatedAt = "",
+                        )
+                    )
+
+                ),
+            )
+        )
+    }
+    var error by remember { mutableStateOf("") }
+    when (notificationState) {
+        is NotificationState.Success -> {
+            val alert = (notificationState as NotificationState.Success).alert
+            Alert = alert
+        }
+
+        is NotificationState.Error -> {
+            error = (notificationState as NotificationState.Error).error
+        }
+
+        is NotificationState.Loading -> {
+            CircularProgressIndicator()
+        }
+
+        is NotificationState.Idle -> {
+            // Do nothing
+        }
+    }
+
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
-        val deviceName = remember { mutableStateOf("Tên thiết bị") }
-        val spaceName = remember { mutableStateOf("Tên không gian") }
-        val timeStamp = remember { mutableStateOf("30/12/2024 12:30 AM") }
-        val message = remember { mutableStateOf("Nội dung thông báo.") }
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             containerColor = colorScheme.background,
             topBar = {
                 Header(
                     type = "Notification",
-                    title = "Chi tiết thông báo",
+                    title = if (Alert.TypeID == 1) "Chi tiết cảnh báo" else "Chi tiết thông báo",
                     navController = navController
                 )
             },
@@ -116,7 +215,7 @@ fun DetailNotification(
                                             contentAlignment = Alignment.Center // Căn giữa nội dung trong Box
                                         ) {
                                             Text(
-                                                text = deviceName.value,
+                                                text = Alert.Device.Name,
                                                 fontSize = 32.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 color = colorScheme.onPrimary
@@ -145,7 +244,7 @@ fun DetailNotification(
 
                                                 // Tên vị trí
                                                 Text(
-                                                    text = spaceName.value,
+                                                    text = Alert.Device.Space.Name + " - " + Alert.Device.Space.House.Name,
                                                     fontSize = 18.sp,
                                                     fontWeight = FontWeight.Bold,
                                                     color = colorScheme.onPrimary
@@ -167,7 +266,7 @@ fun DetailNotification(
                                                 )
                                                 Spacer(modifier = Modifier.width(4.dp))
                                                 Text(
-                                                    text = timeStamp.value,
+                                                    text = Alert.Timestamp,
                                                     fontSize = 14.sp,
                                                     color = colorScheme.onPrimary
                                                 )
@@ -215,7 +314,7 @@ fun DetailNotification(
                             verticalArrangement = Arrangement.Top
                         ) {
                             NotificationDetailScreen(
-                                content = message.value,
+                                content = Alert.Message
                             )
                         }
                     }
@@ -261,24 +360,25 @@ fun NotificationDetailScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Nút "XÓA THÔNG BÁO"
+            // Nút "ĐỌC THÔNG BÁO"
             Button(
                 onClick = {
-                    //Todo: Xử lý xóa thông báo
+                    // Todo: Xử lý đọc thông báo
+//                    viewModel.deleteNotification(alert.AlertID)
                 },
                 modifier = Modifier
                     .width(200.dp)
                     .height(48.dp),
                 shape = RoundedCornerShape(50),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = colorScheme.error// Màu nút xóa
+                    containerColor = colorScheme.primary// Màu nút xóa
                 )
             ) {
                 Text(
-                    text = "Xóa thông báo",
+                    text = "Đã đọc",
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
-                    color = colorScheme.onError
+                    color = colorScheme.onPrimary
                 )
             }
         }
@@ -288,5 +388,5 @@ fun NotificationDetailScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun NotificationDetailPreview() {
-    DetailNotification(navController = rememberNavController())
+    DetailNotification(navController = rememberNavController(), AlertID = 0)
 }

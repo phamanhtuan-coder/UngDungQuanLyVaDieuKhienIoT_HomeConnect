@@ -16,4 +16,13 @@ class AlertRepository(private val context: Context) {
         // Gọi API
         return apiService.getAllNotification(token = "Bearer $token")
     }
+
+    suspend fun getAlertById(alertId: Int): AlertResponse {
+        val sharedPrefs = context.getSharedPreferences("MY_APP_PREFS", Context.MODE_PRIVATE)
+        val token = sharedPrefs.getString("JWT_TOKEN", "") ?: ""
+
+        // Gọi API
+        return apiService.getAlertById(alertId = alertId, token = "Bearer $token")
+    }
+
 }

@@ -61,6 +61,7 @@ interface ApiService {
 
     @GET("/api/alerts/getAllByUser")
     suspend fun getAllNotification(@Header("Authorization") token: String): List<AlertResponse>
+
     @GET("/api/devices/{deviceId}")
     suspend fun getInfoDevice(@Path("deviceId") deviceId: Int, @Header("Authorization") token: String) : DeviceResponse
 
@@ -72,4 +73,11 @@ interface ApiService {
 
     @POST("/api/devices/{deviceId}/unlink")
     suspend fun postUnlink(@Path("deviceId") deviceId: Int, @Header("Authorization") token: String) : UnlinkResponse
+
+
+    @GET("/api/alerts/{alertId}")
+    suspend fun getAlertById(
+        @Path("alertId") alertId: Int,
+        @Header("Authorization") token: String
+    ): AlertResponse
 }
