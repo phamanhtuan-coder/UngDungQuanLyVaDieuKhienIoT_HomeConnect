@@ -93,9 +93,15 @@ fun HouseSelection(
             }
             is HouseState.Success -> {
                 houses = (housesListState as HouseState.Success).houseList
-                Log.d("List Device", (housesListState as HouseState.Success).houseList.toString())
-                selectedItem = houses.first()
-                onTabSelected(selectedItem.HouseID)
+                Log.d("List House", houses.toString())
+
+                // Kiểm tra nếu danh sách `houses` trống
+                if (houses.isEmpty()) {
+                    selectedItem = HouseResponse(HouseID = -1, Name = "Không có nhà")
+                } else {
+                    selectedItem = houses.first()
+                    onTabSelected(selectedItem.HouseID)
+                }
             }
         }
 
