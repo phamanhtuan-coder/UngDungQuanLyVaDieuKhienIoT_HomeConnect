@@ -6,6 +6,8 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Devic
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceTokenResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.NewPasswordRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.NewPasswordResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UserRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UserResponse
 
 class UserRepository(private val context: Context) {
     private val apiService = RetrofitClient.apiService
@@ -31,5 +33,12 @@ class UserRepository(private val context: Context) {
 
         // Gọi API
         return apiService.sendToken(token = "Bearer $token", request)
+    }
+
+    suspend fun putInfoProfile(userId: Int, user: UserRequest): UserResponse {
+        val sharedPrefs = context.getSharedPreferences("MY_APP_PREFS", Context.MODE_PRIVATE)
+        val token = sharedPrefs.getString("JWT_TOKEN", "") ?: ""
+
+        return apiService.putInfoProfile(userId, user, token = "Bearer $token")
     }
 }
