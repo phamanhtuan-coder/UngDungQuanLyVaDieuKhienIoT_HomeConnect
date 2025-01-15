@@ -13,16 +13,21 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Login
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LoginResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.NewPasswordRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.NewPasswordResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ProfileResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RegisterRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RegisterResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UnlinkResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.User
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UserRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UserResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface ApiService {
@@ -72,4 +77,10 @@ interface ApiService {
 
     @POST("/api/devices/{deviceId}/unlink")
     suspend fun postUnlink(@Path("deviceId") deviceId: Int, @Header("Authorization") token: String) : UnlinkResponse
+
+    @GET("/api/auth/me")
+    suspend fun getInfoProfile(@Header("Authorization") token: String) : User
+
+    @PUT("/api/users/{userId}")
+    suspend fun putInfoProfile(@Path("userId") userId: Int, @Body user: UserRequest, @Header("Authorization") token: String) : UserResponse
 }
