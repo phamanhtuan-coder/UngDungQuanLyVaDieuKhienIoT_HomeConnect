@@ -119,8 +119,8 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 @Composable
 fun AccessPointConnectionScreen(
     navController: NavHostController,
-    deviceId: String="",
-    deviceName: String="",
+    deviceId: String = "",
+    deviceName: String = "",
 ) {
     val context = LocalContext.current
     val layoutConfig = rememberResponsiveLayoutConfig() // Lấy LayoutConfig
@@ -518,13 +518,13 @@ fun WiFiCard(
                 .padding(top = 8.dp)
                 .border(1.dp, colorScheme.onSecondary, RoundedCornerShape(8.dp))
                 .clickable(
-                  onClick = {
-                      if (isConnected) {
-                          navController.navigate(Screens.WifiConnection.route)
-                      } else {
-                          showDialog = true // Hiển thị dialog khi nhấn vào WiFiCard chưa kết nối
-                      }
-                  }
+                    onClick = {
+                        if (isConnected) {
+                            navController.navigate(Screens.WifiConnection.route)
+                        } else {
+                            showDialog = true // Hiển thị dialog khi nhấn vào WiFiCard chưa kết nối
+                        }
+                    }
                 ),
             shape = RoundedCornerShape(8.dp),
             colors = CardDefaults.cardColors(containerColor = colorScheme.secondary),

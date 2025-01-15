@@ -65,7 +65,6 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import com.google.gson.Gson
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
@@ -79,7 +78,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AttributeRequest
@@ -90,9 +88,9 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlin.Int
 
 /** Giao diện màn hình Device Detail (DeviceDetailScreen)
  * -----------------------------------------
@@ -205,7 +203,14 @@ fun DeviceDetailPhoneScreen(
         }
 
 
-        var attribute by remember { mutableStateOf(AttributeRequest(brightness = 1, color = "#ffffff"))}
+        var attribute by remember {
+            mutableStateOf(
+                AttributeRequest(
+                    brightness = 1,
+                    color = "#ffffff"
+                )
+            )
+        }
 
         var safeDevice = infoDevice ?: DeviceResponse(
             DeviceID = 0,
@@ -473,14 +478,21 @@ fun DeviceDetailPhoneScreen(
                                                         colorFilter = ColorFilter.tint(colorScheme.onPrimary) // Màu chữ trắng
                                                     )
                                                     Slider(
-                                                        value = attribute.brightness!!.toFloat(),
+                                                        value = attribute.brightness.toFloat(),
                                                         onValueChange = {
-                                                            attribute.brightness =it.toInt()
+                                                            attribute.brightness = it.toInt()
                                                         }, // Thanh trượt giá trị mặc định là 80
                                                         onValueChangeFinished = {
-                                                            viewModel.attributeDevice(safeDevice.DeviceID, attribute.brightness, attribute.color)
+                                                            viewModel.attributeDevice(
+                                                                safeDevice.DeviceID,
+                                                                attribute.brightness,
+                                                                attribute.color
+                                                            )
                                                             Log.d("Color B Slider", attribute.color)
-                                                            Log.d("Brightness B Slider", attribute.brightness.toString())
+                                                            Log.d(
+                                                                "Brightness B Slider",
+                                                                attribute.brightness.toString()
+                                                            )
                                                         },
                                                         steps = 10,
                                                         valueRange = 1f..255f,
@@ -527,7 +539,13 @@ fun DeviceDetailPhoneScreen(
                                                 if (attribute.color != null) {
                                                     SliderWith16BasicColors(safeDevice.DeviceID, attribute)
                                                 } else {
-                                                    SliderWith16BasicColors(safeDevice.DeviceID ,AttributeRequest(brightness = 1, color = "#ffffff"))
+                                                    SliderWith16BasicColors(
+                                                        safeDevice.DeviceID,
+                                                        AttributeRequest(
+                                                            brightness = 1,
+                                                            color = "#ffffff"
+                                                        )
+                                                    )
                                                 }
                                             }
                                         }
@@ -624,7 +642,7 @@ fun DeviceDetailPhoneScreen(
                                                     fun getIconForType(typeId: Int): String {
                                                         return when (typeId) {
                                                             1 -> "Fire Alarm" // Light
-                                                            2,3 -> "LED Light" // Fire
+                                                            2, 3 -> "LED Light" // Fire
                                                             else -> ""         // Biểu tượng mặc định
                                                         }
                                                     }
@@ -1123,7 +1141,7 @@ fun DeviceDetailTabletScreen(
 
                                                         // Thanh trượt (Slider) giá trị 80
                                                         Slider(
-                                                            value = attribute.brightness!!.toFloat(),
+                                                            value = attribute.brightness.toFloat(),
                                                             onValueChange = {
 
                                                             }, // Thanh trượt giá trị mặc định là 80
@@ -1184,7 +1202,13 @@ fun DeviceDetailTabletScreen(
                                                     if (attribute.color != null) {
                                                         SliderWith16BasicColors(safeDevice.DeviceID, attribute)
                                                     } else {
-                                                        SliderWith16BasicColors(safeDevice.DeviceID ,AttributeRequest(brightness =0, color = "#000000"))
+                                                        SliderWith16BasicColors(
+                                                            safeDevice.DeviceID,
+                                                            AttributeRequest(
+                                                                brightness = 0,
+                                                                color = "#000000"
+                                                            )
+                                                        )
                                                     }
                                                 }
                                             }
@@ -1484,7 +1508,11 @@ fun SliderWith16BasicColors(deviceID: Int, attribute: AttributeRequest) {
 
     // Quản lý trạng thái sliderPosition và khởi tạo theo `inputColor`
     var sliderPosition by remember {
-        mutableStateOf(findClosestColorPosition(parseHexToColor(attribute.color) ?: Color.Black, colors.map { it.first }))
+        mutableStateOf(
+            findClosestColorPosition(
+                parseHexToColor(attribute.color) ?: Color.Black,
+                colors.map { it.first })
+        )
     }
     var isSending by remember { mutableStateOf(false) }
 
@@ -1528,7 +1556,7 @@ fun SliderWith16BasicColors(deviceID: Int, attribute: AttributeRequest) {
                     val currentColorIndex = (sliderPosition * (colors.size - 1)).toInt()
                     val selectedColor = colors[currentColorIndex].first
 
-                    attribute.color =colorToHex(selectedColor)
+                    attribute.color = colorToHex(selectedColor)
 
                     isSending = true
                     viewModel.attributeDevice(deviceID, attribute.brightness, attribute.color)
@@ -1560,7 +1588,6 @@ fun SliderWith16BasicColors(deviceID: Int, attribute: AttributeRequest) {
         )
     }
 }
-
 
 
 // Hàm chuyển đổi mã hex sang Color
@@ -1648,9 +1675,7 @@ fun EndlessRollingPadlockTimePicker(
                 .padding(4.dp),
             contentAlignment = Alignment.Center
         ) {
-            Row(
-
-            ) {
+            Row {
                 // Cột giờ
                 RollingColumn(
                     state = hourState,

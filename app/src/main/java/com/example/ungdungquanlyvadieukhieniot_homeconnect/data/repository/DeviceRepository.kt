@@ -24,10 +24,14 @@ class DeviceRepository (private val context: Context) {
         return apiService.toggleDevice(deviceId, toggleRequest, token = "Bearer $token")
     }
 
-    suspend fun postAttributeDevice(deviceId: Int,brightness:Int ,color:String): AttributeResponse {
+    suspend fun postAttributeDevice(
+        deviceId: Int,
+        brightness: Int,
+        color: String
+    ): AttributeResponse {
         val sharedPrefs =context.getSharedPreferences("MY_APP_PREFS", Context.MODE_PRIVATE)
         val token=  sharedPrefs.getString("JWT_TOKEN", "") ?: ""
-        val attributeRequest = AttributeRequest(brightness=brightness, color = color)
+        val attributeRequest = AttributeRequest(brightness = brightness, color = color)
         return apiService.postAttributes(deviceId, attributeRequest, token = "Bearer $token")
     }
 
