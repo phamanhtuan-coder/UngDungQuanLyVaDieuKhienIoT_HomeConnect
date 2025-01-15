@@ -19,9 +19,9 @@ sealed class LoginUiState {
     data class Error(val message: String) : LoginUiState()
 }
 
-class LoginViewModel(application: Application) : AndroidViewModel(application) {
+class LoginViewModel(application: Application, context: Context) : AndroidViewModel(application) {
 
-    private val repository = AuthRepository()
+    private val repository = AuthRepository(context)
     private val userRepository = UserRepository(context = application)
 
     // StateFlow cho UI lắng nghe
