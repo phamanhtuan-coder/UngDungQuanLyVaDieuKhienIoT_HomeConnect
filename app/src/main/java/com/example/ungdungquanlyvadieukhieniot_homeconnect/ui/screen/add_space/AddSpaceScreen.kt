@@ -1,5 +1,6 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.add_space
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -34,26 +36,36 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.repository.SpaceRepository
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.HouseSelection
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.SharedViewModel
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.space.SpaceViewModel
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.ValidationUtils
 
 @Composable
 fun AddSpaceScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    sharedViewModel: SharedViewModel
 ) {
+    val context = LocalContext.current
+    val spaceViewModel = remember {
+        SpaceViewModel(SpaceRepository(context))
+    }
     // Biến trạng thái để lưu giá trị nhập và thông báo lỗi
     var spaceName by remember { mutableStateOf("") }
     var spaceNameError by remember { mutableStateOf("") }
+    var houseId by remember { mutableStateOf(-1) }
     val configuration = LocalConfiguration.current
     val isTablet = configuration.screenWidthDp >= 600
-    AppTheme {
 
+    AppTheme {
         val colorScheme = MaterialTheme.colorScheme
         Scaffold(
             containerColor = colorScheme.background,
@@ -74,118 +86,75 @@ fun AddSpaceScreen(
                             .imePadding()
                             .verticalScroll(rememberScrollState())
                             .padding(innerPadding),
-                        verticalArrangement = Arrangement.Center, // Căn giữa theo chiều dọc
-                        horizontalAlignment = Alignment.CenterHorizontally // Căn giữa theo chiều ngang
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-
-
-                        Row(
+                        Column(
                             modifier = Modifier
-                                .fillMaxSize()
-                                .background(colorScheme.background)
-                                .padding(8.dp)
+                                .width(if (isTablet) 500.dp else 400.dp)
+                                .padding(16.dp)
                         ) {
-                            Box(
+                            // Ô nhập Tên Space
+                            OutlinedTextField(
+                                value = spaceName,
+                                onValueChange = {
+                                    spaceName = it
+                                    spaceNameError = ValidationUtils.validateSpaceName(it)
+                                },
+                                leadingIcon = {
+                                    Icon(Icons.Filled.LocationOn, contentDescription = null)
+                                },
+                                singleLine = true,
+                                shape = RoundedCornerShape(25),
+                                placeholder = { Text("Tên Space") },
+                                isError = spaceNameError.isNotEmpty(),
                                 modifier = Modifier
-                                    .weight(1f)
-                                    .background(
-                                        colorScheme.background,
-                                        shape = RoundedCornerShape(12.dp)
-                                    )
-                                    .padding(16.dp)
-                            ) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center,
-                                    modifier = Modifier.fillMaxSize()
-                                ) {
-                                    Column(
-                                        modifier = Modifier
-                                            .width(if (isTablet) 500.dp else 400.dp)
-                                    ) {
-                                        // Ô nhập Tên Space
-                                        OutlinedTextField(
-                                            value = spaceName,
-                                            onValueChange = {
-                                                spaceName = it
-                                                // Gọi hàm kiểm tra tên Space
-                                                spaceNameError = ValidationUtils.validateSpaceName(it)
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    Icons.Filled.LocationOn,
-                                                    contentDescription = null
-                                                )
-                                            },
-                                            singleLine = true,
-                                            shape = RoundedCornerShape(25),
-                                            placeholder = { Text("Tên Space") },
-                                            modifier = Modifier
-                                                .width(if (isTablet) 500.dp else 400.dp)
-                                                .height(if (isTablet) 80.dp else 70.dp),
-                                            colors = TextFieldDefaults.colors(
-                                                focusedTextColor = colorScheme.onBackground,
-                                                unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),
-                                                focusedContainerColor = colorScheme.onPrimary,
-                                                unfocusedContainerColor = colorScheme.onPrimary,
-                                                focusedIndicatorColor = colorScheme.primary,
-                                                unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
-                                            )
-                                        )
-                                        Spacer(modifier = Modifier.height(8.dp))
+                                    .fillMaxWidth()
+                                    .height(if (isTablet) 80.dp else 70.dp),
+                                colors = TextFieldDefaults.colors(
+                                    focusedTextColor = colorScheme.onBackground,
+                                    unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),
+                                    focusedContainerColor = colorScheme.onPrimary,
+                                    unfocusedContainerColor = colorScheme.onPrimary,
+                                    focusedIndicatorColor = colorScheme.primary,
+                                    unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
+                                )
+                            )
 
-                                        OutlinedTextField(
-                                            value = "",
-                                            onValueChange = {
-                                                // TODO: Handle house selection input
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    Icons.Filled.Home,
-                                                    contentDescription = null
-                                                )
-                                            },
-                                            singleLine = true,
-                                            shape = RoundedCornerShape(25),
-                                            placeholder = { Text("Chọn Nhà") },
-                                            modifier = Modifier
-                                                .width(if (isTablet) 500.dp else 400.dp)
-                                                .height(if (isTablet) 80.dp else 70.dp),
-                                            colors = TextFieldDefaults.colors(
-                                                focusedTextColor = colorScheme.onBackground,  // Màu text khi TextField được focus
-                                                unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),  // Màu text khi TextField không được focus
-                                                focusedContainerColor = colorScheme.onPrimary,
-                                                unfocusedContainerColor = colorScheme.onPrimary,
-                                                focusedIndicatorColor = colorScheme.primary,
-                                                unfocusedIndicatorColor = colorScheme.onBackground.copy(
-                                                    alpha = 0.5f
-                                                )
-                                            ),
-                                            trailingIcon = {
-                                                Icon(
-                                                    imageVector = Icons.Default.KeyboardArrowDown,
-                                                    contentDescription = null
-                                                )
-                                            }
-                                        )
-                                        Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                                        Button(
-                                            onClick = { /* TODO: Handle add space logic */ },
-                                            modifier = Modifier
-                                                .align(Alignment.CenterHorizontally)
-                                                .width(if (isTablet) 300.dp else 200.dp)
-                                                .height(if (isTablet) 56.dp else 48.dp),
-                                            colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
-                                            shape = RoundedCornerShape(50)
-                                        ) {
-                                            Text(
-                                                "Thêm space",
-                                                color = colorScheme.onPrimary
-                                            )
-                                        }
-                                    }
+                            HouseSelection(
+                                sharedViewModel = sharedViewModel,
+                                //houses = listOf("House 1", "House 2", "House 3"),
+                                onManageHouseClicked = { navController.navigate(Screens.HouseManagement.route) },
+                                onTabSelected = {id ->
+                                    houseId = id.toInt()
                                 }
+                            )
+
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            // Nút Thêm Space
+                            Button(
+                                onClick = {
+                                    if (spaceName.isBlank() || houseId == -1) {
+                                        Toast.makeText(context, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        spaceViewModel.createSpace(houseId.toInt(), spaceName)
+                                        navController.popBackStack() // Quay lại màn hình trước đó
+                                    }
+                                },
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .fillMaxWidth()
+                                    .height(if (isTablet) 56.dp else 48.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
+                                shape = RoundedCornerShape(50)
+                            ) {
+                                Text(
+                                    "Thêm Space",
+                                    color = colorScheme.onPrimary
+                                )
                             }
                         }
                     }
@@ -193,10 +162,4 @@ fun AddSpaceScreen(
             }
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AddSpaceScreenPreview() {
-    AddSpaceScreen(navController = rememberNavController())
 }
