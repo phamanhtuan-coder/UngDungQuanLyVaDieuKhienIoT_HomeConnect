@@ -20,9 +20,9 @@ sealed class SignUpState {
     data class Error(val error: String) : SignUpState()
 }
 
-class SignUpViewModel(application: Application) : AndroidViewModel(application) {
+class SignUpViewModel(application: Application, context: Context) : AndroidViewModel(application) {
 
-    private val repository = AuthRepository()
+    private val repository = AuthRepository(context)
 
     // StateFlow cho UI lắng nghe
     private val _signUpState = MutableStateFlow<SignUpState>(SignUpState.Idle)

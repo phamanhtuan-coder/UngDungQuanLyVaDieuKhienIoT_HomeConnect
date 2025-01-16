@@ -1,5 +1,6 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.login
 
+import android.app.Application
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -40,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -48,7 +50,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
@@ -79,17 +80,22 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.Validat
 @Composable
 fun LoginScreen(
     navController: NavHostController,
-    viewModel: LoginViewModel = viewModel()  // Hoặc hiltViewModel()
 ) {
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+    val viewModel = remember {
+        LoginViewModel(application, context)
+    }
+
     AppTheme {
         val configuration = LocalConfiguration.current
         val isTablet = configuration.screenWidthDp >= 600
         val colorScheme = MaterialTheme.colorScheme
         // Biến trạng thái để lưu giá trị email và mật khẩu
         val emailState =
-            remember { mutableStateOf("0306221391@caothang.edu.vn") } //Todo: xoá email debug khi hoàn thiên app
+            remember { mutableStateOf("123jjhAh4@gmail.com") } //Todo: xoá email debug khi hoàn thiên app
         val passwordState =
-            remember { mutableStateOf("Tu@n1234") } //Todo: xoá password debug khi hoàn thiên app
+            remember { mutableStateOf("afhj@A123") } //Todo: xoá password debug khi hoàn thiên app
         var passwordVisible by remember { mutableStateOf(false) }
 
         // Biến trạng thái để lưu thông báo lỗi

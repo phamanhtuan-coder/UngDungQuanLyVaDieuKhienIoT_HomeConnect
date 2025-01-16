@@ -59,6 +59,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
  */
 @Composable
 fun HouseSelection(
+    sharedViewModel: SharedViewModel,
     onTabSelected: (Int) -> Unit,
     onManageHouseClicked: () -> Unit = {} // Callback for managing house
 ) {
@@ -93,9 +94,17 @@ fun HouseSelection(
             }
             is HouseState.Success -> {
                 houses = (housesListState as HouseState.Success).houseList
-                Log.d("List Device", (housesListState as HouseState.Success).houseList.toString())
-                selectedItem = houses.first()
-                onTabSelected(selectedItem.HouseID)
+                Log.d("List House", houses.toString())
+
+                // Kiểm tra nếu danh sách `houses` trống
+                if (houses.isEmpty()) {
+                    selectedItem = HouseResponse(HouseID = -1, Name = "Không có nhà")
+                    sharedViewModel.setHouseId(selectedItem.HouseID)
+                } else {
+                    selectedItem = houses.first()
+                    onTabSelected(selectedItem.HouseID)
+                    sharedViewModel.setHouseId(selectedItem.HouseID)
+                }
             }
         }
 
@@ -148,6 +157,7 @@ fun HouseSelection(
                                 .clickable {
                                     selectedItem = house
                                     onTabSelected(house.HouseID)
+                                    sharedViewModel.setHouseId(selectedItem.HouseID)
                                     isDropdownExpanded = false
                                 }
                                 .padding(horizontal = 16.dp, vertical = 12.dp),

@@ -4,12 +4,14 @@ import android.app.Application
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.HouseResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.repository.HouseRepository
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.repository.SpaceRepository
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.SpaceState
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
@@ -40,5 +42,18 @@ class HouseDropDownViewModel(application: Application, context: Context) : Andro
                 _houseListState.value = HouseState.Error(e.message ?: "Danh sach load thất bại!")
             }
         }
+    }
+}
+
+class SharedViewModel : ViewModel() {
+    private val _houseId = MutableStateFlow<Int?>(null)
+    val houseId: StateFlow<Int?> get() = _houseId
+
+    fun setHouseId(id: Int) {
+        _houseId.value = id
+    }
+
+    fun clearHouseId() {
+        _houseId.value = null // Xóa giá trị khi không cần nữa
     }
 }

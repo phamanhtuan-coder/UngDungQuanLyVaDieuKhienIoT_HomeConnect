@@ -42,6 +42,8 @@ android {
 
 
 dependencies {
+    implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.6.1") // Thay phiên bản nếu cần
+
     //Google Firebase Messaging
     implementation(libs.firebase.messaging)
     //wifiutils

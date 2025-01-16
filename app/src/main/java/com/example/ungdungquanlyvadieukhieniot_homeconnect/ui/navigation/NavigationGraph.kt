@@ -1,13 +1,17 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation
 
+import DashboardDeviceScreen
 import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.SharedViewModel
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens.DashboardDeviceScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.AccessPointConnectionScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.activity_detail.ActivityHistoryScreenDetailScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.activity_history.ActivityHistoryScreen
@@ -36,84 +40,85 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screens.DashboardS
 fun NavigationGraph(
     navController: NavHostController
 ) {
-        NavHost(
-            navController = navController,
-            startDestination = Screens.Welcome.route
-        ){
-            // Welcome screen
-            composable(Screens.Welcome.route) {
-                WelcomeScreen(navController)
-            }
+    val sharedViewModel: SharedViewModel = viewModel()
+    NavHost(
+        navController = navController,
+        startDestination = Screens.Welcome.route
+    ){
+        // Welcome screen
+        composable(Screens.Welcome.route) {
+            WelcomeScreen(navController)
+        }
 
-            // Login screens
-            composable(Screens.Login.route) {
-                LoginScreen(navController)
-            }
+        // Login screens
+        composable(Screens.Login.route) {
+            LoginScreen(navController)
+        }
 
-            // Recover password Screen
-            composable(Screens.RecoverPassword.route) {
-                PasswordRecoveryScreen(navController)
-            }
+        // Recover password Screen
+        composable(Screens.RecoverPassword.route) {
+            PasswordRecoveryScreen(navController)
+        }
 
-            // Signup Screen
-            composable(Screens.Register.route) {
-                SignUpScreen(navController)
-            }
+        // Signup Screen
+        composable(Screens.Register.route) {
+            SignUpScreen(navController)
+        }
 
-            // OTP Screen
-            composable(
-                route = "${Screens.OTP.route}?email={email}",
-                arguments = listOf(
-                    navArgument("email") {
-                        type = NavType.StringType
-                        defaultValue = ""
-                    }
-                )
-            ) { backStackEntry ->
-                val email = backStackEntry.arguments?.getString("email") ?: ""
-                Log.d("OTP", "Email: $email")
-                OtpScreen(
-                    navController = navController,
-                    email = email
-                )
-            }
-            // HomeScreen
-            navigation(startDestination = Screens.Home.route, route = "home_graph") {
-                composable(Screens.Home.route) {
-                    HomeScreen(navController)
+        // OTP Screen
+        composable(
+            route = "${Screens.OTP.route}?email={email}",
+            arguments = listOf(
+                navArgument("email") {
+                    type = NavType.StringType
+                    defaultValue = ""
                 }
+            )
+        ) { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email") ?: ""
+            Log.d("OTP", "Email: $email")
+            OtpScreen(
+                navController = navController,
+                email = email
+            )
+        }
+        // HomeScreen
+        navigation(startDestination = Screens.Home.route, route = "home_graph") {
+            composable(Screens.Home.route) {
+                HomeScreen( navController = navController, sharedViewModel = sharedViewModel)
             }
+        }
 
-            //Dashboard Screen
-            navigation(startDestination = Screens.Dashboard.route, route = "dashboard_graph") {
-                composable(Screens.Dashboard.route) {
-                    DashboardScreen(navController)
-                }
+        //Dashboard Screen
+        navigation(startDestination = Screens.Dashboard.route, route = "dashboard_graph") {
+            composable(Screens.Dashboard.route) {
+                DashboardScreen(navController, sharedViewModel)
             }
+        }
 
-            //Profile Screen
-            navigation(startDestination = Screens.Profile.route, route = "profile_graph") {
-                composable(Screens.Profile.route) {
-                    ProfileScreen(navController)
-                }
+        //Profile Screen
+        navigation(startDestination = Screens.Profile.route, route = "profile_graph") {
+            composable(Screens.Profile.route) {
+                ProfileScreen(navController)
             }
+        }
 
-            //Devices Screen
-            navigation(startDestination = Screens.Devices.route, route = "devices_graph") {
-                composable(Screens.Devices.route) {
-                    DeviceScreen(navController)
-                }
+        //Devices Screen
+        navigation(startDestination = Screens.Devices.route, route = "devices_graph") {
+            composable(Screens.Devices.route) {
+                DeviceScreen(navController = navController, sharedViewModel = sharedViewModel)
             }
+        }
 
-            //Settings Screen
-            navigation(startDestination = Screens.Settings.route, route = "settings_graph") {
-                composable(Screens.Settings.route) {
-                    SettingsScreen(navController)
-                }
+        //Settings Screen
+        navigation(startDestination = Screens.Settings.route, route = "settings_graph") {
+            composable(Screens.Settings.route) {
+                SettingsScreen(navController)
             }
+        }
 
-            //Device Detail Screen
-            //Todo: Tạm thời dẫn tới placeholder, sau này cần truyền Id của thiết bị vào để hiển thị thông tin chi tiết của thiết bị
+        //Device Detail Screen
+        //Todo: Tạm thời dẫn tới placeholder, sau này cần truyền Id của thiết bị vào để hiển thị thông tin chi tiết của thiết bị
 //            composable(Screens.DeviceDetail.route) {
 //                DeviceDetailScreen(navController)
 //            }
@@ -138,29 +143,29 @@ fun NavigationGraph(
             }
 
 
-            //Add Device Screen
-            composable(Screens.AddDevice.route) {
-                AddDeviceScreen(navController)
-            }
+        //Add Device Screen
+        composable(Screens.AddDevice.route) {
+            AddDeviceScreen(navController)
+        }
 
-            //All Notifications Screen
-            //Todo: Lấy dữ liệu thông báo từ server
-            composable(Screens.AllNotifications.route) {
-                NotificationScreen(
-                    navController
-                )
-            }
+        //All Notifications Screen
+        //Todo: Lấy dữ liệu thông báo từ server
+        composable(Screens.AllNotifications.route) {
+            NotificationScreen(
+                navController
+            )
+        }
 
-            //House Management Screen
-            composable(Screens.HouseManagement.route) {
-                HouseManagementScreen(navController)
-            }
+        //House Management Screen
+        composable(Screens.HouseManagement.route) {
+            HouseManagementScreen(navController)
+        }
 
-            //Activity History
-            //Todo: Lấy dữ liêu id để hiển thị thông tin lịch sử
-            composable(Screens.ActivityHistory.route) {
-                ActivityHistoryScreen(navController)
-            }
+        //Activity History
+        //Todo: Lấy dữ liêu id để hiển thị thông tin lịch sử
+        composable(Screens.ActivityHistory.route) {
+            ActivityHistoryScreen(navController)
+        }
 
             //Notification Detail Screen
             //Todo: Lấy id notification để hiển thị thông tin chi tiết
@@ -174,59 +179,79 @@ fun NavigationGraph(
                 DetailNotification(navController, id)
             }
 
-            //Todo: Lấy dữ liêu id để hiển thị chi tiết thông tin lịch sử
-            composable(Screens.ActivityHistoryDetail.route) {
-                ActivityHistoryScreenDetailScreen(navController)
-            }
+        //Todo: Lấy dữ liêu id để hiển thị chi tiết thông tin lịch sử
+        composable(Screens.ActivityHistoryDetail.route) {
+            ActivityHistoryScreenDetailScreen(navController)
+        }
 
-            //Todo: Lấy dữ liêu id để vào kết nối wifi
-            composable(Screens.WifiConnection.route) {
-                WifiConnectionScreen(navController)
-            }
+        //Todo: Lấy dữ liêu id để vào kết nối wifi
+        composable(Screens.WifiConnection.route) {
+            WifiConnectionScreen(navController)
+        }
 
-            //Spaces Screen
-            composable(Screens.Spaces.route) {
-                SpaceScreen(navController)
-            }
+        //Spaces Screen
+        composable(Screens.Spaces.route) {
+            SpaceScreen(navController, sharedViewModel)
+        }
 
-            //Add Space Screen
-            composable(Screens.AddSpace.route) {
-                AddSpaceScreen(navController)
-            }
+        //Add Space Screen
+        composable(Screens.AddSpace.route) {
+            AddSpaceScreen(navController)
+        }
 
-            composable(
-                route = "${Screens.NewPassword.route}?email={email}",
-                arguments = listOf(
-                    navArgument("email") {
-                        type = NavType.StringType
-                        defaultValue = ""
-                    }
-                )
-            ) { backStackEntry ->
-                val email = backStackEntry.arguments?.getString("email") ?: ""
-                NewPasswordScreen(navController, email)
-            }
-            //Password Authentication Screen
-            composable(Screens.PasswordAuth.route) {
-                PasswordAuthenticationScreen(navController)
-            }
+        composable(
+            route = "${Screens.NewPassword.route}?email={email}",
+            arguments = listOf(
+                navArgument("email") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            )
+        ) { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email") ?: ""
+            NewPasswordScreen(navController, email)
+        }
+        //Password Authentication Screen
+        composable(Screens.PasswordAuth.route) {
+            PasswordAuthenticationScreen(navController)
+        }
 
-            composable(Screens.UpdatePassword.route) {
-                UpdatePasswordScreen(navController)
-            }
+        composable(
+            route = "Screens.UpdatePassword.route/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val userId = backStackEntry.arguments?.getInt("id") ?: -1
+            UpdatePasswordScreen(navController, userId)
+        }
 
 //            composable(Screens.FireAlarmDetail.route) {
 //                FireAlarmDetailScreen(navController)
 //            }
 
-            composable("device/{typeID}/{id}") { backStackEntry ->
-                val typeID = backStackEntry.arguments?.getString("typeID")?.toIntOrNull()
-                val id = backStackEntry.arguments?.getString("id")?.toIntOrNull()
+        composable(
+            route = "${Screens.DashboardDeviceScreen.route}/{spaceID}/{id}",
+            arguments = listOf(
+                navArgument("spaceID") { type = NavType.IntType }, // Thêm spaceID
+                navArgument("id") { type = NavType.IntType }       // Tham số id
+            )
+        ) { backStackEntry ->
+            // Lấy giá trị từ arguments
+            val spaceID = backStackEntry.arguments?.getInt("spaceID") ?: -1
+            val id = backStackEntry.arguments?.getInt("id") ?: -1
 
-                // Sử dụng Factory để ánh xạ typeID tới màn hình
-                val screen = DeviceScreenFactory.getScreen(typeID ?: 0)
-                screen(navController, id)
-            }
-            // Todo:... other nested graphs (devices, profile, settings) ...
+            // Truyền spaceID và id vào DashboardDeviceScreen
+            DashboardDeviceScreen(navController = navController, spaceId = spaceID, id = id)
         }
+
+
+        composable("device/{typeID}/{id}") { backStackEntry ->
+            val typeID = backStackEntry.arguments?.getString("typeID")?.toIntOrNull()
+            val id = backStackEntry.arguments?.getString("id")?.toIntOrNull()
+
+            // Sử dụng Factory để ánh xạ typeID tới màn hình
+            val screen = DeviceScreenFactory.getScreen(typeID ?: 0)
+            screen(navController, id)
+        }
+        // Todo:... other nested graphs (devices, profile, settings) ...
     }
+}

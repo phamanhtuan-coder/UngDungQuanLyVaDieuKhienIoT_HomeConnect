@@ -1,5 +1,6 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.data.repository
 
+import android.content.Context
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.api.RetrofitClient
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LoginRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LoginResponse
@@ -7,7 +8,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Regis
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RegisterResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.User
 
-class AuthRepository {
+class AuthRepository(private val context: Context) {
     private val apiService = RetrofitClient.apiService
 
     suspend fun login(email: String, password: String): LoginResponse {
@@ -33,5 +34,11 @@ class AuthRepository {
         )
         // Gọi API
         return apiService.register(request)
+    }
+
+    suspend fun getInfoProfile(): User {
+        val sharedPrefs =context.getSharedPreferences("MY_APP_PREFS", Context.MODE_PRIVATE)
+        val token=  sharedPrefs.getString("JWT_TOKEN", "") ?: ""
+        return apiService.getInfoProfile(token = "Bearer $token")
     }
 }

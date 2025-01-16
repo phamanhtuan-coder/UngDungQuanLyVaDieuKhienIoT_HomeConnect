@@ -69,6 +69,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Toggl
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.HouseSelection
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.SharedViewModel
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
@@ -98,6 +99,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 @Composable
 fun DeviceScreen(
     navController: NavHostController,
+    sharedViewModel: SharedViewModel
 ) {
     var selectedTabIndex by remember { mutableStateOf(0) }
 
@@ -232,6 +234,7 @@ fun DeviceScreen(
                                         .align(Alignment.Center)
                                 ) {
                                     HouseSelection(
+                                        sharedViewModel = sharedViewModel,
                                         //houses = listOf("House 1", "House 2", "House 3"),
                                         onManageHouseClicked = {
                                             /* TODO: Navigate */
@@ -648,5 +651,5 @@ fun IconButtonBox(icon: String) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun DeviceScreenPreview() {
-    DeviceScreen(navController = rememberNavController())
+    DeviceScreen(navController = rememberNavController(), sharedViewModel = SharedViewModel(),)
 }
