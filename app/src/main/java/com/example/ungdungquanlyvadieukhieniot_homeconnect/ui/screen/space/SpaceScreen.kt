@@ -53,6 +53,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.HouseSelection
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.SharedViewModel
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.WarningDialog
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
@@ -73,7 +74,8 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
  */
 @Composable
 fun SpaceScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    sharedViewModel: SharedViewModel
 ) {
     val spaceCount = remember { mutableStateOf("5") }
 
@@ -162,6 +164,7 @@ fun SpaceScreen(
                                         .align(Alignment.Center)
                                 ) {
                                     HouseSelection(
+                                        sharedViewModel = sharedViewModel,
                                         //houses = listOf("House 1", "House 2", "House 3"),
                                         onManageHouseClicked = {
                                             /* TODO: Navigate */
@@ -410,5 +413,5 @@ fun SpaceCard(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun SpaceScreenPreview() {
-    SpaceScreen(navController = rememberNavController())
+    SpaceScreen(navController = rememberNavController(), sharedViewModel = SharedViewModel())
 }
