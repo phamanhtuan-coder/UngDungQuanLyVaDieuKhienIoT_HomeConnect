@@ -51,6 +51,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Alert
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AlertType
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 /** Giao diện màn hình Chi tiết thông báo (DetailNotification)
@@ -76,6 +77,31 @@ fun DetailNotification(
     }
 
     val notificationState by viewModel.alertState.collectAsState()
+    val notificationReadState by viewModel.alertReadState.collectAsState()
+
+
+    when (notificationReadState) {
+        is NotificationReadState.Success -> {
+            navController.popBackStack(Screens.AllNotifications.route, inclusive = false)
+
+        }
+
+        is NotificationReadState.Error -> {
+            val error = (notificationReadState as NotificationReadState.Error).error
+            Log.d("Lỗi: ", error)
+        }
+
+        is NotificationReadState.Loading -> {
+            Log.d("Loading: ", "Đang xử lý")
+        }
+
+        is NotificationReadState.Idle -> {
+            // Do nothing
+        }
+    }
+
+
+
 
     LaunchedEffect(Unit) {
         viewModel.getAllByUser(AlertID)

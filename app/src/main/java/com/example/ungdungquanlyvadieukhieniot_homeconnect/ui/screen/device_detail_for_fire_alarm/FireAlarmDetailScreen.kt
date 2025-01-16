@@ -56,6 +56,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
@@ -77,7 +78,6 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.isTablet
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.getInfoDeviceState
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
-import kotlin.toString
 
 @Composable
 fun FireAlarmDetailScreen(
@@ -630,17 +630,18 @@ fun SingleColorCircleWithDividers(selectedStatus: String, dividerCount: Int) {
         modifier = Modifier.size(200.dp),
         contentAlignment = Alignment.Center // Đảm bảo nội dung bên trong căn giữa
     ) {
+        // Xác định màu dựa theo trạng thái
+        val color = when (selectedStatus) {
+            "Bình thường" -> Color.Green
+            "Báo động" -> Color.Red
+            "Lỗi" -> Color.Yellow
+            else -> Color.Gray
+        }
         Canvas(modifier = Modifier.size(200.dp)) {
             val radius = size.minDimension / 2 - 20f // Trừ bớt để tránh bị cắt
             val center = Offset(size.width / 2, size.height / 2)
 
-            // Xác định màu dựa theo trạng thái
-            val color = when (selectedStatus) {
-                "Bình thường" -> Color.Green
-                "Báo động" -> Color.Red
-                "Lỗi" -> Color.Yellow
-                else -> Color.Gray
-            }
+
 
             // Vẽ vòng tròn với màu trạng thái
             drawCircle(
@@ -671,6 +672,7 @@ fun SingleColorCircleWithDividers(selectedStatus: String, dividerCount: Int) {
         // Icon trung tâm (nếu cần)
         Image(
             painter = painterResource(id = R.drawable.fire),
+            colorFilter = ColorFilter.tint(color),
             contentDescription = null,
             modifier = Modifier.size(100.dp) // Kích thước biểu tượng
         )

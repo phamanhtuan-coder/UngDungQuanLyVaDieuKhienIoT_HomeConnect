@@ -28,3 +28,14 @@ data class AlertDetail(
 data class AlertType(
     val AlertTypeName: String
 )
+
+data class Alert(
+    val AlertID: Int,
+    val DeviceID: Int,
+    val SpaceID: Int,
+    val TypeID: Int,
+    val Message: String,
+    val Timestamp: String,
+    val Status: Boolean,
+    val AlertTypeID: Int,
+)

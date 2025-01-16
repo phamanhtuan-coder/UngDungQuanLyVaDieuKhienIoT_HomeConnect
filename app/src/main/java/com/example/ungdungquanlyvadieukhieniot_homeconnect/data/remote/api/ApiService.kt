@@ -1,5 +1,6 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.api
 
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Alert
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AlertDetail
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AlertResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AttributeRequest
@@ -87,7 +88,7 @@ interface ApiService {
     suspend fun readNotification(
         @Path("alertId") alertId: Int,
         @Header("Authorization") token: String
-    ): AlertDetail
+    ): Alert
 
 
 }
