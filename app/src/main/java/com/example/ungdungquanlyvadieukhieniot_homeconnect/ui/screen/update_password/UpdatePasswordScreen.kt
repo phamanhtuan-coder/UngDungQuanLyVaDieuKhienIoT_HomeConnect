@@ -1,6 +1,9 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.update_password
 
+import android.app.Application
 import android.content.res.Configuration
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,6 +27,7 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -52,8 +58,12 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.Navigator
 import androidx.navigation.compose.rememberNavController
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ChangePasswordRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.User
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.isTablet
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.settings.SettingsScreen
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.signup.SignUpState
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.signup.SignUpViewModel
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.ValidationUtils
 
@@ -70,8 +80,35 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.Validat
 
 @Composable
 fun UpdatePasswordScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    userId: Int
 ) {
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+    val viewModel = remember {
+        UpdatePasswordViewModel(application, context)
+    }
+
+    val updatePasswordState by viewModel.updatePasswordState.collectAsState()
+
+    when(updatePasswordState){
+        is UpdatePasswordState.Error ->{
+            Text((updatePasswordState as UpdatePasswordState.Error).error, color = Color.Red)
+            Log.e("Error",  (updatePasswordState as UpdatePasswordState.Error).error)
+        }
+        is UpdatePasswordState.Idle ->{
+            //Todo
+        }
+        is UpdatePasswordState.Loading -> {
+            CircularProgressIndicator()
+        }
+        is UpdatePasswordState.Success -> {
+            Text((updatePasswordState as UpdatePasswordState.Success).message, color = Color.Red)
+            //navController.navigate(Screens.Login.route)
+            Log.d("Success", (updatePasswordState as UpdatePasswordState.Success).message)
+        }
+    }
+
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
         val configuration = LocalConfiguration.current
@@ -92,6 +129,8 @@ fun UpdatePasswordScreen(
         var passwordError by remember { mutableStateOf("") }
         var passwordNewError by remember { mutableStateOf("") }
         var passwordConfirmError by remember { mutableStateOf("") }
+
+        var changePasswordRequest by remember { mutableStateOf<ChangePasswordRequest?>(null) }
 
         // Xác định xem nếu chúng ta đang ở chế độ ngang
         val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -252,6 +291,7 @@ fun UpdatePasswordScreen(
 
                     //ToDo: Trả về các điều kiện cần đạt được cácd mật khẩu
 
+
                     // Nút đăng nhập
                     // Nút Đặt lại mật khẩu
                     Button(
@@ -277,6 +317,26 @@ fun UpdatePasswordScreen(
                     // Nút quay lại màn hình đăng nhập
                     TextButton(onClick = {
                         //ToDo: Sử lý xự kiện quay lại
+                        if (passwordError.isEmpty() && passwordNewError.isEmpty() && passwordConfirmError.isEmpty()) {
+                            // Gửi yêu cầu đổi mật khẩu
+                            changePasswordRequest = ChangePasswordRequest(
+                                oldPassword = passwordState,
+                                newPassword = passwordState2,
+                            )
+                            viewModel.updatePassword(userId, changePasswordRequest!!)
+
+                            // Hiển thị Toast thành công
+                            Toast.makeText(context, "Đặt lại mật khẩu thành công!", Toast.LENGTH_SHORT).show()
+                        } else {
+                            // Hiển thị lỗi bằng Toast
+                            if (passwordError.isNotEmpty()) {
+                                Toast.makeText(context, passwordError, Toast.LENGTH_SHORT).show()
+                            } else if (passwordNewError.isNotEmpty()) {
+                                Toast.makeText(context, passwordNewError, Toast.LENGTH_SHORT).show()
+                            } else if (passwordConfirmError.isNotEmpty()) {
+                                Toast.makeText(context, passwordConfirmError, Toast.LENGTH_SHORT).show()
+                            }
+                        }
                         navController.popBackStack()
                     }) {
                         Text(
@@ -295,5 +355,5 @@ fun UpdatePasswordScreen(
 @Preview(showBackground = true,showSystemUi = true)
 @Composable
 fun UpdatePasswordScreenPreview() {
-    UpdatePasswordScreen(navController = rememberNavController())
+    UpdatePasswordScreen(navController = rememberNavController(), -1)
 }
