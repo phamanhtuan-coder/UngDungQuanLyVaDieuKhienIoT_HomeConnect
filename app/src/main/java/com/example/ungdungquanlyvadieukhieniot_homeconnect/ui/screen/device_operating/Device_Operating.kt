@@ -61,6 +61,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.HouseSelection
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.SharedViewModel
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
@@ -77,7 +78,8 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
  */
 @Composable
 fun DeviceOperatingScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    sharedViewModel: SharedViewModel
 ) {
     var selectedTabIndex by remember { mutableStateOf(0) }
     AppTheme {
@@ -164,6 +166,7 @@ fun DeviceOperatingScreen(
                                         .align(Alignment.Center)
                                 ) {
                                     HouseSelection(
+                                        sharedViewModel = sharedViewModel,
                                         //houses = listOf("House 1", "House 2", "House 3"),
                                         onManageHouseClicked = {
                                             /* TODO: Navigate */
@@ -516,5 +519,5 @@ fun IconButtonBox(icon: String) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun DeviceOperatingScreenPreview() {
-    DeviceOperatingScreen(navController = rememberNavController())
+    DeviceOperatingScreen(navController = rememberNavController(), sharedViewModel = SharedViewModel())
 }
