@@ -70,6 +70,7 @@ import androidx.navigation.NavHostController
 import androidx.compose.runtime.getValue
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.setValue
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.CreateHouseRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.HousesListPesponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UpdateHouseRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
@@ -148,6 +149,24 @@ fun HouseManagementScreen(
         else -> {}
     }
 
+    val createState by viewModel.createHouseState.collectAsState()
+
+    when (createState) {
+        is CreateHouseState.Loading -> CircularProgressIndicator()
+        is CreateHouseState.Success -> {
+            val successState = createState as CreateHouseState.Success
+            Text("Nhà tạo thành công: ${successState.message}")
+            // Làm mới danh sách nhà
+            LaunchedEffect(Unit) {
+                viewModel.fetchHouses()
+            }
+        }
+        is CreateHouseState.Error -> {
+            val errorState = createState as CreateHouseState.Error
+            Text("Lỗi tạo nhà: ${errorState.error}")
+        }
+        else -> {}
+    }
 
     LaunchedEffect(Unit) {
         viewModel.fetchHouses()
@@ -261,6 +280,14 @@ fun HouseManagementScreen(
                                 )
                             } else {
                                 // Thêm mới
+                                viewModel.createHouse(
+                                    CreateHouseRequest(
+                                        Name = name,
+                                        Address = address,
+                                        IconName = icon,
+                                        IconColor = colorNameMap.entries.firstOrNull { it.value == color }?.key ?: "transparent"
+                                    )
+                                )
                             }
                             isPopupVisible.value = false
                         },
