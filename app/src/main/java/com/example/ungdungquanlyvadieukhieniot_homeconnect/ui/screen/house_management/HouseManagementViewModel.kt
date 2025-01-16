@@ -5,10 +5,10 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.CreateHouseRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.HouseDetail
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.HousesListPesponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UpdateHouseRequest
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UpdateHouseResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.repository.HouseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,6 +26,13 @@ sealed class UpdateHouseState {
     object Loading : UpdateHouseState()
     data class Success(val message: String, val house: HouseDetail) : UpdateHouseState()
     data class Error(val error: String) : UpdateHouseState()
+}
+
+sealed class CreateHouseState {
+    object Idle : CreateHouseState()
+    object Loading : CreateHouseState()
+    data class Success(val message: String, val house: HouseDetail1, val space: DefaultSpace) : CreateHouseState()
+    data class Error(val error: String) : CreateHouseState()
 }
 
 class HouseManagementViewModel(application: Application, context: Context) : AndroidViewModel(application) {
@@ -63,6 +70,21 @@ class HouseManagementViewModel(application: Application, context: Context) : And
                 _updateHouseState.value = UpdateHouseState.Success(response.message, response.house)
             } catch (e: Exception) {
                 _updateHouseState.value = UpdateHouseState.Error(e.message ?: "Đã xảy ra lỗi")
+            }
+        }
+    }
+
+    private val _createHouseState = MutableStateFlow<CreateHouseState>(CreateHouseState.Idle)
+    val createHouseState = _createHouseState.asStateFlow()
+
+    fun createHouse(request: CreateHouseRequest) {
+        _createHouseState.value = CreateHouseState.Loading
+        viewModelScope.launch {
+            try {
+                val response = repository.createHouse(request)
+                _createHouseState.value = CreateHouseState.Success(response.message, response.house, response.space)
+            } catch (e: Exception) {
+                _createHouseState.value = CreateHouseState.Error(e.message ?: "Đã xảy ra lỗi")
             }
         }
     }
