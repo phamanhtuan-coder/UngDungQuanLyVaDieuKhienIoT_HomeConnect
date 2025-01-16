@@ -14,7 +14,9 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Devic
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceTokenResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.EmailRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.EmailResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.House
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.HouseResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.HousesListPesponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LoginRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LoginResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.NewPasswordRequest
@@ -140,4 +142,9 @@ interface ApiService {
         @Path("deviceId") deviceId: Int,
         @Header("Authorization") token: String
     ): WeeklyAverageSensorResponse
+
+    @GET("/api/houses")
+    suspend fun getHouses(
+        @Header("Authorization") token: String
+    ): List<HousesListPesponse>
 }
