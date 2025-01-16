@@ -86,6 +86,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Toggl
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.WarningDialog
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import com.google.gson.Gson
@@ -167,6 +168,8 @@ fun DeviceDetailPhoneScreen(
     infoDevice: DeviceResponse?
 ) {
     AppTheme {
+
+
         val colorScheme = MaterialTheme.colorScheme
         var rowWidth by remember { mutableStateOf(0) }
         var selectedTimeBegin by remember { mutableStateOf("12:00 AM") }
@@ -181,6 +184,7 @@ fun DeviceDetailPhoneScreen(
         val viewModel = remember {
             DeviceDetailViewModel(application, context)
         }
+
 
         var toggleDevice by remember { mutableStateOf<ToggleResponse?>(null) }
         val toggleDeviceState by viewModel.toggleState.collectAsState()
@@ -297,7 +301,21 @@ fun DeviceDetailPhoneScreen(
                 Log.d("Unlink Device", (unlinkState as UnlinkState.Success).message)
             }
         }
-
+        var showAlertDialog by remember { mutableStateOf(false) }
+        if (showAlertDialog) {
+            WarningDialog(
+                title = "Gỡ kết nối",
+                text = "Bạn có chắc chắn muốn gỡ kết nối thiết bị này không?",
+                onConfirm = {
+                    viewModel.unlinkDevice(safeDevice.DeviceID)
+                    showAlertDialog = false
+                    navController.popBackStack()
+                },
+                onDismiss = {
+                    showAlertDialog = false
+                }
+            )
+        }
         Scaffold(
             topBar = {
                 /*
@@ -791,9 +809,7 @@ fun DeviceDetailPhoneScreen(
 
                                 Button(
                                     onClick = {
-                                        //Todo: Xử lý khi nhấn nút Gỡ kết nối
-                                        viewModel.unlinkDevice(safeDevice.DeviceID)
-                                        navController.popBackStack()
+                                        showAlertDialog = true
                                     },
                                     modifier = Modifier
                                         .weight(1f) // Chia đều không gian
@@ -967,6 +983,22 @@ fun DeviceDetailTabletScreen(
             containerColor = colorScheme.background,
             modifier = Modifier.fillMaxSize(),
             content = { innerPadding ->
+
+                var showAlertDialog by remember { mutableStateOf(false) }
+                if (showAlertDialog) {
+                    WarningDialog(
+                        title = "Gỡ kết nối",
+                        text = "Bạn có chắc chắn muốn gỡ kết nối thiết bị này không?",
+                        onConfirm = {
+                            viewModel.unlinkDevice(safeDevice.DeviceID)
+                            showAlertDialog = false
+                            navController.popBackStack()
+                        },
+                        onDismiss = {
+                            showAlertDialog = false
+                        }
+                    )
+                }
                 Box(
                     modifier = Modifier
                         .wrapContentHeight()
@@ -1457,9 +1489,7 @@ fun DeviceDetailTabletScreen(
 
                                     Button(
                                         onClick = {
-                                            //Todo: Xử lý khi nhấn nút gỡ liên kết
-                                            viewModel.unlinkDevice(safeDevice.DeviceID)
-                                            navController.popBackStack()
+                                            showAlertDialog = true
                                         },
                                         modifier = Modifier
                                             .weight(1f) // Chia đều không gian

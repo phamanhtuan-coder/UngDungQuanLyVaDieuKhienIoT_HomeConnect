@@ -75,6 +75,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Toggl
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.WarningDialog
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.isTablet
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.getInfoDeviceState
@@ -275,7 +276,21 @@ fun FireAlarmDetailScreen(
             }
         }
 
-
+        var showAlertDialog by remember { mutableStateOf(false) }
+        if (showAlertDialog) {
+            WarningDialog(
+                title = "Gỡ kết nối",
+                text = "Bạn có chắc chắn muốn gỡ kết nối thiết bị này không?",
+                onConfirm = {
+                    viewModel.unlinkDevice(safeDevice.DeviceID)
+                    showAlertDialog = false
+                    navController.popBackStack()
+                },
+                onDismiss = {
+                    showAlertDialog = false
+                }
+            )
+        }
 
         val colorScheme = MaterialTheme.colorScheme
         Scaffold(
@@ -682,9 +697,7 @@ fun FireAlarmDetailScreen(
 
                                 Button(
                                     onClick = {
-                                        //Todo: Xử lý khi nhấn nút Gỡ kết nối
-                                        viewModel.unlinkDevice(safeDevice.DeviceID)
-                                        navController.popBackStack()
+                                        showAlertDialog = true
                                     },
                                     modifier = Modifier
                                         .weight(0.5f) // Chia đều không gian
