@@ -34,4 +34,11 @@ class AlertRepository(private val context: Context) {
         return apiService.readNotification(alertId = alertId, token = "Bearer $token")
     }
 
+    suspend fun searchNotification(search: String): List<AlertResponse> {
+        val sharedPrefs = context.getSharedPreferences("MY_APP_PREFS", Context.MODE_PRIVATE)
+        val token = sharedPrefs.getString("JWT_TOKEN", "") ?: ""
+        // Gọi API
+        return apiService.searchAlerts(search, token = "Bearer $token")
+    }
+
 }

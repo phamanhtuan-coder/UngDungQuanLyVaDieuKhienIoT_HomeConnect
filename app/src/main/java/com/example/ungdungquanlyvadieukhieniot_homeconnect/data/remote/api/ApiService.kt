@@ -27,6 +27,7 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiService {
     @POST("/api/auth/login")
@@ -89,6 +90,13 @@ interface ApiService {
         @Path("alertId") alertId: Int,
         @Header("Authorization") token: String
     ): Alert
+
+
+    @GET("/api/alerts/search")
+    suspend fun searchAlerts(
+        @Query("q") query: String,
+        @Header("Authorization") token: String
+    ): List<AlertResponse>
 
 
 }

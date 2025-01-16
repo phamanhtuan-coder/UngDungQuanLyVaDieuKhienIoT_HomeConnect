@@ -51,6 +51,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AlertResponse
@@ -58,6 +59,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
+import kotlinx.coroutines.launch
 
 
 //Todo: Bỏ các object này để làm isTablet
@@ -129,12 +131,17 @@ fun NotificationScreen(
                         .fillMaxSize()
                         .padding(innerPadding)
                 ) {
-
-
                         if (notifications.isEmpty()) {
                             EmptyNotificationScreen()
                         } else {
-                            NotificationList(notifications, navController)
+                            NotificationList(notifications, navController,
+                                onSearch = { query ->
+                                    // Launch search in coroutine
+                                    viewModel.viewModelScope.launch {
+                                        viewModel.searchNotification(query)
+                                    }
+                                }
+                            )
                         }
 
                 }
@@ -181,7 +188,12 @@ fun EmptyNotificationScreen() {
 
 // Danh sách các thông báo
 @Composable
-fun NotificationList(notifications: List<AlertResponse>, navController: NavHostController) {
+fun NotificationList(
+    notifications: List<AlertResponse>, navController: NavHostController,
+    onSearch: (String) -> Unit
+) {
+
+    val searchState = remember { mutableStateOf("") }
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
         Column(
@@ -219,9 +231,11 @@ fun NotificationList(notifications: List<AlertResponse>, navController: NavHostC
                             horizontalAlignment = Alignment.CenterHorizontally // Căn giữa các phần tử con theo chiều ngang
                         ) {
                             TextField(
-                                value = "",
-                                onValueChange = {
-                                    //Todo: Xử lý tiềm kiếm
+                                value = searchState.value,
+                                onValueChange = { query ->
+                                    searchState.value = query
+                                    onSearch(query)
+
                                 },
                                 leadingIcon = {
                                     Icon(

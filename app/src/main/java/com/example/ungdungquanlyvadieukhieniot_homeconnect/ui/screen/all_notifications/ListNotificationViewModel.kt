@@ -43,4 +43,19 @@ class ListNotificationModel(application: Application, context: Context) :
             }
         }
     }
+
+    fun searchNotification(search: String) {
+        viewModelScope.launch {
+            try {
+                _alertListState.value = NotificationState.Loading
+                val response = repository.searchNotification(search)
+                Log.d("ListNotificationModel", "Alerts: $response")
+                _alertListState.value = NotificationState.Success(response)
+            } catch (e: Exception) {
+                Log.e("ListNotificationModel", "Error fetching alerts: ${e.message}")
+                _alertListState.value =
+                    NotificationState.Error(e.message ?: "Danh sach load thất bại!")
+            }
+        }
+    }
 }
