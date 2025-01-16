@@ -82,12 +82,14 @@ import androidx.navigation.NavHostController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AttributeRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LogLastest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.WarningDialog
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail_for_fire_alarm.LogLastestState
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
@@ -145,8 +147,58 @@ fun DeviceDetailScreen(
         }
     }
 
+    val logLastestState by viewModel.logLastestState.collectAsState()
+    var log by remember { mutableStateOf<LogLastest?>(null) }
+
+    when (logLastestState) {
+        is LogLastestState.Error -> {
+            Log.e("Error", (logLastestState as LogLastestState.Error).error)
+        }
+
+        is LogLastestState.Idle -> {
+            //Todo
+        }
+
+        is LogLastestState.Loading -> {
+            //Todo
+        }
+
+        is LogLastestState.Success -> {
+            log = (logLastestState as LogLastestState.Success).log
+            infoDevice?.Attribute ?: (logLastestState as LogLastestState.Success).log.Details
+            Log.d(" Log", (logLastestState as LogLastestState.Success).log.toString())
+        }
+    }
+
+
+
+    val logToggleState by viewModel.toggleLogState.collectAsState()
+    var logToggle by remember { mutableStateOf<LogLastest?>(null) }
+
+    when (logToggleState) {
+        is LogLastestState.Error -> {
+            Log.e("Error", (logToggleState as LogLastestState.Error).error)
+        }
+
+        is LogLastestState.Idle -> {
+            //Todo
+        }
+
+        is LogLastestState.Loading -> {
+            //Todo
+        }
+
+        is LogLastestState.Success -> {
+            logToggle = (logToggleState as LogLastestState.Success).log
+            infoDevice?.PowerStatus ?: (logToggleState as LogLastestState.Success).log.Action.contains("true")
+            Log.d(" Log", (logToggleState as LogLastestState.Success).log.toString())
+        }
+    }
+
     LaunchedEffect(1) {
         viewModel.getInfoDevice(deviceID!!)
+        viewModel.getLatestUpdateAttributes(deviceID)
+        viewModel.getLatestToggle(deviceID)
     }
 
     val configuration = LocalConfiguration.current
@@ -184,6 +236,51 @@ fun DeviceDetailPhoneScreen(
         val viewModel = remember {
             DeviceDetailViewModel(application, context)
         }
+        val logLastestState by viewModel.logLastestState.collectAsState()
+        var log by remember { mutableStateOf<LogLastest?>(null) }
+
+        when (logLastestState) {
+            is LogLastestState.Error -> {
+                Log.e("Error", (logLastestState as LogLastestState.Error).error)
+            }
+
+            is LogLastestState.Idle -> {
+                //Todo
+            }
+
+            is LogLastestState.Loading -> {
+                //Todo
+            }
+
+            is LogLastestState.Success -> {
+                log = (logLastestState as LogLastestState.Success).log
+                Log.d(" Log", (logLastestState as LogLastestState.Success).log.toString())
+            }
+        }
+
+
+
+        val logToggleState by viewModel.toggleLogState.collectAsState()
+        var logToggle by remember { mutableStateOf<LogLastest?>(null) }
+
+        when (logToggleState) {
+            is LogLastestState.Error -> {
+                Log.e("Error", (logToggleState as LogLastestState.Error).error)
+            }
+
+            is LogLastestState.Idle -> {
+                //Todo
+            }
+
+            is LogLastestState.Loading -> {
+                //Todo
+            }
+
+            is LogLastestState.Success -> {
+                logToggle = (logToggleState as LogLastestState.Success).log
+                Log.d(" Log", (logToggleState as LogLastestState.Success).log.toString())
+            }
+        }
 
 
         var toggleDevice by remember { mutableStateOf<ToggleResponse?>(null) }
@@ -216,6 +313,19 @@ fun DeviceDetailPhoneScreen(
             )
         }
 
+        data class LogCommand (
+            val action: String = "",
+            val brightness: Int = 0,
+            val color: String = ""
+        )
+
+        data class LogAction (
+            val fromServer: Boolean = false,
+            val command: LogCommand = LogCommand()
+        )
+
+
+
         var safeDevice = infoDevice ?: DeviceResponse(
             DeviceID = 0,
             TypeID = 0,
@@ -226,7 +336,37 @@ fun DeviceDetailPhoneScreen(
         )
 
         Log.e("safeDevice", safeDevice.toString())
+        LaunchedEffect(logLastestState) {
+            try {
+                val actionJson = log?.Action ?: return@LaunchedEffect
+                val logAction = Gson().fromJson(actionJson, LogAction::class.java)
 
+                if (logAction.command.action == "updateAttributes") {
+                    val currentDeviceAttribute = try {
+                        Gson().fromJson(safeDevice.Attribute, AttributeRequest::class.java)
+                    } catch (e: Exception) {
+                        AttributeRequest(brightness = 1, color = "#ffffff")
+                    }
+
+                    val newAttribute = AttributeRequest(
+                        brightness = logAction.command.brightness,
+                        color = logAction.command.color
+                    )
+
+                    if (currentDeviceAttribute.brightness != newAttribute.brightness ||
+                        currentDeviceAttribute.color != newAttribute.color) {
+                        attribute = newAttribute
+                        viewModel.attributeDevice(
+                            safeDevice.DeviceID,
+                            attribute.brightness,
+                            attribute.color
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("LogParsing", "Error parsing log: ${e.message}")
+            }
+        }
         LaunchedEffect(toggleDevice) {
             safeDevice = infoDevice ?: DeviceResponse(
                 DeviceID = 0,
@@ -858,6 +998,53 @@ fun DeviceDetailTabletScreen(
     val viewModel = remember {
         DeviceDetailViewModel(application, context)
     }
+    val logLastestState by viewModel.logLastestState.collectAsState()
+    var log by remember { mutableStateOf<LogLastest?>(null) }
+
+    when (logLastestState) {
+        is LogLastestState.Error -> {
+            Log.e("Error", (logLastestState as LogLastestState.Error).error)
+        }
+
+        is LogLastestState.Idle -> {
+            //Todo
+        }
+
+        is LogLastestState.Loading -> {
+            //Todo
+        }
+
+        is LogLastestState.Success -> {
+            log = (logLastestState as LogLastestState.Success).log
+            Log.d(" Log", (logLastestState as LogLastestState.Success).log.toString())
+        }
+    }
+
+
+
+    val logToggleState by viewModel.toggleLogState.collectAsState()
+    var logToggle by remember { mutableStateOf<LogLastest?>(null) }
+
+    when (logToggleState) {
+        is LogLastestState.Error -> {
+            Log.e("Error", (logToggleState as LogLastestState.Error).error)
+        }
+
+        is LogLastestState.Idle -> {
+            //Todo
+        }
+
+        is LogLastestState.Loading -> {
+            //Todo
+        }
+
+        is LogLastestState.Success -> {
+            logToggle = (logToggleState as LogLastestState.Success).log
+            Log.d(" Log", (logToggleState as LogLastestState.Success).log.toString())
+        }
+    }
+
+
 
     var toggleDevice by remember { mutableStateOf<ToggleResponse?>(null) } // Lắng nghe danh sách thiết bị
     val toggleDeviceState by viewModel.toggleState.collectAsState()
