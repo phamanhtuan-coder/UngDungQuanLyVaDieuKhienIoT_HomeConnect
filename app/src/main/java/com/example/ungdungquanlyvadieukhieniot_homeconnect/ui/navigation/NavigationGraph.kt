@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LogDetailNavArg
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.AccessPointConnectionScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.activity_detail.ActivityHistoryScreenDetailScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.activity_history.ActivityHistoryScreen
@@ -31,6 +32,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.space.Space
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.update_password.UpdatePasswordScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.wifi_connection.WifiConnectionScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screens.DashboardScreen
+import com.google.gson.Gson
 
 @Composable
 fun NavigationGraph(
@@ -175,9 +177,9 @@ fun NavigationGraph(
             }
 
             //Todo: Lấy dữ liêu id để hiển thị chi tiết thông tin lịch sử
-            composable(Screens.ActivityHistoryDetail.route) {
-                ActivityHistoryScreenDetailScreen(navController)
-            }
+//            composable(Screens.ActivityHistoryDetail.route) {
+//                ActivityHistoryScreenDetailScreen(navController)
+//            }
 
             //Todo: Lấy dữ liêu id để vào kết nối wifi
             composable(Screens.WifiConnection.route) {
@@ -227,6 +229,35 @@ fun NavigationGraph(
                 val screen = DeviceScreenFactory.getScreen(typeID ?: 0)
                 screen(navController, id)
             }
+            composable(
+                route = Screens.ActivityHistory.route,
+                arguments = listOf(
+                    navArgument("deviceId") {
+                        type = NavType.IntType
+                        defaultValue = -1
+                    }
+                )
+            ) { backStackEntry ->
+                val deviceId = backStackEntry.arguments?.getInt("deviceId") ?: -1
+                ActivityHistoryScreen(
+                    navController = navController,
+                    deviceId = deviceId
+                )
+            }
+
+            composable(
+                route = Screens.ActivityHistoryDetail.route,
+                arguments = listOf(
+                    navArgument("logDetails") { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+                val logDetailsJson = backStackEntry.arguments?.getString("logDetails") ?: ""
+                ActivityHistoryScreenDetailScreen(
+                    navController = navController,
+                    logDetailsJson = logDetailsJson
+                )
+            }
+
             // Todo:... other nested graphs (devices, profile, settings) ...
         }
     }

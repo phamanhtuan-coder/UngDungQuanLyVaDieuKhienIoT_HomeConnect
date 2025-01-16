@@ -11,6 +11,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Devic
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.EmailRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.EmailResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.HouseResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LogResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LoginRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LoginResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.NewPasswordRequest
@@ -89,6 +90,12 @@ interface ApiService {
         @Path("alertId") alertId: Int,
         @Header("Authorization") token: String
     ): Alert
+
+    @GET("/api/logs/device/{id}")
+    suspend fun getDeviceLogs(
+        @Path("id") deviceId: Int,
+        @Header("Authorization") token: String
+    ): List<LogResponse>
 
 
 }
