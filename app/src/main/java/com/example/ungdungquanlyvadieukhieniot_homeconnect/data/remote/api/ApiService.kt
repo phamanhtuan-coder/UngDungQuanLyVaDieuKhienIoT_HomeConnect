@@ -3,6 +3,12 @@ package com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.api
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AlertResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AttributeRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AttributeResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AverageSensorResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ChangePasswordRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ChangePasswordResponce
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DailyAverageSensorResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DailyPowerUsageResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DailySensorRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceTokenRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceTokenResponse
@@ -13,6 +19,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Login
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LoginResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.NewPasswordRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.NewPasswordResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RangeSensorRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RegisterRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RegisterResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse
@@ -22,6 +29,8 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Unlin
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.User
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UserRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UserResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.WeeklyAverageSensorResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.WeeklySensorRequest
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -82,4 +91,53 @@ interface ApiService {
 
     @PUT("/api/users/{userId}")
     suspend fun putInfoProfile(@Path("userId") userId: Int, @Body user: UserRequest, @Header("Authorization") token: String) : UserResponse
+
+    @PUT("/api/users/{userId}/change-password")
+    suspend fun putChangePassword(@Path("userId") userId: Int, @Body changePasswordRequest: ChangePasswordRequest, @Header("Authorization") token: String) : ChangePasswordResponce
+
+    // Lấy thống kê trung bình hàng ngày trong khoảng thời gian
+    @GET("/api/statistics/daily-averages-sensor/{deviceId}/{startDate}/{endDate}")
+    suspend fun getDailyAveragesSensor(
+        @Path("deviceId") deviceId: Int,
+        @Path("startDate") startDate: String,
+        @Path("endDate") endDate: String,
+        @Header("Authorization") token: String
+    ): DailyAverageSensorResponse
+
+    // Lấy tiêu thụ điện hàng ngày trong khoảng thời gian
+    @GET("/api/statistics/daily-power-usages/{deviceId}/{startDate}/{endDate}")
+    suspend fun getDailyPowerUsages(
+        @Path("deviceId") deviceId: Int,
+        @Path("startDate") startDate: String,
+        @Path("endDate") endDate: String,
+        @Header("Authorization") token: String
+    ): DailyPowerUsageResponse
+
+    // Tính trung bình sensor hàng ngày
+    @POST("/api/statistics/calculate-daily-average-sensor")
+    suspend fun calculateDailyAverageSensor(
+        @Body request: DailySensorRequest,
+        @Header("Authorization") token: String
+    ): AverageSensorResponse
+
+    // Tính trung bình sensor hàng tuần
+    @POST("/api/statistics/calculate-weekly-average-sensor")
+    suspend fun calculateWeeklyAverageSensor(
+        @Body request: WeeklySensorRequest,
+        @Header("Authorization") token: String
+    ): AverageSensorResponse
+
+    // Tính trung bình sensor theo khoảng thời gian
+    @POST("/api/statistics/calculate-average-sensor-for-range")
+    suspend fun calculateAverageSensorForRange(
+        @Body request: RangeSensorRequest,
+        @Header("Authorization") token: String
+    ): AverageSensorResponse
+
+    // Lấy thống kê sensor hàng tuần gần nhất
+    @GET("/api/statistics/weekly-average-sensor/{deviceId}")
+    suspend fun getWeeklyAverageSensor(
+        @Path("deviceId") deviceId: Int,
+        @Header("Authorization") token: String
+    ): WeeklyAverageSensorResponse
 }
