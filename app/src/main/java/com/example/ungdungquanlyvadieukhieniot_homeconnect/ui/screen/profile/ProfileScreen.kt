@@ -88,7 +88,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.WarningDialog
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.isTablet
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_sharing_list.isTablet
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.ValidationUtils
 import java.io.ByteArrayOutputStream
@@ -322,7 +322,7 @@ fun ProfileScreen(
         LaunchedEffect(userResponse) { // Lắng nghe thay đổi của userResponse
             userResponse?.let { response ->
                 // Kiểm tra xem response.user có null không
-                response.user?.let { user ->
+                response.user.let { user ->
                     nameState.value = user.Name
                     phoneState.value = user.Phone
                     locationState.value = user.Address
@@ -350,8 +350,6 @@ fun ProfileScreen(
                             avatarBitmapState.value = bitmap // Cập nhật trạng thái Bitmap
                         }
                     }
-                } ?: run {
-                    Log.e("LaunchedEffect", "User data is null in UserResponse.")
                 }
             } ?: run {
                 Log.e("LaunchedEffect", "UserResponse is null.")

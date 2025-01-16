@@ -92,8 +92,6 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail_for_fire_alarm.LogLastestState
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import com.google.gson.Gson
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 /** Giao diện màn hình Device Detail (DeviceDetailScreen)
  * -----------------------------------------
@@ -229,7 +227,7 @@ fun DeviceDetailPhoneScreen(
         var showDialogTimePickerBegin by remember { mutableStateOf(false) }
         var showDialogTimePickerEnd by remember { mutableStateOf(false) }
         var showDialog by remember { mutableStateOf(false) }
-        var switchState by remember { mutableStateOf(true) }
+        val switchState by remember { mutableStateOf(true) }
 
         val context = LocalContext.current
         val application = context.applicationContext as Application
@@ -379,13 +377,13 @@ fun DeviceDetailPhoneScreen(
         }
 
         LaunchedEffect(safeDevice.Attribute) {
-            val attributeJson = if (safeDevice.Attribute.isNullOrEmpty()) {
+            val attributeJson = if (safeDevice.Attribute.isEmpty()) {
                 """{"brightness":1, "color":"#ffffff"}""" // Giá trị mặc định
             } else {
                 safeDevice.Attribute
             }
 
-            Log.e("attributeJson",attributeJson.toString())
+            Log.e("attributeJson", attributeJson)
 
             val gson = Gson()
             attribute = gson.fromJson(attributeJson, AttributeRequest::class.java)
@@ -694,17 +692,10 @@ fun DeviceDetailPhoneScreen(
                                                 horizontalAlignment = Alignment.Start,
                                                 verticalArrangement = Arrangement.Top
                                             ) {
-                                                if (attribute.color != null) {
-                                                    SliderWith16BasicColors(safeDevice.DeviceID, attribute)
-                                                } else {
-                                                    SliderWith16BasicColors(
-                                                        safeDevice.DeviceID,
-                                                        AttributeRequest(
-                                                            brightness = 1,
-                                                            color = "#ffffff"
-                                                        )
-                                                    )
-                                                }
+                                                SliderWith16BasicColors(
+                                                    safeDevice.DeviceID,
+                                                    attribute
+                                                )
                                             }
                                         }
                                     }
@@ -971,6 +962,51 @@ fun DeviceDetailPhoneScreen(
                                     )
                                 }
                             }
+                            Row(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .then(Modifier.width(rowWidth.dp)),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp), // Khoảng cách giữa các nút
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Button(
+                                    onClick = {
+                                        navController.navigate(Screens.SharedUsers.route + "?id=${safeDevice.DeviceID}")
+                                    },
+                                    modifier = Modifier
+                                        .weight(1f) // Chia đều không gian
+                                        .width(300.dp)
+                                        .height(48.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color.Green),
+                                    shape = RoundedCornerShape(50)
+                                ) {
+                                    Text(
+                                        text = "Chia sẻ quyền",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 14.sp,
+                                        color = colorScheme.onPrimary
+                                    )
+                                }
+
+                                Button(
+                                    onClick = {
+                                        showAlertDialog = true
+                                    },
+                                    modifier = Modifier
+                                        .weight(1f) // Chia đều không gian
+                                        .width(300.dp)
+                                        .height(48.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow),
+                                    shape = RoundedCornerShape(50)
+                                ) {
+                                    Text(
+                                        text = "Reset thiết bị",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 14.sp,
+                                        color = Color.Black
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -991,7 +1027,7 @@ fun DeviceDetailTabletScreen(
     var showDialogTimePickerEnd by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
 
-    var switchState by remember { mutableStateOf(true) }
+    val switchState by remember { mutableStateOf(true) }
 
     val context = LocalContext.current
     val application = context.applicationContext as Application
@@ -1090,13 +1126,13 @@ fun DeviceDetailTabletScreen(
     }
 
     LaunchedEffect(safeDevice.Attribute) {
-        val attributeJson = if (safeDevice.Attribute.isNullOrEmpty()) {
+        val attributeJson = if (safeDevice.Attribute.isEmpty()) {
             """{"brightness":0, "color":"#000000"}""" // Giá trị mặc định
         } else {
             safeDevice.Attribute
         }
 
-        Log.e("attributeJson",attributeJson.toString())
+        Log.e("attributeJson", attributeJson)
 
         val gson = Gson()
         attribute = gson.fromJson(attributeJson, AttributeRequest::class.java)
@@ -1423,17 +1459,10 @@ fun DeviceDetailTabletScreen(
                                                     horizontalAlignment = Alignment.CenterHorizontally,
                                                     verticalArrangement = Arrangement.Center
                                                 ) {
-                                                    if (attribute.color != null) {
-                                                        SliderWith16BasicColors(safeDevice.DeviceID, attribute)
-                                                    } else {
-                                                        SliderWith16BasicColors(
-                                                            safeDevice.DeviceID,
-                                                            AttributeRequest(
-                                                                brightness = 0,
-                                                                color = "#000000"
-                                                            )
-                                                        )
-                                                    }
+                                                    SliderWith16BasicColors(
+                                                        safeDevice.DeviceID,
+                                                        attribute
+                                                    )
                                                 }
                                             }
                                         }
@@ -1650,7 +1679,53 @@ fun DeviceDetailTabletScreen(
                                     }
                                 }
                                 DayPicker()
+                                Row(
+                                    modifier = Modifier
+                                        .padding(16.dp)
+                                        .then(Modifier.width(rowWidth!!.dp)),
+                                    horizontalArrangement = Arrangement.spacedBy(
+                                        8.dp,
+                                        alignment = Alignment.CenterHorizontally
+                                    ), // Khoảng cách giữa các nút
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Button(
+                                        onClick = {
+                                            //Todo: Xử lý khi nhấn nút Lịch sử
+                                            navController.navigate(Screens.ActivityHistory.route)
+                                        },
+                                        modifier = Modifier
+                                            .weight(1f) // Chia đều không gian
+                                            .width(200.dp)
+                                            .height(48.dp),
+                                        colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
+                                        shape = RoundedCornerShape(50)
+                                    ) {
+                                        Text(
+                                            text = "Lịch sử hoạt động",
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 12.sp
+                                        )
+                                    }
 
+                                    Button(
+                                        onClick = {
+                                            showAlertDialog = true
+                                        },
+                                        modifier = Modifier
+                                            .weight(1f) // Chia đều không gian
+                                            .width(200.dp)
+                                            .height(48.dp),
+                                        colors = ButtonDefaults.buttonColors(containerColor = colorScheme.error),
+                                        shape = RoundedCornerShape(50)
+                                    ) {
+                                        Text(
+                                            text = "Gỡ kết nối",
+                                            fontWeight = FontWeight.Bold,
+                                            color = colorScheme.onError
+                                        )
+                                    }
+                                }
                                 Row(
                                     modifier = Modifier
                                         .padding(16.dp)
@@ -1660,18 +1735,17 @@ fun DeviceDetailTabletScreen(
                                 ) {
                                     Button(
                                         onClick = {
-                                            //Todo: Xử lý khi nhấn nút lịch sử hoạt động
-                                            navController.navigate(Screens.ActivityHistory.route)
+                                            navController.navigate(Screens.SharedUsers.route + "?id=${safeDevice.DeviceID}")
                                         },
                                         modifier = Modifier
                                             .weight(1f) // Chia đều không gian
                                             .width(300.dp)
                                             .height(48.dp),
-                                        colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color.Green),
                                         shape = RoundedCornerShape(50)
                                     ) {
                                         Text(
-                                            text = "Lịch sử hoạt động",
+                                            text = "Chia sẻ quyền",
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 14.sp,
                                             color = colorScheme.onPrimary
@@ -1686,14 +1760,14 @@ fun DeviceDetailTabletScreen(
                                             .weight(1f) // Chia đều không gian
                                             .width(300.dp)
                                             .height(48.dp),
-                                        colors = ButtonDefaults.buttonColors(containerColor = colorScheme.error),
+                                        colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow),
                                         shape = RoundedCornerShape(50)
                                     ) {
                                         Text(
-                                            text = "Gỡ kết nối",
+                                            text = "Reset thiết bị",
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 14.sp,
-                                            color = colorScheme.onError
+                                            color = Color.Black
                                         )
                                     }
                                 }
@@ -1743,9 +1817,11 @@ fun SliderWith16BasicColors(deviceID: Int, attribute: AttributeRequest) {
         DeviceDetailViewModel(application, context)
     }
 
-    LaunchedEffect(attribute.color.toString()) {
+    LaunchedEffect(attribute.color) {
         // Cập nhật vị trí slider khi `inputColor` thay đổi
-        sliderPosition = findClosestColorPosition(parseHexToColor(attribute.color.toString()) ?: Color.Black, colors.map { it.first })
+        sliderPosition = findClosestColorPosition(
+            parseHexToColor(attribute.color) ?: Color.Black,
+            colors.map { it.first })
     }
 
     Column(
@@ -2038,13 +2114,6 @@ fun <T> RollingColumn(
                 }
             }
         }
-    }
-}
-
-suspend fun snapToCenter(scope: CoroutineScope, state: LazyListState, size: Int) {
-    if (!state.isScrollInProgress) {
-        val index = state.firstVisibleItemIndex % size
-        scope.launch { state.scrollToItem(index + size * 50) }
     }
 }
 

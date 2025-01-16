@@ -1,58 +1,53 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.share_device
 
-import androidx.compose.foundation.Image
+import android.app.Application
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Devices
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.isTablet
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_sharing_list.DeviceSharingActionState
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_sharing_list.DeviceSharingState
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_sharing_list.DeviceSharingViewModel
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_sharing_list.isTablet
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.ValidationUtils
 
@@ -70,13 +65,55 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.Validat
  * ---------------------------------------
  */
 @Composable
-fun ShareDeviceScreens() {
+fun ShareDeviceScreen(
+    navController: NavHostController,
+    id: Int
+) {
+
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+    val viewModel = remember {
+        DeviceSharingViewModel(
+            application,
+            context
+        )
+    }
+
+    val addSharedUserState by viewModel.addSharedUserState.collectAsState()
+
+    when (addSharedUserState) {
+        DeviceSharingActionState.Idle -> {
+            viewModel.getSharedUsers(id)
+        }
+
+        DeviceSharingActionState.Loading -> {
+            CircularProgressIndicator()
+        }
+
+        is DeviceSharingActionState.Success -> {
+            LaunchedEffect(Unit) {
+                navController.popBackStack(
+                    Screens.SharedUsers.route + "?id=${id}",
+                    inclusive = false
+                )
+                viewModel._addSharedUserState.value = DeviceSharingActionState.Idle
+            }
+        }
+
+        is DeviceSharingActionState.Error -> {
+            Log.e(
+                "ShareDeviceScreen",
+                "Error: ${(addSharedUserState as DeviceSharingState.Error).error}"
+            )
+        }
+    }
+
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
         val configuration = LocalConfiguration.current
         val isTablet = configuration.screenWidthDp >= 600
 
-        val deviceIdState = remember { mutableStateOf("") }
+        val deviceIdState = remember { mutableStateOf(id) }
         val deviceIdErrorState = remember { mutableStateOf("") }
 
         val emailState = remember { mutableStateOf("") }
@@ -121,14 +158,14 @@ fun ShareDeviceScreens() {
                     // Ô nhập ID thiết bị
                     OutlinedTextField(
                         //ToDo: Bổ sung biến lưu giá trị
-                        value = deviceIdState.value, // Giá trị hiện tại (để trống)
+                        value = deviceIdState.value.toString(), // Giá trị hiện tại (để trống)
                         onValueChange = {
-                            deviceIdState.value = it
+                            deviceIdState.value = it.toInt()
                             // Kiểm tra lỗi ngay khi nhập
                             deviceIdErrorState.value = ValidationUtils.validateDeviceId(it)
                         }, // Hàm xử lý khi nhập liệu (chưa triển khai)
                         leadingIcon = { // Biểu tượng ở bên trái ô nhập liệu
-                            Icon(Icons.Filled.Person, contentDescription = null) // Icon người dùng
+                            Icon(Icons.Filled.Devices, contentDescription = null) // Icon người dùng
                         },
                         shape = RoundedCornerShape(25),
                         singleLine = true,
@@ -178,7 +215,7 @@ fun ShareDeviceScreens() {
                     // Nút gửi yêu cầu
                     Button(
                         onClick = {
-                            // TODO: Xử lý lưu thông tin
+                            viewModel.addSharedUser(deviceIdState.value, emailState.value)
                         },
                         modifier = Modifier
                             .width(if (isTablet()) 300.dp else 200.dp)
@@ -197,5 +234,5 @@ fun ShareDeviceScreens() {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ShareDeviceScreenPreview() {
-    ShareDeviceScreens()
+    ShareDeviceScreen(rememberNavController(), 1)
 }

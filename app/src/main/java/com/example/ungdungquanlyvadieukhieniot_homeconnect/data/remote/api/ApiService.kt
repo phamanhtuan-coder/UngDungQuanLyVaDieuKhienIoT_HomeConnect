@@ -25,6 +25,8 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.NewPa
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RangeSensorRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RegisterRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RegisterResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SharedUser
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SharedUserRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleResponse
@@ -34,7 +36,9 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UserR
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UserResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.WeeklyAverageSensorResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.WeeklySensorRequest
+import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
@@ -186,4 +190,25 @@ interface ApiService {
         @Path("deviceId") deviceId: Int,
         @Header("Authorization") token: String
     ): WeeklyAverageSensorResponse
+
+    @DELETE("/api/sharedpermissions/revoke/{permissionId}")
+    suspend fun revokePermission(
+        @Path("permissionId") permissionId: Int, // Sử dụng Int thay vì RevokeShare
+        @Header("Authorization") token: String
+    ): Response<Unit>
+
+    @GET("/api/sharedpermissions/{deviceId}/shared-users")
+    suspend fun getSharedUsers(
+        @Path("deviceId") deviceId: Int,
+        @Header("Authorization") token: String
+    ): List<SharedUser>
+
+    @POST("/api/sharedpermissions/{deviceId}/share")
+    suspend fun shareDevice(
+        @Path("deviceId") deviceId: Int,
+        @Body sharedWithUserEmail: SharedUserRequest,
+        @Header("Authorization") token: String
+    ): Response<Unit>
+
+
 }

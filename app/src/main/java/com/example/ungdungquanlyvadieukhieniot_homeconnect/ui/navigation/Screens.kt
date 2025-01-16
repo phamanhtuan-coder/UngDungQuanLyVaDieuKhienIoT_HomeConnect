@@ -26,6 +26,8 @@ sealed class Screens(
     object Spaces : Screens("spaces")
     object AddSpace : Screens("add_space")
     object FireAlarmDetail : Screens("fire_alarm_detail")
+    object SharedUsers : Screens("shared_users")
+    object AddSharedUser : Screens("add_shared_user")
 
     object DashboardDeviceScreen: Screens("dashboard_device")
     object Settings: Screens("settings")

@@ -11,7 +11,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.SharedViewModel
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens.DashboardDeviceScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.AccessPointConnectionScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.activity_detail.ActivityHistoryScreenDetailScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.activity_history.ActivityHistoryScreen
@@ -19,6 +18,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.add_device.
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.add_space.AddSpaceScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.all_notifications.NotificationScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.DeviceScreen
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_sharing_list.DeviceSharingListScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.home.HomeScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.house_management.HouseManagementScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.login.LoginScreen
@@ -30,6 +30,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.password_au
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.password_recovery.PasswordRecoveryScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.profile.ProfileScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.settings.SettingsScreen
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.share_device.ShareDeviceScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.signup.SignUpScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.space.SpaceScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.update_password.UpdatePasswordScreen
@@ -44,7 +45,7 @@ fun NavigationGraph(
     NavHost(
         navController = navController,
         startDestination = Screens.Welcome.route
-    ){
+    ) {
         // Welcome screen
         composable(Screens.Welcome.route) {
             WelcomeScreen(navController)
@@ -85,7 +86,7 @@ fun NavigationGraph(
         // HomeScreen
         navigation(startDestination = Screens.Home.route, route = "home_graph") {
             composable(Screens.Home.route) {
-                HomeScreen( navController = navController, sharedViewModel = sharedViewModel)
+                HomeScreen(navController = navController, sharedViewModel = sharedViewModel)
             }
         }
 
@@ -123,24 +124,24 @@ fun NavigationGraph(
 //                DeviceDetailScreen(navController)
 //            }
 
-            //Access Point Screen
-            composable(
-                route = "${Screens.AccessPoint.route}?id={id}&name={name}",
-                arguments = listOf(
-                    navArgument("id") {
-                        type = NavType.StringType
-                        defaultValue = ""
-                    },
-                    navArgument("name") {
-                        type = NavType.StringType
-                        defaultValue = ""
-                    }
-                )
-            ) { backStackEntry ->
-                val id = backStackEntry.arguments?.getString("id") ?: ""
-                val name = backStackEntry.arguments?.getString("name") ?: ""
-                AccessPointConnectionScreen(navController, id, name)
-            }
+        //Access Point Screen
+        composable(
+            route = "${Screens.AccessPoint.route}?id={id}&name={name}",
+            arguments = listOf(
+                navArgument("id") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                },
+                navArgument("name") {
+                    type = NavType.StringType
+                    defaultValue = ""
+                }
+            )
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("id") ?: ""
+            val name = backStackEntry.arguments?.getString("name") ?: ""
+            AccessPointConnectionScreen(navController, id, name)
+        }
 
 
         //Add Device Screen
@@ -167,17 +168,17 @@ fun NavigationGraph(
             ActivityHistoryScreen(navController)
         }
 
-            //Notification Detail Screen
-            //Todo: Lấy id notification để hiển thị thông tin chi tiết
-            composable(
-                route = Screens.NotificationDetail.route + "?id={id}",
-                arguments = listOf(navArgument("id") {
-                    type = NavType.IntType
-                })
-            ) { backStackEntry ->
-                val id = backStackEntry.arguments?.getInt("id") ?: 0
-                DetailNotification(navController, id)
-            }
+        //Notification Detail Screen
+        //Todo: Lấy id notification để hiển thị thông tin chi tiết
+        composable(
+            route = Screens.NotificationDetail.route + "?id={id}",
+            arguments = listOf(navArgument("id") {
+                type = NavType.IntType
+            })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("id") ?: 0
+            DetailNotification(navController, id)
+        }
 
         //Todo: Lấy dữ liêu id để hiển thị chi tiết thông tin lịch sử
         composable(Screens.ActivityHistoryDetail.route) {
@@ -251,6 +252,23 @@ fun NavigationGraph(
             // Sử dụng Factory để ánh xạ typeID tới màn hình
             val screen = DeviceScreenFactory.getScreen(typeID ?: 0)
             screen(navController, id)
+        }
+
+
+        composable(
+            route = Screens.AddSharedUser.route + "?id={id}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("id") ?: -1
+            ShareDeviceScreen(navController, id)
+        }
+
+        composable(
+            route = Screens.SharedUsers.route + "?id={id}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("id") ?: -1
+            DeviceSharingListScreen(navController, id)
         }
         // Todo:... other nested graphs (devices, profile, settings) ...
     }

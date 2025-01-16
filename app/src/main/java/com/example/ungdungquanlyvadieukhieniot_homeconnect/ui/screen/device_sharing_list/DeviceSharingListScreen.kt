@@ -1,5 +1,7 @@
-package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection
+package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_sharing_list
 
+import android.app.Application
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,17 +23,22 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -50,8 +58,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SharedUser
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.WarningDialog
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 /** Giao diện màn hình Access Point Connection Screen (AccessPointConnectionScreen
@@ -109,12 +120,78 @@ fun rememberResponsiveLayoutConfig(): LayoutConfig {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeviceSharingListScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    deviceID: Int = 0
 ) {
+
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+    val viewModel = remember {
+        DeviceSharingViewModel(application, context)
+    }
+
+    val sharedUsersState by viewModel.sharedUsersState.collectAsState()
+    var sharedUsersList by remember { mutableStateOf(emptyList<SharedUser>()) }
+    var selectedPermissionId by remember { mutableStateOf(-1) }
+
+    LaunchedEffect(Unit) {
+        viewModel.getSharedUsers(deviceID)
+    }
+
+    when (sharedUsersState) {
+        is DeviceSharingState.Idle -> {
+            // Do nothing
+        }
+
+        is DeviceSharingState.Loading -> {
+            CircularProgressIndicator()
+        }
+
+        is DeviceSharingState.Success -> {
+            sharedUsersList = (sharedUsersState as DeviceSharingState.Success).sharedUsers
+        }
+
+        is DeviceSharingState.Error -> {
+            // Show error
+            Log.e(
+                "DeviceSharingListScreen",
+                "Error: ${(sharedUsersState as DeviceSharingState.Error).error}"
+            )
+        }
+    }
+
+    val revokePermissionState by viewModel.revokePermissionState.collectAsState()
+
+    when (revokePermissionState) {
+        is DeviceSharingActionState.Idle -> {
+            // Do nothing
+        }
+
+        is DeviceSharingActionState.Loading -> {
+            CircularProgressIndicator()
+        }
+
+        is DeviceSharingActionState.Success -> {
+            LaunchedEffect(Unit) {
+                viewModel.getSharedUsers(deviceID)
+            }
+        }
+
+        is DeviceSharingActionState.Error -> {
+            Log.e(
+                "DeviceSharingListScreen",
+                "Error: ${(revokePermissionState as DeviceSharingActionState.Error).error}"
+            )
+        }
+    }
+
     AppTheme {
         val layoutConfig = rememberResponsiveLayoutConfig() // Lấy LayoutConfig
         var showDialog by remember { mutableStateOf(false) }
         val colorScheme = MaterialTheme.colorScheme
+
+
+
         Scaffold(
             topBar = {
                 /*
@@ -133,9 +210,23 @@ fun DeviceSharingListScreen(
                 MenuBottom(navController)
             },
             floatingActionButton = {
-                /*
-            * Hiển thị nút add
-                 */
+
+                FloatingActionButton(
+                    containerColor = colorScheme.primary,
+                    onClick = {
+                        navController.navigate(Screens.AddSharedUser.route + "?id=$deviceID")
+                    },
+                    content = {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Thêm người dùng",
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp),
+
+                            )
+                    }
+                )
+
             },
             containerColor = colorScheme.background,
             modifier = Modifier.fillMaxSize(),
@@ -181,7 +272,7 @@ fun DeviceSharingListScreen(
                                         ) {
                                             // Văn bản tiêu đề "TÀI KHOẢN ĐÃ ĐƯỢC CHIA SẼ"
                                             Text(
-                                                "TÀI KHOẢN ĐÃ ĐƯỢC CHIA SẼ",
+                                                "TÀI KHOẢN ĐÃ ĐƯỢC CHIA SẺ",
                                                 fontSize = layoutConfig.headingFontSize, // Font size linh hoạt
                                                 color = colorScheme.onPrimary
                                             )
@@ -206,7 +297,7 @@ fun DeviceSharingListScreen(
                                             )
                                             // Văn bản tiêu đề "ĐƯỢC CHIA SẼ"
                                             Text(
-                                                "ĐƯỢC CHIA SẼ",
+                                                "ĐƯỢC CHIA SẺ",
                                                 fontSize = layoutConfig.headingFontSize, // Font size linh hoạt
                                                 color = colorScheme.onPrimary
                                             )
@@ -259,22 +350,38 @@ fun DeviceSharingListScreen(
                                 .width(layoutConfig.contentWidth),               // Độ rộng linh hoạt theo LayoutConfig
                             horizontalAlignment = Alignment.CenterHorizontally   // Căn giữa theo chiều ngang
                         ) {
-                        items(10) { index ->
+                        items(sharedUsersList.count()) { index ->
                             SharedUserCard(
-                                userName = "Nguyễn Thanh Sang",
-                                userEmail = "Sang@gmail.com",
-                                sharedDate = "10/12/2024",
-                                onRevokeClick = {
+                                userName = sharedUsersList[index].SharedWithUser.Name,
+                                userEmail = sharedUsersList[index].SharedWithUser.Email,
+                                sharedDate = sharedUsersList[index].CreatedAt,
+                                permissionId = sharedUsersList[index].PermissionID,
+                                onRevokeClick = { id ->
+                                    selectedPermissionId = id
                                     showDialog = true
                                 }
                             )
+
                         }
                     }
                 }
 
             }
         )
+        if (showDialog) {
+            WarningDialog(
+                title = "Xác nhận",
+                text = "Bạn có chắc chắn muốn thu hồi quyền chia sẻ?",
+                onConfirm = {
+                    viewModel.revokePermission(selectedPermissionId)
+                    showDialog = false
+                    viewModel.getSharedUsers(deviceID)
+                },
+                onDismiss = { showDialog = false }
+            )
+        }
     }
+
 }
 
 @Preview(showBackground = true, showSystemUi = true)
@@ -288,7 +395,8 @@ fun SharedUserCard(
     userName: String,
     userEmail: String,
     sharedDate: String,
-    onRevokeClick: () -> Unit
+    permissionId: Int,
+    onRevokeClick: (Int) -> Unit
 ) {
     AppTheme {
         // Lấy thông tin layout responsive từ config
@@ -358,7 +466,9 @@ fun SharedUserCard(
 
                 // Nút thu hồi gỡ bỏ quyền
                 Button(
-                    onClick = onRevokeClick,
+                    onClick = {
+                        onRevokeClick(permissionId)
+                    },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFFE74C3C)
                     ),
