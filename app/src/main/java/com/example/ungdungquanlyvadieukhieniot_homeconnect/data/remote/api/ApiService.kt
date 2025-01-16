@@ -7,6 +7,8 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Avera
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ChangePasswordRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ChangePasswordResponce
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.CreateHouseRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.CreateSpaceRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.CreateSpaceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DailyAverageSensorResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DailyPowerUsageResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DailySensorRequest
@@ -15,7 +17,6 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Devic
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceTokenResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.EmailRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.EmailResponse
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.House
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.HouseResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.HousesListPesponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LoginRequest
@@ -26,6 +27,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Range
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RegisterRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RegisterResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse2
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UnlinkResponse
@@ -163,4 +165,25 @@ interface ApiService {
         @Body request: CreateHouseRequest,
         @Header("Authorization") token: String
     ): CreateHouseResponse
+
+    @GET("/api/spaces/{houseId}")
+    suspend fun getSpaces(
+        @Path("houseId") houseId: Int,
+        @Header("Authorization") token: String
+    ): List<SpaceResponse2>
+
+    data class UpdateSpaceRequest(val Name: String)
+
+    @PUT("/api/spaces/{id}")
+    suspend fun updateSpace(
+        @Path("id") spaceId: Int,
+        @Body body: UpdateSpaceRequest,
+        @Header("Authorization") token: String
+    ): SpaceResponse3
+
+    @POST("/api/spaces")
+    suspend fun createSpace(
+        @Body body: CreateSpaceRequest,
+        @Header("Authorization") token: String
+    ): CreateSpaceResponse
 }
