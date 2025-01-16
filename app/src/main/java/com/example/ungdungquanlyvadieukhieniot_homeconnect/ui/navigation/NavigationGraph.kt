@@ -34,6 +34,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.profile.Pro
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.settings.SettingsScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.signup.SignUpScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.space.SpaceScreen
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.space.SpaceViewModel
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.update_password.UpdatePasswordScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.wifi_connection.WifiConnectionScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screens.DashboardScreen
@@ -178,8 +179,12 @@ fun NavigationGraph(
 
         //Add Space Screen
         composable(Screens.AddSpace.route) {
-            AddSpaceScreen(navController)
+            AddSpaceScreen(
+                navController = navController,
+                sharedViewModel = sharedViewModel
+            )
         }
+
 
         composable(
             route = "${Screens.NewPassword.route}?email={email}",
