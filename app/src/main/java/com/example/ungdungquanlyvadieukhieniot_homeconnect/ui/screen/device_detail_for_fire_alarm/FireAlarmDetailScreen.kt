@@ -502,8 +502,7 @@ fun FireAlarmDetailScreen(
                                                 }
                                                 Button(
                                                     onClick = {
-                                                        //Todo: Xử lý khi nhấn nút Wifi
-                                                        navController.navigate(Screens.AccessPoint.route)
+                                                        navController.navigate(Screens.AccessPoint.route + "?id=${safeDevice.DeviceID}&name=${safeDevice.Name}")
                                                     },
                                                     modifier = Modifier
                                                         .size(24.dp), // Kích thước tổng thể của Button
@@ -524,6 +523,14 @@ fun FireAlarmDetailScreen(
                                                     )
                                                 }
                                                 if (showDialog) {
+                                                    fun getIconForType(typeId: Int): String {
+                                                        return when (typeId) {
+                                                            1 -> "Fire Alarm" // Light
+                                                            2, 3 -> "LED Light" // Fire
+                                                            else -> ""         // Biểu tượng mặc định
+                                                        }
+                                                    }
+
                                                     AlertDialog(
                                                         onDismissRequest = {
                                                             showDialog = false
@@ -531,9 +538,15 @@ fun FireAlarmDetailScreen(
                                                         title = { Text(text = "Thông tin thiết bị") },
                                                         text = {
                                                             Column {
-                                                                Text("ID Thiết bị: 001")
-                                                                Text("Tên thiết bị: Đèn LED phòng khách")
-                                                                Text("Loại thiết bị: Đèn chiếu sáng")
+                                                                Text("ID Thiết bị: ${safeDevice.DeviceID}")
+                                                                Text("Tên thiết bị: ${safeDevice.Name}")
+                                                                Text(
+                                                                    "Loại thiết bị: ${
+                                                                        getIconForType(
+                                                                            safeDevice.TypeID
+                                                                        )
+                                                                    }"
+                                                                )
                                                             }
                                                         },
                                                         confirmButton = {

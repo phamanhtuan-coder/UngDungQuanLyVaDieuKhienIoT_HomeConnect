@@ -674,7 +674,13 @@ fun DeviceDetailPhoneScreen(
                                                             Column {
                                                                 Text("ID Thiết bị: ${safeDevice.DeviceID}")
                                                                 Text("Tên thiết bị: ${safeDevice.Name}")
-                                                                Text("Loại thiết bị: ${getIconForType(safeDevice.TypeID)}")
+                                                                Text(
+                                                                    "Loại thiết bị: ${
+                                                                        getIconForType(
+                                                                            safeDevice.TypeID
+                                                                        )
+                                                                    }"
+                                                                )
                                                             }
                                                         },
                                                         confirmButton = {
@@ -1314,8 +1320,7 @@ fun DeviceDetailTabletScreen(
                                                 }
                                                 Button(
                                                     onClick = {
-                                                        //Todo: Xử lý khi nhấn nút Wifi
-                                                        navController.navigate(Screens.AccessPoint.route)
+                                                        navController.navigate(Screens.AccessPoint.route + "?id=${safeDevice.DeviceID}&name=${safeDevice.Name}")
                                                     },
                                                     modifier = Modifier
                                                         .size(36.dp), // Kích thước tổng thể của Button
