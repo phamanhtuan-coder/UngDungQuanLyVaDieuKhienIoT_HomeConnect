@@ -1,6 +1,7 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.notification_detail
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -46,11 +47,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AlertResponse
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Device
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceType
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.House
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Space
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AlertDetail
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AlertType
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
@@ -85,7 +83,7 @@ fun DetailNotification(
 
     var Alert by remember {
         mutableStateOf(
-            AlertResponse(
+            AlertDetail(
                 AlertID = 0,
                 DeviceID = 0,
                 SpaceID = 0,
@@ -94,56 +92,16 @@ fun DetailNotification(
                 Timestamp = "",
                 Status = false,
                 AlertTypeID = 0,
-                Device = Device(
-                    DeviceID = 0,
-                    Name = "",
-                    TypeID = 0,
-                    SpaceID = 0,
-                    UserID = 0,
-                    PowerStatus = false,
-                    Attribute = "",
-                    WifiSSID = "",
-                    WifiPassword = "",
-                    IsDeleted = false,
-                    CreatedAt = "",
-                    UpdatedAt = "",
-                    DeviceType = DeviceType(
-                        typeID = 0,
-                        typeName = "",
-                        attributes = "",
-                        rules = "",
-                        isDeleted = false,
-                        createdAt = "",
-                        updatedAt = "",
-                    ),
-                    Space = Space(
-                        SpaceID = 0,
-                        Name = "",
-                        HouseID = 0,
-                        IsDeleted = 0,
-                        CreatedAt = "",
-                        UpdatedAt = "",
-                        House = House(
-                            HouseID = 0,
-                            UserID = 0,
-                            Name = "",
-                            Address = "",
-                            IconName = "",
-                            IconColor = "",
-                            IsDeleted = 0,
-                            CreatedAt = "",
-                            UpdatedAt = "",
-                        )
-                    )
-
-                ),
-            )
+                AlertType = AlertType(AlertTypeName = "")
+            ),
         )
     }
     var error by remember { mutableStateOf("") }
+
     when (notificationState) {
         is NotificationState.Success -> {
             val alert = (notificationState as NotificationState.Success).alert
+            Log.d("Thành công: ", alert.toString())
             Alert = alert
         }
 
@@ -215,7 +173,7 @@ fun DetailNotification(
                                             contentAlignment = Alignment.Center // Căn giữa nội dung trong Box
                                         ) {
                                             Text(
-                                                text = Alert.Device.Name,
+                                                text = Alert.AlertType.AlertTypeName,
                                                 fontSize = 32.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 color = colorScheme.onPrimary
@@ -236,15 +194,15 @@ fun DetailNotification(
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
                                                 Icon(
-                                                    imageVector = Icons.Filled.LocationOn,
-                                                    contentDescription = "Location",
+                                                    imageVector = Icons.Filled.Info,
+                                                    contentDescription = "Staus",
                                                     tint = colorScheme.onPrimary
                                                 )
                                                 Spacer(modifier = Modifier.width(4.dp))
 
                                                 // Tên vị trí
                                                 Text(
-                                                    text = Alert.Device.Space.Name + " - " + Alert.Device.Space.House.Name,
+                                                    text = if (Alert.Status) "Đã xem" else "Chưa xem",
                                                     fontSize = 18.sp,
                                                     fontWeight = FontWeight.Bold,
                                                     color = colorScheme.onPrimary
@@ -313,9 +271,52 @@ fun DetailNotification(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Top
                         ) {
-                            NotificationDetailScreen(
-                                content = Alert.Message
-                            )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentHeight()
+                                    .border(
+                                        1.dp,
+                                        colorScheme.onBackground,
+                                        shape = RoundedCornerShape(8.dp)
+                                    )
+                                    .padding(12.dp)
+                            ) {
+                                // Hiển thị nội dung thông báo
+                                Text(
+                                    text = Alert.Message,
+                                    fontSize = 16.sp,
+                                    color = colorScheme.onBackground,
+                                    softWrap = true,
+                                    lineHeight = TextUnit.Unspecified,
+                                    textAlign = TextAlign.Start
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // Nút "ĐỌC THÔNG BÁO"
+                            Button(
+                                onClick = {
+                                    // Todo: Xử lý đọc thông báo
+                                    viewModel.readNotification(alertId = Alert.AlertID)
+                                },
+                                modifier = Modifier
+                                    .width(200.dp)
+                                    .height(48.dp),
+                                shape = RoundedCornerShape(50),
+                                enabled = !Alert.Status,
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = colorScheme.primary// Màu nút xóa
+                                )
+                            ) {
+                                Text(
+                                    text = "Xác nhận đã đọc",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp,
+                                    color = colorScheme.onPrimary
+                                )
+                            }
                         }
                     }
                 }
@@ -324,66 +325,6 @@ fun DetailNotification(
     }
 }
 
-@Composable
-fun NotificationDetailScreen(
-    content: String,
-) {
-    AppTheme {
-        val colorScheme = MaterialTheme.colorScheme
-        Column(
-            modifier = Modifier
-                .width(500.dp)
-                .background(colorScheme.background)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-
-        ) {
-            // Hộp chứa nội dung thông báo
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .border(1.dp, colorScheme.onBackground, shape = RoundedCornerShape(8.dp))
-                    .padding(12.dp)
-            ) {
-                // Hiển thị nội dung thông báo
-                Text(
-                    text = content,
-                    fontSize = 16.sp,
-                    color = colorScheme.onBackground,
-                    softWrap = true,
-                    lineHeight = TextUnit.Unspecified,
-                    textAlign = TextAlign.Start
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Nút "ĐỌC THÔNG BÁO"
-            Button(
-                onClick = {
-                    // Todo: Xử lý đọc thông báo
-//                    viewModel.deleteNotification(alert.AlertID)
-                },
-                modifier = Modifier
-                    .width(200.dp)
-                    .height(48.dp),
-                shape = RoundedCornerShape(50),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = colorScheme.primary// Màu nút xóa
-                )
-            ) {
-                Text(
-                    text = "Đã đọc",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    color = colorScheme.onPrimary
-                )
-            }
-        }
-    }
-}
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable

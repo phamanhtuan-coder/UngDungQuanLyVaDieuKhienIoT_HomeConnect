@@ -1,5 +1,6 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.api
 
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AlertDetail
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AlertResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AttributeRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AttributeResponse
@@ -23,6 +24,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface ApiService {
@@ -79,5 +81,13 @@ interface ApiService {
     suspend fun getAlertById(
         @Path("alertId") alertId: Int,
         @Header("Authorization") token: String
-    ): AlertResponse
+    ): AlertDetail
+
+    @PUT("/api/alerts/{alertId}/resolve")
+    suspend fun readNotification(
+        @Path("alertId") alertId: Int,
+        @Header("Authorization") token: String
+    ): AlertDetail
+
+
 }

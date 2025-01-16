@@ -5,7 +5,7 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AlertResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AlertDetail
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.repository.AlertRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,9 +14,10 @@ import kotlinx.coroutines.launch
 sealed class NotificationState {
     object Idle : NotificationState()               // Chưa làm gì
     object Loading : NotificationState()            // Đang loading
-    data class Success(val alert: AlertResponse) : NotificationState()
+    data class Success(val alert: AlertDetail) : NotificationState()
     data class Error(val error: String) : NotificationState()
 }
+
 
 
 class NotificationViewModel(application: Application, context: Context) :
@@ -33,12 +34,28 @@ class NotificationViewModel(application: Application, context: Context) :
             try {
                 _alertState.value = NotificationState.Loading
                 val response = repository.getAlertById(alertId)
-                Log.d("ListNotificationModel", "Alerts: $response")
+                Log.d("NotificationModel", "Alerts: $response")
                 _alertState.value = NotificationState.Success(response)
             } catch (e: Exception) {
-                Log.e("ListNotificationModel", "Error fetching alerts: ${e.message}")
+                Log.e("NotificationModel", "Error fetching alerts: ${e.message}")
                 _alertState.value =
                     NotificationState.Error(e.message ?: "Thong bao load thất bại!")
+            }
+        }
+    }
+
+
+    fun readNotification(alertId: Int) {
+        viewModelScope.launch {
+            try {
+                _alertState.value = NotificationState.Loading
+                val response = repository.readNotification(alertId)
+                Log.d("NotificationModel", "Alerts: $response")
+                _alertState.value = NotificationState.Success(response)
+            } catch (e: Exception) {
+                Log.e("NotificationModel", "Error fetching alerts: ${e.message}")
+                _alertState.value =
+                    NotificationState.Error(e.message ?: "Cập nhật trạng thái thất bại!")
             }
         }
     }
