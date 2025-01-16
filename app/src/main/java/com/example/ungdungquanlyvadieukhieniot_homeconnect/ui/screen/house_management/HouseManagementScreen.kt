@@ -71,6 +71,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.setValue
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.HousesListPesponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UpdateHouseRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
@@ -127,6 +128,26 @@ fun HouseManagementScreen(
             Text("Error: $error")
         }
     }
+
+    val updateState by viewModel.updateHouseState.collectAsState()
+
+    when (updateState) {
+        is UpdateHouseState.Loading -> CircularProgressIndicator()
+        is UpdateHouseState.Success -> {
+            val successState = updateState as UpdateHouseState.Success
+            Text("Cập nhật thành công: ${successState.message}")
+            // Làm mới danh sách nhà nếu cần
+            LaunchedEffect(Unit) {
+                viewModel.fetchHouses()
+            }
+        }
+        is UpdateHouseState.Error -> {
+            val errorState = updateState as UpdateHouseState.Error
+            Text("Lỗi cập nhật: ${errorState.error}")
+        }
+        else -> {}
+    }
+
 
     LaunchedEffect(Unit) {
         viewModel.fetchHouses()
@@ -207,6 +228,19 @@ fun HouseManagementScreen(
                     }
                 }
 
+                // Map tên màu -> Color
+                val colorNameMap = mapOf(
+                    "red" to Color.Red,
+                    "green" to Color.Green,
+                    "blue" to Color.Blue,
+                    "yellow" to Color.Yellow,
+                    "cyan" to Color.Cyan,
+                    "magenta" to Color.Magenta,
+                    "gray" to Color.Gray,
+                    "black" to Color.Black,
+                    "white" to Color.White,
+                    "customBlue" to Color(0xFF2196F3)
+                )
 
                 if (isPopupVisible.value) {
                     AddHousePopup(
@@ -214,6 +248,20 @@ fun HouseManagementScreen(
                         isEditing = isEditing.value,
                         onDismiss = { isPopupVisible.value = false },
                         onAddOrUpdateHouse = { name, address, icon, color ->
+
+                            if (isEditing.value) { // Sử dụng isEditing.value
+                                viewModel.updateHouse(
+                                    houseId = editingData.value.HouseID,
+                                    request = UpdateHouseRequest(
+                                        Name = name,
+                                        Address = address,
+                                        IconName = icon,
+                                        IconColor = colorNameMap.entries.firstOrNull { it.value == color }?.key ?: "transparent"
+                                    )
+                                )
+                            } else {
+                                // Thêm mới
+                            }
                             isPopupVisible.value = false
                         },
                         isTablet = isTablet
