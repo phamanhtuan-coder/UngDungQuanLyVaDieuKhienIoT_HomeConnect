@@ -28,6 +28,8 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Space
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UnlinkResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UpdateHouseRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UpdateHouseResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.User
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UserRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UserResponse
@@ -147,4 +149,11 @@ interface ApiService {
     suspend fun getHouses(
         @Header("Authorization") token: String
     ): List<HousesListPesponse>
+
+    @PUT("/api/houses/{houseId}")
+    suspend fun updateHouse(
+        @Path("houseId") houseId: Int,
+        @Body body: UpdateHouseRequest,
+        @Header("Authorization") token: String
+    ): UpdateHouseResponse
 }
