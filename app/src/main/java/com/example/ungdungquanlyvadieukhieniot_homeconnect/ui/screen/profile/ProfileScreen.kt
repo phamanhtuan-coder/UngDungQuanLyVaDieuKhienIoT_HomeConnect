@@ -545,7 +545,7 @@ fun ProfileScreen(
                                         Button(
                                             onClick = {
                                                 //ToDo: Xử lý khi bấm đổi mật khẩu
-                                                navController.navigate(Screens.UpdatePassword.route)
+                                                navController.navigate("${Screens.UpdatePassword.route}/${profile!!.UserID}")
                                             },
                                             modifier = Modifier.fillMaxSize(),
                                             shape = RoundedCornerShape(bottomStart = 12.dp),
