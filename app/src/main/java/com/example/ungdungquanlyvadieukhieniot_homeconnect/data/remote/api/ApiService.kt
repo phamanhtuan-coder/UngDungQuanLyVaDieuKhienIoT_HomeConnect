@@ -6,6 +6,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Attri
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AverageSensorResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ChangePasswordRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ChangePasswordResponce
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.CreateHouseRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DailyAverageSensorResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DailyPowerUsageResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DailySensorRequest
@@ -156,4 +157,10 @@ interface ApiService {
         @Body body: UpdateHouseRequest,
         @Header("Authorization") token: String
     ): UpdateHouseResponse
+
+    @POST("/api/houses")
+    suspend fun createHouse(
+        @Body request: CreateHouseRequest,
+        @Header("Authorization") token: String
+    ): CreateHouseResponse
 }
