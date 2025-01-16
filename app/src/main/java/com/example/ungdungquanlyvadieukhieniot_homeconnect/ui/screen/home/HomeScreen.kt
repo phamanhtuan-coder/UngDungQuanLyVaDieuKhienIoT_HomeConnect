@@ -30,6 +30,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.DeviceCa
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.HouseSelection
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.SharedViewModel
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.SpaceCard
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.WeatherInfo
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
@@ -50,13 +51,13 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
  */
 @Composable
 fun HomeScreen(
+    sharedViewModel: SharedViewModel,
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
-        Scaffold(
-            containerColor = colorScheme.background,
+        Scaffold(containerColor = colorScheme.background,
         modifier = modifier.fillMaxSize(),
         topBar = {
             /*
@@ -97,6 +98,7 @@ fun HomeScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         HouseSelection(
+                            sharedViewModel = sharedViewModel,
                             //houses = listOf("House 1", "House 2", "House 3"),
                             onManageHouseClicked = { navController.navigate(Screens.HouseManagement.route) },
                             onTabSelected = {id ->
@@ -177,18 +179,7 @@ fun HomeScreen(
                     }
                 }
             }
-
-
-
-
         }
     )
     }
-
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun HomeScreenPreview() {
-    HomeScreen(navController = rememberNavController())
 }
