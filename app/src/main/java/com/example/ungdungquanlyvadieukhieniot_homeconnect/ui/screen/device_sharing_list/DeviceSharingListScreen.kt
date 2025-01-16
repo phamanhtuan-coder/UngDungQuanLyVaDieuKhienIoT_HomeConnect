@@ -1,7 +1,6 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,24 +10,23 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.RemoveCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -40,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
@@ -53,8 +52,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.NutHome
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail_for_fire_alarm.FireAlarmDetailScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 /** Giao diện màn hình Access Point Connection Screen (AccessPointConnectionScreen
@@ -135,20 +132,24 @@ fun DeviceSharingListScreen(
              */
                 MenuBottom(navController)
             },
+            floatingActionButton = {
+                /*
+            * Hiển thị nút add
+                 */
+            },
             containerColor = colorScheme.background,
             modifier = Modifier.fillMaxSize(),
             content = { innerPadding ->
-                LazyColumn(
+                Column(
                     modifier = Modifier
                         .fillMaxSize() // Chiếm toàn bộ kích thước của màn hình
-    //                    .padding(bottom = layoutConfig.outerPadding) // Padding linh hoạt
-                        .padding(innerPadding),
+                        //                    .padding(bottom = layoutConfig.outerPadding) // Padding linh hoạt
+                        .padding(innerPadding)
+                        .verticalScroll(rememberScrollState()), // Cho phép cuộn nếu nội dung vượt khỏi m
                     verticalArrangement = Arrangement.Top, // Sắp xếp các item theo chiều dọc, bắt đầu từ trên xuống.
                     horizontalAlignment = Alignment.CenterHorizontally // Căn chỉnh các item theo chiều ngang vào giữa.
                 ) {
                     // Tiêu đề
-                    item {
-                        // Box lớn chứa phần tiêu đề và các thành phần bên trong
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -239,105 +240,38 @@ fun DeviceSharingListScreen(
                                             .zIndex(2f), // Z-index cao hơn
                                         contentAlignment = Alignment.Center // Căn Row vào giữa Box
                                     ) {
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth() // Đảm bảo Row chiếm toàn bộ chiều rộng
-                                                .padding(
-                                                    top = 12.dp,
-                                                    start = 12.dp,
-                                                    end = 8.dp
-                                                ), // Khoảng cách bên trong Row
-                                            horizontalArrangement = Arrangement.SpaceBetween, // Đẩy các phần tử ra hai bên
-                                            verticalAlignment = Alignment.CenterVertically // Căn giữa theo chiều dọc
-                                        ) {
-                                            // Nội dung bên phải (Icon trong Box)
-                                            Button(
-                                                onClick = {
-                                                    showDialog = true
-                                                },
-                                                modifier = Modifier
-                                                    .size(24.dp), // Kích thước tổng thể của Button
-                                                shape = CircleShape, // Đảm bảo Button có dạng hình tròn
-                                                contentPadding = PaddingValues(0.dp), // Loại bỏ padding mặc định
-                                                colors = ButtonDefaults.buttonColors(
-                                                    containerColor = colorScheme.onPrimary,
-                                                    contentColor = colorScheme.primary
-                                                )
-                                            ) {
-                                                Icon(
-                                                    imageVector = Icons.Default.Delete,
-                                                    contentDescription = "Delete",
-                                                    modifier = Modifier.size(24.dp), // Kích thước của Icon
-                                                    tint = colorScheme.primary
-                                                )
-                                            }
 
-                                            Button(
-                                                onClick = {
-                                                    showDialog = true
-                                                },
-                                                modifier = Modifier
-                                                    .size(24.dp), // Kích thước tổng thể của Button
-                                                shape = CircleShape, // Đảm bảo Button có dạng hình tròn
-                                                contentPadding = PaddingValues(0.dp), // Loại bỏ padding mặc định
-                                                colors = ButtonDefaults.buttonColors(
-                                                    containerColor = colorScheme.onPrimary,
-                                                    contentColor = colorScheme.primary
-                                                )
-                                            ) {
-                                                Icon(
-                                                    imageVector = Icons.Default.Add,
-                                                    contentDescription = "Add",
-                                                    modifier = Modifier.size(24.dp), // Kích thước của Icon
-                                                    tint = colorScheme.primary
-                                                )
-                                            }
-                                        }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    // Công tắc Wi-Fi
-                    item {
-                        // Cột chứa nội dung công tắc Wi-Fi
-                        Column (
+
+                    // Cột chứa nội dung công tắc Wi-Fi
+                    LazyColumn(
                             modifier = Modifier
                                 .wrapContentHeight()
+                                .heightIn(
+                                    min = 300.dp,
+                                    max = 600.dp
+                                ) // Chiều cao tối thiểu và tối đa
                                 .padding(horizontal = layoutConfig.outerPadding) // Padding ngang linh hoạt theo LayoutConfig
                                 .width(layoutConfig.contentWidth),               // Độ rộng linh hoạt theo LayoutConfig
                             horizontalAlignment = Alignment.CenterHorizontally   // Căn giữa theo chiều ngang
                         ) {
-                            JobCard(
-                                companyName = "Dribbble",
-                                jobTitle = "UI Designer",
-                                location = "Yogyakarta",
-                                jobType = "Fulltime",
-                                appliedDate = "June 3, 2021",
-                                appliedStatus = "APPLIED"
-                            )
-
-                            JobCard(
-                                companyName = "Dribbble",
-                                jobTitle = "UI Designer",
-                                location = "Yogyakarta",
-                                jobType = "Fulltime",
-                                appliedDate = "June 3, 2021",
-                                appliedStatus = "APPLIED"
-                            )
-
-                            JobCard(
-                                companyName = "Dribbble",
-                                jobTitle = "UI Designer",
-                                location = "Yogyakarta",
-                                jobType = "Fulltime",
-                                appliedDate = "June 3, 2021",
-                                appliedStatus = "APPLIED"
+                        items(10) { index ->
+                            SharedUserCard(
+                                userName = "Nguyễn Thanh Sang",
+                                userEmail = "Sang@gmail.com",
+                                sharedDate = "10/12/2024",
+                                onRevokeClick = {
+                                    showDialog = true
+                                }
                             )
                         }
                     }
                 }
+
             }
         )
     }
@@ -350,13 +284,11 @@ fun DeviceSharingListScreenPreview() {
 }
 
 @Composable
-fun JobCard(
-    companyName: String,
-    jobTitle: String,
-    location: String,
-    jobType: String,
-    appliedDate: String,
-    appliedStatus: String
+fun SharedUserCard(
+    userName: String,
+    userEmail: String,
+    sharedDate: String,
+    onRevokeClick: () -> Unit
 ) {
     AppTheme {
         // Lấy thông tin layout responsive từ config
@@ -365,10 +297,9 @@ fun JobCard(
         Card(
             modifier = Modifier
                 .padding(top = layoutConfig.textFieldSpacing)
-                .clickable(onClick = {})
                 .fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = colorScheme.primary),
+            colors = CardDefaults.cardColors(containerColor = colorScheme.surface),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             Column(
@@ -376,113 +307,75 @@ fun JobCard(
                     .padding(layoutConfig.outerPadding)
                     .fillMaxWidth()
             ) {
-                // Row đầu tiên: Hiển thị logo người dùng được chia sẽ
+                // Hàng đầu tiên: Hiển thị tên và email người dùng
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Vùng hiển thị Logo
+                    // Vùng hiển thị Avatar hoặc Icon
                     Box(
                         modifier = Modifier
                             .size(layoutConfig.iconSize * 2)
-                            .background(Color(0xFFE74C3C), shape = RoundedCornerShape(50))
-                    )
+                            .background(Color(0xFFBDC3C7), shape = RoundedCornerShape(50))
+                            .clip(CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = userName.firstOrNull()?.toString() ?: "",
+                            color = Color.White,
+                            fontSize = layoutConfig.textFontSize
+                        )
+                    }
 
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(12.dp))
 
-                    // Tên người dùng được chia sẽ
-                    Text(
-                        text = companyName,
-                        fontSize = layoutConfig.textFontSize/ 1.5f,
-                        color = colorScheme.onPrimary
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Row (
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
                     Column {
-                        // Tiêu đề của phần chia sẽ
+                        // Tên người dùng
                         Text(
-                            text = jobTitle,
-                            fontSize = layoutConfig.headingFontSize/1.5f ,
+                            text = userName,
+                            fontSize = layoutConfig.textFontSize,
                             fontWeight = FontWeight.Bold,
-                            color = colorScheme.onBackground
+                            color = colorScheme.onSurface
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
-
-                        // Location & Job Type
-                        Row (
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = location,
-                                fontSize = layoutConfig.textFontSize/1.5f,
-                                color = colorScheme.onPrimary
-                            )
-
-                            Spacer(modifier = Modifier.width(4.dp))
-
-                            Text(
-                                text = "• $jobType",
-                                fontSize = layoutConfig.textFontSize/1.5f,
-                                color = Color(0xFFE74C3C),
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-                    // Nội dung bên phải (Icon trong Box)
-                    Button(
-                        onClick = {},
-                        modifier = Modifier
-                            .size(36.dp), // Kích thước tổng thể của Button
-                        shape = CircleShape, // Đảm bảo Button có dạng hình tròn
-                        contentPadding = PaddingValues(0.dp), // Loại bỏ padding mặc định
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.White
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Clear,
-                            contentDescription = "Clear",
-                            tint = Color.Black,
-                            modifier = Modifier.size(24.dp) // Icon kích thước từ layoutConfig
+                        // Email người dùng
+                        Text(
+                            text = userEmail,
+                            fontSize = layoutConfig.textFontSize * 0.9f,
+                            color = colorScheme.onBackground.copy(alpha = 0.6f)
                         )
                     }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .background(
-                                color = Color(0xFFFFEDED),
-                                shape = RoundedCornerShape(16.dp)
-                            )
-                            .padding(vertical = 4.dp, horizontal = 12.dp)
-                    ) {
-                        Text(
-                            text = appliedStatus,
-                            color = Color(0xFFE74C3C),
-                            fontSize = layoutConfig.textFontSize/1.2f,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                // Ngày chia sẻ quyền
+                Text(
+                    text = "Chia sẻ ngày: $sharedDate",
+                    fontSize = layoutConfig.textFontSize * 0.9f,
+                    color = colorScheme.onSurfaceVariant
+                )
 
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Nút thu hồi gỡ bỏ quyền
+                Button(
+                    onClick = onRevokeClick,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFE74C3C)
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.RemoveCircle,
+                        contentDescription = "Gỡ bỏ",
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Applied at $appliedDate",
-                        fontSize = layoutConfig.textFontSize/ 2,
-                        color = colorScheme.onPrimary
+                        text = "Gỡ bỏ quyền",
+                        color = Color.White,
+                        fontSize = layoutConfig.textFontSize * 0.9f
                     )
                 }
             }

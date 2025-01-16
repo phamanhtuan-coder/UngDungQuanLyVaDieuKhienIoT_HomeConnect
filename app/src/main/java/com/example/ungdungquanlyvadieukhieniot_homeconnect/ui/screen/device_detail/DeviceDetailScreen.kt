@@ -171,7 +171,6 @@ fun DeviceDetailScreen(
     }
 
 
-
     val logToggleState by viewModel.toggleLogState.collectAsState()
     var logToggle by remember { mutableStateOf<LogLastest?>(null) }
 
@@ -190,7 +189,8 @@ fun DeviceDetailScreen(
 
         is LogLastestState.Success -> {
             logToggle = (logToggleState as LogLastestState.Success).log
-            infoDevice?.PowerStatus ?: (logToggleState as LogLastestState.Success).log.Action.contains("true")
+            infoDevice?.PowerStatus
+                ?: (logToggleState as LogLastestState.Success).log.Action.contains("true")
             Log.d(" Log", (logToggleState as LogLastestState.Success).log.toString())
         }
     }
@@ -259,7 +259,6 @@ fun DeviceDetailPhoneScreen(
         }
 
 
-
         val logToggleState by viewModel.toggleLogState.collectAsState()
         var logToggle by remember { mutableStateOf<LogLastest?>(null) }
 
@@ -313,13 +312,13 @@ fun DeviceDetailPhoneScreen(
             )
         }
 
-        data class LogCommand (
+        data class LogCommand(
             val action: String = "",
             val brightness: Int = 0,
             val color: String = ""
         )
 
-        data class LogAction (
+        data class LogAction(
             val fromServer: Boolean = false,
             val command: LogCommand = LogCommand()
         )
@@ -354,7 +353,8 @@ fun DeviceDetailPhoneScreen(
                     )
 
                     if (currentDeviceAttribute.brightness != newAttribute.brightness ||
-                        currentDeviceAttribute.color != newAttribute.color) {
+                        currentDeviceAttribute.color != newAttribute.color
+                    ) {
                         attribute = newAttribute
                         viewModel.attributeDevice(
                             safeDevice.DeviceID,
@@ -1019,7 +1019,6 @@ fun DeviceDetailTabletScreen(
             Log.d(" Log", (logLastestState as LogLastestState.Success).log.toString())
         }
     }
-
 
 
     val logToggleState by viewModel.toggleLogState.collectAsState()

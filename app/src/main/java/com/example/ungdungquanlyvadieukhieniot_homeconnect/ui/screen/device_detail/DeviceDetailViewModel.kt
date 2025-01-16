@@ -59,7 +59,8 @@ class DeviceDetailViewModel(application: Application, context: Context) : Androi
                 _logLastestState.value = LogLastestState.Success(response)
             } catch (e: Exception) {
                 Log.e("DeviceDetailViewModel", "Error fetching spaces: ${e.message}")
-                _logLastestState.value = LogLastestState.Error(e.message ?: "Danh sach load thất bại!")
+                _logLastestState.value =
+                    LogLastestState.Error(e.message ?: "Danh sach load thất bại!")
             }
         }
     }
@@ -78,7 +79,8 @@ class DeviceDetailViewModel(application: Application, context: Context) : Androi
                 _logLastestState.value = LogLastestState.Success(response)
             } catch (e: Exception) {
                 Log.e("DeviceDetailViewModel", "Error fetching spaces: ${e.message}")
-                _logLastestState.value = LogLastestState.Error(e.message ?: "Danh sach load thất bại!")
+                _logLastestState.value =
+                    LogLastestState.Error(e.message ?: "Danh sach load thất bại!")
             }
         }
     }
