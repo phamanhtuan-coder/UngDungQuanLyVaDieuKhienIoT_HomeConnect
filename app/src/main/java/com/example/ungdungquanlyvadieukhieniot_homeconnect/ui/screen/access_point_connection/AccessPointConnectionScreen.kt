@@ -4,7 +4,10 @@ package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_poi
 
 import android.Manifest
 import android.app.Activity
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.Network
@@ -17,6 +20,10 @@ import android.net.wifi.WifiNetworkSpecifier
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.provider.Settings
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -368,14 +375,12 @@ fun AccessPointConnectionScreen(
                         ) {
                             // Hàng ngang chứa nhãn và công tắc Wi-Fi
                             Row(
-                                modifier = Modifier.width(layoutConfig.contentWidth), // Độ rộng linh hoạt theo LayoutConfig
-                                horizontalArrangement = Arrangement.SpaceBetween,     // Các thành phần được bố trí cách xa nhau
-                                verticalAlignment = Alignment.CenterVertically        // Căn giữa theo chiều dọc
+                                modifier = Modifier.width(layoutConfig.contentWidth),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text("Wi-Fi:", fontSize = layoutConfig.textFontSize)
-                                Switch(checked = true, onCheckedChange = {
-                                    //Todo: Bật/Tắt Wi-Fi
-                                })
+                                WifiToggle(wifiManager, context)
                             }
 
                             if(wifiManager.isWifiEnabled) {
@@ -902,4 +907,60 @@ fun bindToNetwork(context: Context, network: Network) {
     val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     connectivityManager.bindProcessToNetwork(network)
     println("Network bound to process.")
+}
+
+@Composable
+fun WifiToggle(
+    wifiManager: WifiManager,
+    context: Context
+) {
+    var isWifiEnabled by remember { mutableStateOf(wifiManager.isWifiEnabled) }
+
+    // For Android 10 (Q) and above, we need to use the system settings
+    val settingsLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) {
+        // Update the UI state after returning from settings
+        isWifiEnabled = wifiManager.isWifiEnabled
+    }
+
+    Switch(
+        checked = isWifiEnabled,
+        onCheckedChange = { enabled ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                // For Android 10 and above, direct the user to system settings
+                val intent = Intent(Settings.Panel.ACTION_WIFI)
+                settingsLauncher.launch(intent)
+                Toast.makeText(
+                    context,
+                    "Please toggle Wi-Fi in system settings",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                // For Android 9 and below, we can directly control Wi-Fi
+                try {
+                    wifiManager.setWifiEnabled(enabled)
+                    isWifiEnabled = enabled
+                } catch (e: Exception) {
+                    Toast.makeText(
+                        context,
+                        "Failed to toggle Wi-Fi: ${e.localizedMessage}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    )
+
+    LaunchedEffect(Unit) {
+        val filter = IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION)
+        context.registerReceiver(
+            object : BroadcastReceiver() {
+                override fun onReceive(context: Context?, intent: Intent?) {
+                    isWifiEnabled = wifiManager.isWifiEnabled
+                }
+            },
+            filter
+        )
+    }
 }
