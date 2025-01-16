@@ -70,6 +70,7 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LogLastest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
@@ -78,6 +79,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.isTablet
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.getInfoDeviceState
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
+import org.json.JSONObject
 
 @Composable
 fun FireAlarmDetailScreen(
@@ -92,13 +94,58 @@ fun FireAlarmDetailScreen(
         var showDialog by remember { mutableStateOf(false) }
         var switchState by remember { mutableStateOf(true) }
         val statusList = listOf("Bình thường", "Báo động", "Lỗi")// Trạng thái
-        val status by remember { mutableStateOf(0) }
+        var status by remember { mutableStateOf(0) }
 
         val context = LocalContext.current
         val application = context.applicationContext as Application
         val viewModel = remember {
             FireAlarmDetailViewModel(application, context)
         }
+
+        val logLastestState by viewModel.logLastestState.collectAsState()
+        var log by remember { mutableStateOf<LogLastest?>(null) }
+
+        when (logLastestState) {
+            is LogLastestState.Error -> {
+                Log.e("Error", (logLastestState as LogLastestState.Error).error)
+            }
+
+            is LogLastestState.Idle -> {
+                //Todo
+            }
+
+            is LogLastestState.Loading -> {
+                //Todo
+            }
+
+            is LogLastestState.Success -> {
+                log = (logLastestState as LogLastestState.Success).log
+                Log.d(" Log", (logLastestState as LogLastestState.Success).log.toString())
+            }
+        }
+
+        val logToggleState by viewModel.toggleLogState.collectAsState()
+        var logToggle by remember { mutableStateOf<LogLastest?>(null) }
+
+        when (logToggleState) {
+            is LogLastestState.Error -> {
+                Log.e("Error", (logToggleState as LogLastestState.Error).error)
+            }
+
+            is LogLastestState.Idle -> {
+                //Todo
+            }
+
+            is LogLastestState.Loading -> {
+                //Todo
+            }
+
+            is LogLastestState.Success -> {
+                logToggle = (logToggleState as LogLastestState.Success).log
+                Log.d(" Log", (logToggleState as LogLastestState.Success).log.toString())
+            }
+        }
+
 
         var infoDevice by remember { mutableStateOf<DeviceResponse?>(null) } // Lắng nghe danh sách thiết bị
         val infoDeviceState by viewModel.infoDeviceState.collectAsState()
@@ -121,6 +168,8 @@ fun FireAlarmDetailScreen(
 
         LaunchedEffect(1) {
             viewModel.getInfoDevice(deviceID!!)
+            viewModel.getLatestToggle(deviceID)
+            viewModel.getLastestSensor(deviceID)
         }
 
         var toggleDevice by remember { mutableStateOf<ToggleResponse?>(null) } // Lắng nghe danh sách thiết bị
@@ -193,6 +242,40 @@ fun FireAlarmDetailScreen(
                 Log.d("Unlink Device", (unlinkState as UnlinkState.Success).message)
             }
         }
+
+        LaunchedEffect(logToggle) {
+            if (logToggle != null && infoDevice != null) {
+                // Parse giá trị toggle từ Value
+                val toggleValue = logToggle!!.Action.parseToggleCommand()
+                if (toggleValue != null && infoDevice!!.PowerStatus != toggleValue) {
+                    // Nếu khác nhau, cập nhật lại trạng thái device theo log
+                    powerStatus = toggleValue
+                    toggle = ToggleRequest(powerStatus = powerStatus)
+                    viewModel.toggleDevice(infoDevice!!.DeviceID, toggle)
+                }
+            }
+        }
+
+        // Cập nhật các thông số sensor từ log mới nhất
+        LaunchedEffect(log) {
+            if (log != null) {
+                val sensorData = log!!.Details.parseSensorData()
+                if (sensorData != null) {
+                    smokeLevel = sensorData.gas
+                    temperature = sensorData.temperature.toInt()
+                    coLevel = sensorData.humidity // assuming humidity is used for CO level
+
+                    // Cập nhật status dựa trên các giá trị sensor
+                    status = when {
+                        sensorData.gas > 500 || sensorData.temperature > 40 -> 1 // Báo động
+                        sensorData.gas < 0 || sensorData.temperature < 0 -> 2 // Lỗi
+                        else -> 0 // Bình thường
+                    }
+                }
+            }
+        }
+
+
 
         val colorScheme = MaterialTheme.colorScheme
         Scaffold(
@@ -474,7 +557,7 @@ fun FireAlarmDetailScreen(
 
                                 // Sử dụng hàm InfoRow để hiển thị thông tin
                                 InfoRow(
-                                    label = "Khói:",
+                                    label = "Khí gas:",
                                     value = "$smokeLevel",
                                     unit = "ppm",
                                     stateColor = when {
@@ -490,12 +573,12 @@ fun FireAlarmDetailScreen(
                                 )
 
                                 Slider(
-                                    value = 40f,
+                                    value = smokeLevel.toFloat(),
                                     onValueChange = {
                                         //Todo: Xử lý khi thay đổi giá trị
                                     }, // Thanh trượt giá trị mặc định là 80
                                     steps = 50,
-                                    valueRange = 0f..100f,
+                                    valueRange = 0f..1000f,
                                     colors = SliderDefaults.colors(
                                         thumbColor = colorScheme.onPrimary,
                                         activeTrackColor = colorScheme.onPrimary,
@@ -521,11 +604,11 @@ fun FireAlarmDetailScreen(
                                     }
                                 )
                                 Slider(
-                                    value = 90f,
+                                    value = temperature.toFloat(),
                                     onValueChange = {
                                         //Todo: Xử lý khi thay đổi giá trị
                                     }, // Thanh trượt giá trị mặc định là 80
-                                    steps = 50,
+                                    steps = 5,
                                     valueRange = 0f..100f,
                                     colors = SliderDefaults.colors(
                                         thumbColor = colorScheme.onPrimary,
@@ -536,9 +619,9 @@ fun FireAlarmDetailScreen(
                                     )
                                 )
                                 InfoRow(
-                                    label = "CO:",
+                                    label = "Độ ẩm:",
                                     value = "$coLevel",
-                                    unit = "ppm",
+                                    unit = "%",
                                     stateColor = when {
                                         coLevel > 40 -> Color.Red
                                         coLevel < 0 -> Color.Yellow
@@ -549,13 +632,14 @@ fun FireAlarmDetailScreen(
                                         coLevel < 0 -> "?"
                                         else -> "✓"
                                     }
+
                                 )
                                 Slider(
-                                    value = 60f,
+                                    value = coLevel.toFloat(),
                                     onValueChange = {
                                         //Todo: Xử lý khi thay đổi giá trị
                                     }, // Thanh trượt giá trị mặc định là 80
-                                    steps = 50,
+                                    steps = 5,
                                     valueRange = 0f..100f,
                                     colors = SliderDefaults.colors(
                                         thumbColor = colorScheme.onPrimary,
@@ -740,5 +824,47 @@ fun InfoRow(label: String, value: String, unit: String, stateColor: Color, state
                 )
             }
         }
+    }
+}
+
+// Thêm extension function để parse toggle log
+fun String.parseToggleCommand(): Boolean? {
+    return try {
+        val command = JSONObject(this)
+        if (command.has("command")) {
+            val toggleCommand = command.getJSONObject("command")
+            toggleCommand.getBoolean("powerStatus")
+        } else {
+            null
+        }
+    } catch (e: Exception) {
+        Log.e("ParseLog", "Error parsing toggle command", e)
+        null
+    }
+}
+
+// Thêm data class để giữ giá trị sensor
+data class SensorData(
+    val gas: Int = 0,
+    val temperature: Double = 0.0,
+    val humidity: Int = 0
+)
+
+// Extension function để parse sensor data
+fun String.parseSensorData(): SensorData? {
+    return try {
+        val parts = this.split("}")
+        // Lấy phần JSON cuối cùng chứa dữ liệu sensor
+        val sensorJson = parts.last { it.contains("sensorData") } + "}"
+        val data = JSONObject(sensorJson)
+
+        SensorData(
+            gas = data.optInt("gas", 0),
+            temperature = data.optDouble("temperature", 0.0),
+            humidity = data.optInt("humidity", 0)
+        )
+    } catch (e: Exception) {
+        Log.e("ParseLog", "Error parsing sensor data", e)
+        null
     }
 }

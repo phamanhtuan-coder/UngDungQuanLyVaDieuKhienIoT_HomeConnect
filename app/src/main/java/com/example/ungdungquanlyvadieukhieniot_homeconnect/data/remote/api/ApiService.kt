@@ -11,6 +11,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Devic
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.EmailRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.EmailResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.HouseResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LogLastest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LoginRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LoginResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.NewPasswordRequest
@@ -97,6 +98,25 @@ interface ApiService {
         @Query("q") query: String,
         @Header("Authorization") token: String
     ): List<AlertResponse>
+
+    @GET("/api/logs/latestToggle/{deviceId}")
+    suspend fun getLatestToggle(
+        @Path("deviceId") deviceId: Int,
+        @Header("Authorization") token: String
+    ): LogLastest
+
+    @GET("/api/logs/latestUpdateAttributes/{deviceId}")
+    suspend fun getLatestUpdateAttributes(
+        @Path("deviceId") deviceId: Int,
+        @Header("Authorization") token: String
+    ): LogLastest
+
+    @GET("/api/logs/latestSensor/{deviceId}")
+    suspend fun getLatestSensor(
+        @Path("deviceId") deviceId: Int,
+        @Header("Authorization") token: String
+    ): LogLastest
+
 
 
 }

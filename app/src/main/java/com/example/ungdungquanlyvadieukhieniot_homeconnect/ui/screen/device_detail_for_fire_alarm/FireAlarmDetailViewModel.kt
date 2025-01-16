@@ -6,9 +6,11 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LogLastest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.repository.DeviceRepository
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.repository.LogRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -34,8 +36,50 @@ sealed class UnlinkState {
     data class Error(val error: String) : UnlinkState()
 }
 
+sealed class LogLastestState {
+    object Idle : LogLastestState()               // Chưa làm gì
+    object Loading : LogLastestState()           // Đang loading
+    data class Success(val log: LogLastest) : LogLastestState()
+    data class Error(val error: String) : LogLastestState()
+}
+
+
+
 class FireAlarmDetailViewModel(application: Application, context: Context) : AndroidViewModel(application) {
     private val repository = DeviceRepository(context) // Repository để quản lý cả Spaces và Devices
+
+    private val repositoryLog = LogRepository(context) // Repository để quản lý cả Log
+    private val _logLastestState = MutableStateFlow<LogLastestState>(LogLastestState.Idle)
+    val logLastestState = _logLastestState.asStateFlow()
+
+    private val _toggleLogState = MutableStateFlow<LogLastestState>(LogLastestState.Idle)
+    val toggleLogState = _toggleLogState.asStateFlow()
+
+    fun getLatestToggle(DeviceID: Int) {
+        viewModelScope.launch {
+            try {
+                _toggleLogState.value = LogLastestState.Loading
+                val response = repositoryLog.getLastestToggle(DeviceID)
+                _toggleLogState.value = LogLastestState.Success(response)
+            } catch (e: Exception) {
+                Log.e("DeviceViewModel", "Error fetching spaces: ${e.message}")
+                _toggleLogState.value = LogLastestState.Error(e.message ?: "Load Toggle thất bại!")
+            }
+        }
+    }
+
+    fun getLastestSensor(DeviceID: Int) {
+        viewModelScope.launch {
+            try {
+                _logLastestState.value = LogLastestState.Loading
+                val response = repositoryLog.getLatestSensor(DeviceID)
+                _logLastestState.value = LogLastestState.Success(response)
+            } catch (e: Exception) {
+                Log.e("DeviceViewModel", "Error fetching spaces: ${e.message}")
+                _logLastestState.value = LogLastestState.Error(e.message ?: "Load Sensor thất bại!")
+            }
+        }
+    }
 
     private val _infoDeviceState = MutableStateFlow<com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.getInfoDeviceState>(
         com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.getInfoDeviceState.Idle)
