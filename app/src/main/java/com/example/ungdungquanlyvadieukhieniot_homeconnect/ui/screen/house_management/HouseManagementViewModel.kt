@@ -5,7 +5,10 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.HouseDetail
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.HousesListPesponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UpdateHouseRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UpdateHouseResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.repository.HouseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,6 +21,12 @@ sealed class HouseManagementState {
     data class Error(val error: String?) : HouseManagementState()
 }
 
+sealed class UpdateHouseState {
+    object Idle : UpdateHouseState()
+    object Loading : UpdateHouseState()
+    data class Success(val message: String, val house: HouseDetail) : UpdateHouseState()
+    data class Error(val error: String) : UpdateHouseState()
+}
 
 class HouseManagementViewModel(application: Application, context: Context) : AndroidViewModel(application) {
 
@@ -38,6 +47,22 @@ class HouseManagementViewModel(application: Application, context: Context) : And
                 Log.e("HouseManagementViewModel", "Fetch houses error: ${e.message}")
                 _houseManagementState.value =
                     HouseManagementState.Error(e.message ?: "Không thể tải danh sách houses!")
+            }
+        }
+    }
+
+    private val _updateHouseState = MutableStateFlow<UpdateHouseState>(UpdateHouseState.Idle)
+    val updateHouseState = _updateHouseState.asStateFlow()
+
+    fun updateHouse(houseId: Int, request: UpdateHouseRequest) {
+        _updateHouseState.value = UpdateHouseState.Loading
+        viewModelScope.launch {
+            try {
+                // Gọi hàm cập nhật từ Repository
+                val response = repository.updateHouse(houseId, request)
+                _updateHouseState.value = UpdateHouseState.Success(response.message, response.house)
+            } catch (e: Exception) {
+                _updateHouseState.value = UpdateHouseState.Error(e.message ?: "Đã xảy ra lỗi")
             }
         }
     }
