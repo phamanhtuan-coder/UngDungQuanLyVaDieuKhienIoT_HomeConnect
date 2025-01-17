@@ -1,18 +1,8 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component
 
+import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,12 +12,11 @@ import androidx.compose.material.icons.filled.NightsStay
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material.icons.filled.WbSunny
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -38,7 +27,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.api.RetrofitClient
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.WeatherResponse
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ActivityCompat
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+
 
 /**
  * Weather Information UI
@@ -54,126 +58,161 @@ import java.time.LocalTime
 fun WeatherInfo() {
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val isTablet = screenWidth > 600
+    val context = LocalContext.current
 
-    val iconThoiGian =
-        if (isDayTime()) Icons.Filled.WbSunny else Icons.Filled.NightsStay
-    val iconThoiTiet = Icons.Filled.WbSunny
-    val thoiGianHienTai = "Sun, 12 Dec 2024 10:00 AM"
-    val thoiTietHienTai = "Sunny"
-    val nhietDoHienTai = "25°C"
-    val viTriHienTai = "Hanoi, Vietnam"
-    val doAm = "80"
-    val tamNhin = "10"
-    val tocDoGio = "5"
+    val weatherData = remember { mutableStateOf<WeatherResponse?>(null) }
+    val apiKey = "93231902cfd746368a9121412251701" // Thay bằng API Key thực tế
+    val locationState = remember { mutableStateOf("Hanoi") } // Giá trị mặc định
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(Color(0xFF6EC6FF), Color(0xFF2196F3))
-                ),
-                shape = RoundedCornerShape(bottomStartPercent = 25, bottomEndPercent = 25)
-            )
-            .padding(bottom = 16.dp)
-    ) {
+    // Lấy vị trí hiện tại
+    LaunchedEffect(Unit) {
+        getCurrentLocation(context) { location ->
+            locationState.value = location // Cập nhật vị trí hiện tại
+        }
+    }
+
+    // Gọi API
+    LaunchedEffect(Unit) {
+        RetrofitClient.instance.getCurrentWeather(apiKey, locationState.toString())
+            .enqueue(object : Callback<WeatherResponse> {
+                override fun onResponse(
+                    call: Call<WeatherResponse>,
+                    response: Response<WeatherResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        weatherData.value = response.body()
+                    } else {
+//                        Log.e("WeatherAPI", "API Error: ${response.code}")
+                    }
+                }
+
+                override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
+                    Log.e("WeatherAPI", "Network Error: ${t.message}")
+                }
+            })
+    }
+
+    weatherData.value?.let { data ->
+        val weatherCondition = data.current.condition.text ?: "Unknown"
+        val iconThoiTiet = getWeatherIcon(weatherCondition)
+        val iconThoiGian =
+            if (isDayTime()) Icons.Filled.WbSunny else Icons.Filled.NightsStay
+        val thoiGianHienTai = formatDateTime(data.location.localtime)
+        val thoiTietHienTai = data.current.condition.text
+        val nhietDoHienTai = "${data.current.temp_c}°C"
+        val viTriHienTai = "${data.location.name}, ${data.location.country}"
+        val doAm = "${data.current.humidity}"
+        val tamNhin = "${data.current.vis_km}"
+        val tocDoGio = "${data.current.wind_kph}"
+
         Column(
             modifier = Modifier
-                .padding(16.dp)
+                .fillMaxWidth()
                 .background(
-                    color = Color.White.copy(alpha = 0.7f),
-                    shape = RoundedCornerShape(25.dp)
+                    brush = Brush.verticalGradient(
+                        colors = listOf(Color(0xFF6EC6FF), Color(0xFF2196F3))
+                    ),
+                    shape = RoundedCornerShape(bottomStartPercent = 25, bottomEndPercent = 25)
                 )
-                .padding(16.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(bottom = 16.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .background(
+                        color = Color.White.copy(alpha = 0.7f),
+                        shape = RoundedCornerShape(25.dp)
+                    )
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Icon(
-                    imageVector = iconThoiTiet,
-                    contentDescription = null,
-                    tint = Color(0xFF424242),
-                    modifier = Modifier.size(if (isTablet) 80.dp else 40.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Column(horizontalAlignment = Alignment.Start) {
-                    Text(
-                        text = thoiGianHienTai,
-                        color = Color(0xFF424242),
-                        fontSize = 14.sp
-                    )
-                    Text(
-                        text = thoiTietHienTai,
-                        color = Color(0xFF424242),
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = viTriHienTai,
-                        color = Color(0xFF424242),
-                        fontSize = 14.sp
-                    )
-                }
-                Spacer(modifier = Modifier.width(10.dp))
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = nhietDoHienTai,
-                        color = Color(0xFF424242),
-                        fontSize = if (isTablet) 40.sp else 30.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Icon(
                         imageVector = iconThoiGian,
                         contentDescription = null,
                         tint = Color(0xFF424242),
-                        modifier = Modifier.size(if (isTablet) 32.dp else 28.dp)
+                        modifier = Modifier.size(if (isTablet) 80.dp else 40.dp)
                     )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Column(horizontalAlignment = Alignment.Start) {
+                        Text(
+                            text = thoiGianHienTai.toString(),
+                            color = Color(0xFF424242),
+                            fontSize = 14.sp
+                        )
+                        Text(
+                            text = thoiTietHienTai,
+                            color = Color(0xFF424242),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = viTriHienTai,
+                            color = Color(0xFF424242),
+                            fontSize = 14.sp
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = nhietDoHienTai,
+                            color = Color(0xFF424242),
+                            fontSize = if (isTablet) 40.sp else 30.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Icon(
+                            imageVector = iconThoiTiet,
+                            contentDescription = null,
+                            tint = Color(0xFF424242),
+                            modifier = Modifier.size(if (isTablet) 32.dp else 28.dp)
+                        )
+                    }
+                }
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 16.dp),
+                    thickness = 1.dp,
+                    color = Color(0xFFBDBDBD)
+                )
+                LazyVerticalGrid(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 100.dp),
+                    columns = GridCells.Fixed(3),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    item {
+                        WeatherWidget(
+                            icon = Icons.Filled.WaterDrop,
+                            value = "$doAm%",
+                            label = "Độ ẩm",
+                            isTablet = isTablet
+                        )
+                    }
+                    item {
+                        WeatherWidget(
+                            icon = Icons.Filled.Visibility,
+                            value = "$tamNhin km",
+                            label = "Tầm nhìn",
+                            isTablet = isTablet
+                        )
+                    }
+                    item {
+                        WeatherWidget(
+                            icon = Icons.Filled.Air,
+                            value = "$tocDoGio km/h",
+                            label = "Phong",
+                            isTablet = isTablet
+                        )
+                    }
                 }
             }
-
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 16.dp),
-                thickness = 1.dp,
-                color = Color(0xFFBDBDBD)
-            )
-            LazyVerticalGrid(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(max = 100.dp),
-                columns = GridCells.Fixed(3),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalArrangement = Arrangement.Center
-            ) {
-                item {
-                    WeatherWidget(
-                        icon = Icons.Filled.WaterDrop,
-                        value = "$doAm%",
-                        label = "Độ ẩm",
-                        isTablet = isTablet
-                    )
-                }
-                item {
-                    WeatherWidget(
-                        icon = Icons.Filled.Visibility,
-                        value = "$tamNhin km",
-                        label = "Tầm nhìn",
-                        isTablet = isTablet
-                    )
-                }
-                item {
-                    WeatherWidget(
-                        icon = Icons.Filled.Air,
-                        value = "$tocDoGio km/h",
-                        label = "Phong tốc",
-                        isTablet = isTablet
-                    )
-                }
-            }
-
         }
     }
 }
@@ -258,4 +297,56 @@ fun WeatherWidget(icon: ImageVector, value: String, label: String, isTablet: Boo
 fun isDayTime(): Boolean {
     val hour = LocalTime.now().hour
     return hour in 6..18
+}
+
+// Hàm trả về biểu tượng dựa trên trạng thái thời tiết
+fun getWeatherIcon(weatherCondition: String): ImageVector {
+    return when (weatherCondition.lowercase()) {
+        "sunny", "clear" -> Icons.Filled.WbSunny
+        "partly cloudy", "cloudy" -> Icons.Filled.Visibility
+        "rain", "showers", "drizzle" -> Icons.Filled.WaterDrop
+        "snow", "sleet" -> Icons.Filled.NightsStay // Sử dụng icon phù hợp
+        "thunderstorm" -> Icons.Filled.Air
+        else -> Icons.Filled.Visibility // Biểu tượng mặc định
+    }
+}
+
+fun getCurrentLocation(context: Context, onLocationResult: (String) -> Unit) {
+    val fusedLocationClient: FusedLocationProviderClient =
+        LocationServices.getFusedLocationProviderClient(context)
+
+    // Kiểm tra quyền truy cập vị trí
+    if (ActivityCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        onLocationResult("Permission Denied")
+        return
+    }
+
+    fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+        if (location != null) {
+            val latitude = location.latitude
+            val longitude = location.longitude
+            onLocationResult("$latitude,$longitude") // Kết quả trả về
+        } else {
+            onLocationResult("Unable to get location")
+        }
+    }.addOnFailureListener {
+        onLocationResult("Failed to fetch location")
+    }
+}
+
+fun formatDateTime(input: String): String {
+    // Định dạng đầu vào (theo API trả về)
+    val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+    // Định dạng đầu ra (mong muốn)
+    val outputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+    // Phân tích chuỗi ngày giờ và định dạng lại
+    val dateTime = LocalDateTime.parse(input, inputFormatter)
+    return dateTime.format(outputFormatter)
 }
