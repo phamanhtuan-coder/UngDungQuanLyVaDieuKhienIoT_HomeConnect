@@ -43,13 +43,13 @@ android {
 
 dependencies {
     implementation(libs.java.jwt)
-    implementation (libs.ui)
-    implementation (libs.material3)
-    implementation (libs.retrofit2.retrofit)
-    implementation (libs.converter.gson)
-    implementation (libs.gson)
-    implementation (libs.androidx.lifecycle.runtime.compose) // Thay phiên bản nếu cần
-    implementation (libs.play.services.location)
+    implementation(libs.ui)
+    implementation(libs.material3)
+    implementation(libs.retrofit2.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.gson)
+    implementation(libs.androidx.lifecycle.runtime.compose) // Thay phiên bản nếu cần
+    implementation(libs.play.services.location)
 
     //Google Firebase Messaging
     implementation(libs.firebase.messaging)
