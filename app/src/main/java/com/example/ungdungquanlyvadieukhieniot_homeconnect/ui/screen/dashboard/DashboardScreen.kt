@@ -108,7 +108,7 @@ fun DashboardScreen(
     var chartLabels by remember { mutableStateOf(listOf<String>()) }
 
     // --- 4) State cho tab “Sử dụng điện, Nhiệt độ, Độ ẩm, Khí ga” ---
-    val chartOptions = listOf("Sử dụng điện", "Nhiệt độ", "Độ ẩm", "Khí ga")
+    val chartOptions = listOf("Nhiệt độ", "Độ ẩm", "Khí ga", "Sử dụng điện")
     val selectedChart = remember { mutableStateOf(0) }
 
     // --- 5) State cho “khoảng thời gian” (ngày, tuần, tháng, custom) ---
@@ -187,9 +187,9 @@ fun DashboardScreen(
                 // Tuỳ selectedChart.value => 1=nhiệt, 2=ẩm, 3=ga
                 chartData = data.map {
                     when (selectedChart.value) {
-                        1 -> it.averageTemperature.toFloat()
-                        2 -> it.averageHumidity.toFloat()
-                        3 -> it.averageGas.toFloat()
+                        0 -> it.averageTemperature.toFloat()
+                        1 -> it.averageHumidity.toFloat()
+                        2 -> it.averageGas.toFloat()
                         else -> 0f
                     }
                 }
@@ -216,7 +216,7 @@ fun DashboardScreen(
         if (sDate.isEmpty() || eDate.isEmpty()) return@LaunchedEffect
 
         when (selectedChart.value) {
-            0 -> {
+            3 -> {
                 // Sử dụng điện
                 statisticsViewModel.fetchDailyRoomPowerUsage(
                     spaceId = spacesID,
