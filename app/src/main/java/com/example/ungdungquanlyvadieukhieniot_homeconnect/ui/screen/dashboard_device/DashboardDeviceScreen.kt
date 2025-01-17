@@ -1,5 +1,6 @@
 import android.app.Application
 import android.app.DatePickerDialog
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -106,14 +107,14 @@ fun DashboardDeviceScreen(
     val statisticsState by viewModel3.statisticsState.collectAsState()
 
     // Mỗi lần “selectedDataType”, “selectedTimeRange” hoặc “deviceId” đổi => gọi LaunchedEffect
-    LaunchedEffect(selectedDataType.value, selectedTimeRange.value, deviceId) {
+    LaunchedEffect(selectedDataType.value, selectedTimeRange.value, deviceId, startDate, endDate) {
         // Tính ra khoảng thời gian start - end dựa theo selectedTimeRange
         val calendar = Calendar.getInstance()
         val currentDate = dateFormat.format(calendar.time)
 
         val (start, end) = when (selectedTimeRange.value) {
             0 -> { // Ngày => 3 tháng gần đây
-                calendar.add(Calendar.MONTH, -3)
+                calendar.add(Calendar.DAY_OF_YEAR, -15)
                 val s = dateFormat.format(calendar.time)
                 Pair(s, currentDate)
             }
@@ -139,12 +140,11 @@ fun DashboardDeviceScreen(
         // Kiểm tra “loại dữ liệu”
         when (selectedDataType.value) {
             0 -> {
-                Log.e("Sử dụng điện" , "Đã vào")
                 // Loại 0 => Sử dụng điện -> gọi getDailyPowerUsages
                 if (deviceId > 0 && start.isNotEmpty() && end.isNotEmpty()) {
                     viewModel3.getDailyPowerUsages(deviceId, start, end)
+                    Log.e("Sử dụng điện" , "Đã vào")
                 }
-
             }
             else -> {
                 // Các loại khác => Nhiệt độ (1), Ẩm (2), Ga (3)
@@ -279,9 +279,11 @@ fun DashboardDeviceScreen(
                     },
                     onManageTimeClicked = {  // mở DatePicker
                         showDatePickerForCustomRange(
+                            context,
                             onResult = { start, end ->
                                 startDate = start
                                 endDate = end
+                                Log.e("Time start end", startDate.toString() + endDate.toString())
                                 // Sau khi user chọn xong, ta “ép” selectedTimeRange = 3
                                 selectedTimeRange.value = 3
                             }
@@ -323,7 +325,7 @@ fun DashboardDeviceScreen(
 fun TimeSelectionDropdown(
     selectedTimeRange: Int,
     onTimeRangeChange: (Int) -> Unit,
-    onManageTimeClicked: @Composable () -> Unit
+    onManageTimeClicked: () -> Unit
 ) {
     // 0 -> Ngày (3 tháng), 1 -> Tuần (7 ngày), 2 -> Tháng (30 ngày), 3 -> Khoảng thời gian
     val timeOptions = listOf("Ngày", "Tuần", "Tháng", "Khoảng thời gian")
@@ -384,6 +386,7 @@ fun TimeSelectionDropdown(
                                 isDropdownExpanded = false
                                 if (index == 3) {
                                     // Người dùng chọn “Khoảng thời gian” => gọi hàm mở DatePicker
+                                    onManageTimeClicked()
                                 } else {
                                     onTimeRangeChange(index)
                                 }
@@ -401,11 +404,10 @@ fun TimeSelectionDropdown(
 // --------------------------------------
 // 3) Hàm hiển thị DatePickerDialog
 // --------------------------------------
-@Composable
 fun showDatePickerForCustomRange(
+    context: Context,
     onResult: (String, String) -> Unit
 ) {
-    val context = LocalContext.current
     val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     val calendar = Calendar.getInstance()
 
