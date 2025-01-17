@@ -244,7 +244,7 @@ fun NavigationGraph(
         }
 
         composable(
-            route = "Screens.UpdatePassword.route/{id}",
+            route = "${Screens.UpdatePassword.route}/{id}",
             arguments = listOf(navArgument("id") { type = NavType.IntType })
         ) { backStackEntry ->
             val userId = backStackEntry.arguments?.getInt("id") ?: -1

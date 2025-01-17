@@ -1,5 +1,6 @@
 import android.app.Application
 import android.app.DatePickerDialog
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,10 +27,14 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.PowerUsageData
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.PowerUsageData2
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SensorData
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.DeviceState
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.DeviceViewModel
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.CalculationState
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screens.IconBox
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screens.LimitedWordsText
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
@@ -106,14 +111,14 @@ fun DashboardDeviceScreen(
     val statisticsState by viewModel3.statisticsState.collectAsState()
 
     // Mỗi lần “selectedDataType”, “selectedTimeRange” hoặc “deviceId” đổi => gọi LaunchedEffect
-    LaunchedEffect(selectedDataType.value, selectedTimeRange.value, deviceId) {
+    LaunchedEffect(selectedDataType.value, selectedTimeRange.value, deviceId, startDate, endDate) {
         // Tính ra khoảng thời gian start - end dựa theo selectedTimeRange
         val calendar = Calendar.getInstance()
         val currentDate = dateFormat.format(calendar.time)
 
         val (start, end) = when (selectedTimeRange.value) {
             0 -> { // Ngày => 3 tháng gần đây
-                calendar.add(Calendar.MONTH, -3)
+                calendar.add(Calendar.DAY_OF_YEAR, -15)
                 val s = dateFormat.format(calendar.time)
                 Pair(s, currentDate)
             }
@@ -138,13 +143,12 @@ fun DashboardDeviceScreen(
 
         // Kiểm tra “loại dữ liệu”
         when (selectedDataType.value) {
-            0 -> {
-                Log.e("Sử dụng điện" , "Đã vào")
+            3 -> {
                 // Loại 0 => Sử dụng điện -> gọi getDailyPowerUsages
                 if (deviceId > 0 && start.isNotEmpty() && end.isNotEmpty()) {
                     viewModel3.getDailyPowerUsages(deviceId, start, end)
+                    Log.e("Sử dụng điện" , "Đã vào")
                 }
-
             }
             else -> {
                 // Các loại khác => Nhiệt độ (1), Ẩm (2), Ga (3)
@@ -168,7 +172,7 @@ fun DashboardDeviceScreen(
         when (statisticsState) {
             is StatisticsState.DailyPowerUsageSuccess -> {
                 // Trường hợp “Sử dụng điện”
-                if (selectedDataType.value == 0) {
+                if (selectedDataType.value == 3) {
                     Log.e("Sử dụng điện 2" , "Đã vào")
                     val response = (statisticsState as StatisticsState.DailyPowerUsageSuccess).data
                     Log.d("DEBUG", "Updating chart for Power Usage: ${response.dailyPowerUsages}")
@@ -182,9 +186,9 @@ fun DashboardDeviceScreen(
 
                 chartData = data.map { dailyData ->
                     when (selectedDataType.value) {
-                        1 -> dailyData.averageTemperature
-                        2 -> dailyData.averageHumidity
-                        3 -> dailyData.averageGas
+                        0 -> dailyData.averageTemperature
+                        1 -> dailyData.averageHumidity
+                        2 -> dailyData.averageGas
                         else -> 0f
                     }
                 }
@@ -231,7 +235,7 @@ fun DashboardDeviceScreen(
                 verticalArrangement = Arrangement.Top
             ) {
                 // 1) TabRow “loại dữ liệu” (điện/ nhiệt/ ẩm/ ga)
-                val chartOptions = listOf("Sử dụng điện", "Nhiệt độ", "Độ ẩm", "Khí ga")
+                val chartOptions = listOf("Nhiệt độ", "Độ ẩm", "Khí ga", "Sử dụng điện")
                 TabRow(
                     selectedTabIndex = selectedDataType.value,
                     modifier = Modifier.fillMaxWidth()
@@ -255,10 +259,10 @@ fun DashboardDeviceScreen(
                 // 3) Hiển thị biểu đồ
                 MpAndroidChart(
                     title = when (selectedDataType.value) {
-                        0 -> "Sử dụng điện"
-                        1 -> "Nhiệt độ"
-                        2 -> "Độ ẩm"
-                        3 -> "Khí ga"
+                        3 -> "Sử dụng điện"
+                        0 -> "Nhiệt độ"
+                        1 -> "Độ ẩm"
+                        2 -> "Khí ga"
                         else -> ""
                     },
                     data = chartData,
@@ -279,9 +283,11 @@ fun DashboardDeviceScreen(
                     },
                     onManageTimeClicked = {  // mở DatePicker
                         showDatePickerForCustomRange(
+                            context,
                             onResult = { start, end ->
                                 startDate = start
                                 endDate = end
+                                Log.e("Time start end", startDate.toString() + endDate.toString())
                                 // Sau khi user chọn xong, ta “ép” selectedTimeRange = 3
                                 selectedTimeRange.value = 3
                             }
@@ -323,7 +329,7 @@ fun DashboardDeviceScreen(
 fun TimeSelectionDropdown(
     selectedTimeRange: Int,
     onTimeRangeChange: (Int) -> Unit,
-    onManageTimeClicked: @Composable () -> Unit
+    onManageTimeClicked: () -> Unit
 ) {
     // 0 -> Ngày (3 tháng), 1 -> Tuần (7 ngày), 2 -> Tháng (30 ngày), 3 -> Khoảng thời gian
     val timeOptions = listOf("Ngày", "Tuần", "Tháng", "Khoảng thời gian")
@@ -384,6 +390,7 @@ fun TimeSelectionDropdown(
                                 isDropdownExpanded = false
                                 if (index == 3) {
                                     // Người dùng chọn “Khoảng thời gian” => gọi hàm mở DatePicker
+                                    onManageTimeClicked()
                                 } else {
                                     onTimeRangeChange(index)
                                 }
@@ -401,11 +408,10 @@ fun TimeSelectionDropdown(
 // --------------------------------------
 // 3) Hàm hiển thị DatePickerDialog
 // --------------------------------------
-@Composable
 fun showDatePickerForCustomRange(
+    context: Context,
     onResult: (String, String) -> Unit
 ) {
-    val context = LocalContext.current
     val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     val calendar = Calendar.getInstance()
 
@@ -498,7 +504,57 @@ fun MpAndroidChart(title: String, data: List<Float>, labels: List<String>) {
 // 5) DeviceItem giữ nguyên
 // --------------------------------------
 @Composable
-fun DeviceItem(device: DeviceResponse, onDetailsClick: () -> Unit) {
+fun DeviceItem(
+    device: DeviceResponse,
+    onDetailsClick: () -> Unit,
+) {
+    val now = Calendar.getInstance()
+    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+
+    // 1) Tạo ViewModel
+    val viewModel = remember { DashboardViewModel(application, context) }
+
+    // 2) Lắng nghe calculationState từ ViewModel
+    val calcState = viewModel.calculationState.collectAsState()
+
+    // 3) Tạo biến cục bộ để lưu kết quả SensorData và PowerUsageData
+    val sensorData = remember { mutableStateOf<SensorData?>(null) }
+    val powerData = remember { mutableStateOf<PowerUsageData2?>(null) }
+
+    // 4) Gọi 2 hàm tính toán khi composable khởi tạo
+    LaunchedEffect(Unit) {
+        viewModel.calculateDailyAverageSensor(device.DeviceID, sdf.format(now.time))
+        viewModel.calculateDailyPowerUsage(device.DeviceID, sdf.format(now.time))
+    }
+
+    // 5) Dựa trên state, cập nhật biến cục bộ
+    when (val state = calcState.value) {
+        is CalculationState.Idle -> {
+            // Chưa tính toán hoặc chưa có gì
+        }
+        is CalculationState.Loading -> {
+            // Đang load, bạn có thể hiển thị ProgressIndicator nếu muốn
+        }
+        is CalculationState.AverageSensorSuccess -> {
+            // Lấy dữ liệu SensorData -> lưu vào sensorData
+            sensorData.value = state.data
+        }
+        is CalculationState.PowerUsageSuccess -> {
+            // Lấy dữ liệu PowerUsageData -> lưu vào powerData
+            powerData.value = state.data
+        }
+        is CalculationState.Error -> {
+            // Khi xảy ra lỗi -> tuỳ bạn hiển thị
+            // Text(text = "Lỗi: ${state.error}")
+            Log.e("CalculationState.Error", (state as CalculationState.Error).toString())
+        }
+    }
+
+    // ----------------------------------------------
+    // Tạo vài hàm tiện ích format hiển thị
+    // ----------------------------------------------
     fun getIconForType(typeId: Int): String {
         return when (typeId) {
             1 -> "\uD83D\uDD25" // Fire
@@ -511,17 +567,19 @@ fun DeviceItem(device: DeviceResponse, onDetailsClick: () -> Unit) {
         return when (typeId) {
             1 -> "Báo cháy" // Fire
             2 -> "Đèn led" // Light
-            else -> "Không xác định"         // Biểu tượng mặc định
+            else -> "Không xác định"
         }
     }
 
     fun getPower(power: Boolean): String {
-        return when (power) {
-            true -> "Bật" // Fire
-            false -> "Tắt" // Light
-            else -> "Không xác định"         // Biểu tượng mặc định
-        }
+        return if (power) "Bật" else "Tắt"
     }
+
+    // ----------------------------------------------
+    // Chuẩn bị giá trị hiển thị, nếu null => 0f
+    // ----------------------------------------------
+    val powerRatingValue = powerData.value?.powerRating ?: 0f
+    val avgTemperatureValue = sensorData.value?.averageTemperature ?: 0f
 
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
@@ -529,7 +587,7 @@ fun DeviceItem(device: DeviceResponse, onDetailsClick: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            colors = CardDefaults.cardColors(containerColor = colorScheme.surface)
         ) {
             Row(
                 modifier = Modifier
@@ -542,34 +600,35 @@ fun DeviceItem(device: DeviceResponse, onDetailsClick: () -> Unit) {
                     IconBox(getIconForType(device.TypeID), colorScheme.background)
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
-
                         LimitedWordsText(device.Name, 3)
 
                         Text(
                             text = "Loại: ${getType(device.TypeID)}",
                             fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                            color = colorScheme.onSurface.copy(alpha = 0.6f)
                         )
                         Text(
                             text = "Trạng thái: ${getPower(device.PowerStatus)}",
                             fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                            color = colorScheme.onSurface.copy(alpha = 0.6f)
                         )
-//                        Text(
-//                            text = "Sử dụng điện: ${device.powerUsage} W",
-//                            fontSize = 14.sp,
-//                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-//                        )
-//                        Text(
-//                            text = "Nhiệt độ: ${device.temperature}°C",
-//                            fontSize = 14.sp,
-//                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-//                        )
+                        // Lấy powerRatingValue, nếu null thì 0f
+                        Text(
+                            text = "Sử dụng điện: $powerRatingValue W",
+                            fontSize = 14.sp,
+                            color = colorScheme.onSurface.copy(alpha = 0.6f)
+                        )
+                        // Lấy avgTemperatureValue, nếu null thì 0f
+                        Text(
+                            text = "Nhiệt độ: $avgTemperatureValue °C",
+                            fontSize = 14.sp,
+                            color = colorScheme.onSurface.copy(alpha = 0.6f)
+                        )
                     }
                 }
                 Button(
                     onClick = onDetailsClick,
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary)
                 ) {
                     Text(text = "Chi tiết", color = Color.White)
                 }

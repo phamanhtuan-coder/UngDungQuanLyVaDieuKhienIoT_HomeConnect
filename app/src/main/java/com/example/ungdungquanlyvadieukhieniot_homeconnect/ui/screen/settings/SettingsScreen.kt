@@ -1,5 +1,7 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.settings
 
+import android.app.Application
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Password
 import androidx.compose.material3.Icon
@@ -24,22 +27,37 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.User
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.isTablet
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.rememberResponsiveLayoutConfig
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.WarningDialog
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_sharing_list.isTablet
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_sharing_list.rememberResponsiveLayoutConfig
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.profile.InfoProfileState
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.profile.ProfileScreenViewModel
+import kotlin.toString
 
 /** Giao diện màn hình Settings Screen (SettingsScreen)
  * -----------------------------------------
@@ -55,6 +73,37 @@ fun SettingsScreen(
     navController: NavHostController
 ) {
     val layoutConfig = rememberResponsiveLayoutConfig() // Lấy LayoutConfig
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+    val viewModel = remember {
+        ProfileScreenViewModel(application, context)
+    }
+
+    var showAlertDialog by remember { mutableStateOf(false) }
+
+    var profileId by remember { mutableStateOf(-1) } // Lắng nghe danh sách thiết bị
+    val infoProfileState by viewModel.infoProfileState.collectAsState()
+
+    when(infoProfileState){
+        is InfoProfileState.Error ->{
+            Log.d("Error Profile",  (infoProfileState as InfoProfileState.Error).error)
+        }
+        is InfoProfileState.Idle ->{
+            //Todo
+        }
+        is InfoProfileState.Loading -> {
+            //Todo
+        }
+        is InfoProfileState.Success -> {
+            val successState = infoProfileState as InfoProfileState.Success
+            profileId = successState.user.UserID
+            Log.d("Thành công", "Dữ liệu user: ${profileId}")
+        }
+    }
+
+    LaunchedEffect(1) {
+        viewModel.getInfoProfile()
+    }
 
     AppTheme {
         // Trạng thái lưu trữ card được chọn
@@ -98,32 +147,44 @@ fun SettingsScreen(
                                     title = "Đổi mật khẩu",
                                     onClick = {
                                         //ToDo: Kiểm tra dữ liệu, di chuyển đền màn hình cài đặt password.
-                                        navController.navigate(Screens.UpdatePassword.route)
+                                        navController.navigate("${Screens.UpdatePassword.route}/${profileId}")
                                     }
                                 )
 
-                                CardSettings(
-                                    icon = Icons.Default.Notifications,
-                                    title = "Thông báo",
-                                    onClick = {
-                                        //ToDo: Kiểm tra dữ liệu, di chuyển đền màn hình cài đặt thông báo.
-                                    }
-                                )
-
-                                CardSettings(
-                                    icon = Icons.Default.Apps,
-                                    title = "Ứng dụng",
-                                    onClick = {
-                                        //ToDo: Kiểm tra dữ liệu, di chuyển đền màn hình cài đặt ứng dụng.
-                                    }
-                                )
+//                                CardSettings(
+//                                    icon = Icons.Default.Notifications,
+//                                    title = "Thông báo",
+//                                    onClick = {
+//                                        //ToDo: Kiểm tra dữ liệu, di chuyển đền màn hình cài đặt thông báo.
+//                                    }
+//                                )
+//
+//                                CardSettings(
+//                                    icon = Icons.Default.Apps,
+//                                    title = "Ứng dụng",
+//                                    onClick = {
+//                                        //ToDo: Kiểm tra dữ liệu, di chuyển đền màn hình cài đặt ứng dụng.
+//                                    }
+//                                )
 
                                 CardSettings(
                                     icon = Icons.AutoMirrored.Filled.ExitToApp,
                                     title = "Đăng xuất",
                                     onClick = {
+                                        showAlertDialog = true
                                         //ToDo: Kiểm tra dữ liệu, di chuyển đền màn hình cài đặt đăng suất.
                                     }
+                                )
+                            }
+
+                            if (showAlertDialog) {
+                                WarningDialog(
+                                    title = "Cảnh báo",
+                                    text = "Hành động này sẽ đăng xuất bạn ra khỏi ứng dụng. Bạn có chắc chắn không?",
+                                    onConfirm = {
+                                        viewModel.logoutAndNavigateToLogin(context)
+                                    },
+                                    onDismiss = { showAlertDialog = false }
                                 )
                             }
                         }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -213,89 +214,88 @@ fun DeviceScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(color = colorScheme.background)
-                                .height(150.dp)
+                                .wrapContentHeight()
+                                .defaultMinSize(minHeight = 150.dp)
                         ) {
-                            // Hộp màu xanh dương
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .offset(y = (-9).dp)
-                                    .height(110.dp)
-                                    .background(
-                                        color = colorScheme.primary,
-                                        shape = RoundedCornerShape(bottomStartPercent = 60)
-                                    )
-                                    .zIndex(1f),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .width(if (isTablet) 550.dp else 300.dp)
-                                        .align(Alignment.Center)
-                                ) {
-                                    HouseSelection(
-                                        sharedViewModel = sharedViewModel,
-                                        //houses = listOf("House 1", "House 2", "House 3"),
-                                        onManageHouseClicked = {
-                                            /* TODO: Navigate */
-                                            navController.navigate(Screens.HouseManagement.route)
-                                        },
-                                        onTabSelected = {id ->
-                                            viewModel.getSpacesByHomeId(id)
-                                        }
-                                    )
-                                }
-                            }
-                            // Hộp màu xanh với góc lõm
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 100.dp)
-                                    .width(40.dp)
-                                    .height(40.dp)
-                            ) {
-                                // Box màu vàng (ở dưới)
-                                Box(
-                                    modifier = Modifier
-                                        .width(40.dp)
-                                        .height(40.dp)
-                                        .align(Alignment.TopEnd)
-                                        .background(color = colorScheme.primary)
-                                        .zIndex(1f) // Z-index thấp hơn
-                                )
-
-
+                            Column {
+                                // Hộp màu xanh dương
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
+                                        .wrapContentHeight()
+                                        .defaultMinSize(minHeight = 110.dp)
                                         .background(
-                                            color = colorScheme.background,
-                                            shape = RoundedCornerShape(topEndPercent = 100)
+                                            color = MaterialTheme.colorScheme.primary,
+                                            shape = RoundedCornerShape(bottomStart = 38.dp)
                                         )
-                                        .width(40.dp)
-                                        .height(40.dp)
-                                        .zIndex(2f) // Z-index cao hơn
+                                        .zIndex(1f),
+                                    contentAlignment = Alignment.Center
                                 ) {
                                     Box(
                                         modifier = Modifier
-                                            .clip(RoundedCornerShape(topEndPercent = 100)) // Clip nội dung ScrollableTabRow
+                                            .width(if (isTablet) 550.dp else 300.dp)
+                                            .align(Alignment.Center)
                                     ) {
-                                        if (spaces.isNotEmpty()) {
-                                            CustomScrollableTabRow(
-                                                selectedTabIndex = selectedTabIndex,
-                                                spaces = spaces,
-                                                onTabSelected = { index, spaceId ->
-                                                    selectedTabIndex = index
-                                                    viewModel.selectSpace(spaceId) // Cập nhật Space được chọn
-                                                }
-                                            )
-                                        } else {
-                                            // Xử lý khi danh sách spaces trống
-                                            Text(
-                                                text = "",
-                                            )
-                                        }
+                                        HouseSelection(
+                                            sharedViewModel = sharedViewModel,
+                                            //houses = listOf("House 1", "House 2", "House 3"),
+                                            onManageHouseClicked = {
+                                                /* TODO: Navigate */
+                                                navController.navigate(Screens.HouseManagement.route)
+                                            },
+                                            onTabSelected = {id ->
+                                                viewModel.getSpacesByHomeId(id)
+                                            }
+                                        )
+                                    }
+                                }
+                                // Hộp màu xanh với góc lõm
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                ) {
+                                    // Box màu vàng (ở dưới)
+                                    Box(
+                                        modifier = Modifier
+                                            .width(40.dp)
+                                            .height(40.dp)
+                                            .align(Alignment.TopEnd)
+                                            .background(color = colorScheme.primary)
+                                            .zIndex(1f) // Z-index thấp hơn
+                                    )
 
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .background(
+                                                color = colorScheme.background,
+                                                shape = RoundedCornerShape(topEndPercent = 100)
+                                            )
+                                            .width(40.dp)
+                                            .height(40.dp)
+                                            .zIndex(2f) // Z-index cao hơn
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(topEndPercent = 100)) // Clip nội dung ScrollableTabRow
+                                        ) {
+                                            if (spaces.isNotEmpty()) {
+                                                CustomScrollableTabRow(
+                                                    selectedTabIndex = selectedTabIndex,
+                                                    spaces = spaces,
+                                                    onTabSelected = { index, spaceId ->
+                                                        selectedTabIndex = index
+                                                        viewModel.selectSpace(spaceId) // Cập nhật Space được chọn
+                                                    }
+                                                )
+                                            } else {
+                                                // Xử lý khi danh sách spaces trống
+                                                Text(
+                                                    text = "",
+                                                )
+                                            }
+
+                                        }
                                     }
                                 }
                             }
