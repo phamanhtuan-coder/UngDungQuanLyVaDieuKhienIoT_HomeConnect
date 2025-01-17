@@ -1,14 +1,12 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.data.repository
 
 import android.content.Context
+import android.util.Log
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.api.RetrofitClient
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AverageSensorResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DailyAverageSensorResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DailyPowerUsageResponse
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DailySensorRequest
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RangeSensorRequest
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.WeeklyAverageSensorResponse
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.WeeklySensorRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DailyPowerUsageResponse2
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DailySensorAveragesResponse
 
 class StatisticsRepository(private val context: Context) {
     private val apiService = RetrofitClient.apiService
@@ -30,20 +28,23 @@ class StatisticsRepository(private val context: Context) {
         return sharedPrefs.getString("JWT_TOKEN", "") ?: ""
     }
 
-    suspend fun calculateDailyAverageSensor(request: DailySensorRequest): AverageSensorResponse {
-        return apiService.calculateDailyAverageSensor(request, "Bearer ${getToken()}")
+    suspend fun getDailyRoomPowerUsage(spaceId: Int, startDate: String, endDate: String): DailyPowerUsageResponse2 {
+        val sharedPrefs = context.getSharedPreferences("MY_APP_PREFS", Context.MODE_PRIVATE)
+        val token = sharedPrefs.getString("JWT_TOKEN", "") ?: throw Exception("Token không tồn tại")
+
+        Log.d("StatisticsRepository", "Token: Bearer $token")
+        Log.d("StatisticsRepository", "Request: spaceId=$spaceId, startDate=$startDate, endDate=$endDate")
+
+        return apiService.getDailyRoomPowerUsage(spaceId, startDate, endDate, "Bearer $token")
     }
 
-    suspend fun calculateWeeklyAverageSensor(request: WeeklySensorRequest): AverageSensorResponse {
-        return apiService.calculateWeeklyAverageSensor(request, "Bearer ${getToken()}")
-    }
+    suspend fun getDailyRoomAveragesSensor(spaceId: Int, startDate: String, endDate: String): DailySensorAveragesResponse {
+        val sharedPrefs = context.getSharedPreferences("MY_APP_PREFS", Context.MODE_PRIVATE)
+        val token = sharedPrefs.getString("JWT_TOKEN", "") ?: throw Exception("Token không tồn tại")
 
-    suspend fun calculateAverageSensorForRange(request: RangeSensorRequest): AverageSensorResponse {
-        return apiService.calculateAverageSensorForRange(request, "Bearer ${getToken()}")
-    }
+        Log.d("StatisticsRepository", "Token: Bearer $token")
+        Log.d("StatisticsRepository", "Request: spaceId=$spaceId, startDate=$startDate, endDate=$endDate")
 
-    suspend fun getWeeklyAverageSensor(deviceId: Int): WeeklyAverageSensorResponse {
-        return apiService.getWeeklyAverageSensor(deviceId, "Bearer ${getToken()}")
+        return apiService.getDailyRoomAveragesSensor(spaceId, startDate, endDate, "Bearer $token")
     }
-
 }
