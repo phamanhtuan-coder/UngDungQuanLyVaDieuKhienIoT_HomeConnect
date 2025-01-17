@@ -134,7 +134,7 @@ fun NavigationGraph(
 
         //Add Device Screen
         composable(Screens.AddDevice.route) {
-            AddDeviceScreen(navController)
+            AddDeviceScreen(navController, sharedViewModel)
         }
 
         //All Notifications Screen
