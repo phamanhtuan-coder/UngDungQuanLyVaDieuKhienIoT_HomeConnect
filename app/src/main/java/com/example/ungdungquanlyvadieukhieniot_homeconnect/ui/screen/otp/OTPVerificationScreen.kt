@@ -1,5 +1,6 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.otp
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -42,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 @Composable
@@ -64,17 +66,14 @@ fun OtpScreen(
     var verifyEmailMessage = ""
     when (verifyEmailState) {
         is VerifyEmailState.Success -> {
-            LaunchedEffect(Unit) {
-                onVerificationSuccess()
-            }
+            verifyEmailMessage = "Xác thực Email thành công!"
+            onVerificationSuccess()
         }
 
         is VerifyEmailState.Error -> {
-            verifyEmailMessage = "Xác thực Email thất bại! Email không tồn tại."
         }
 
         is VerifyEmailState.Loading -> {
-            verifyEmailMessage = "Đang xác thực Email..."
         }
 
         else -> {
@@ -100,23 +99,26 @@ fun OtpScreen(
         }
     }
 
-    val verifyOTPState by viewModel.verifyOtpState.collectAsState()
-    var verifyOTPMessage = ""
-    when (verifyOTPState) {
-        is OTPState.Success -> {
+    val verifyOtpState by viewModel.verifyOtpState.collectAsState()
 
+    var verifyOTPMessage = ""
+    when (verifyOtpState) {
+        is OTPState.Success -> {
             when (title) {
-                "Xác nhận Email" -> {
-                    viewModel.confirmEmail(email)
+                "Xác thực Email" -> {
+                    LaunchedEffect(key1 = "confirmEmail") {
+                        Log.d("OtpScreen", "Calling confirmEmail")
+                        viewModel.confirmEmail(email)
+                    }
                 }
 
                 else -> {
-                    LaunchedEffect(Unit) {
+                    LaunchedEffect(key1 = "onVerificationSuccess") {
+                        Log.d("OtpScreen", "Calling onVerificationSuccess")
                         onVerificationSuccess()
                     }
                 }
             }
-
         }
 
         is OTPState.Error -> {
@@ -130,6 +132,8 @@ fun OtpScreen(
         else -> {
         }
     }
+
+
 
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
@@ -247,7 +251,7 @@ fun OtpScreen(
                 }
 
 
-                if (title == "Xác nhận Email") {
+                if (title == "Xác thực Email") {
                     Text(
                         text = verifyEmailMessage,
                         fontSize = 14.sp,
@@ -262,7 +266,7 @@ fun OtpScreen(
                         text = verifyOTPMessage,
                         fontSize = 14.sp,
                         color =
-                        when (verifyOTPState) {
+                        when (verifyOtpState) {
                             is OTPState.Idle -> Color.Green
                             is OTPState.Loading -> Color.Yellow
                             else -> colorScheme.error

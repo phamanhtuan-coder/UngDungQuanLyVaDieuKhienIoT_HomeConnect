@@ -61,12 +61,12 @@ class UserRepository(private val context: Context) {
         return apiService.sharedWith(userId, token = "Bearer $token")
     }
     suspend fun confirmEmail(email: String): EmailResponse {
-        val request = EmailRequest(
-            email = email
-        )
+//        val request = EmailRequest(
+//            email = email
+//        )
         val sharedPrefs = context.getSharedPreferences("MY_APP_PREFS", Context.MODE_PRIVATE)
         val token = sharedPrefs.getString("JWT_TOKEN", "") ?: ""
-        return apiService.confirmEmail(request, token = "Bearer $token")
+        return apiService.confirmEmail(email, token = "Bearer $token")
     }
 
 

@@ -268,14 +268,14 @@ fun HomeScreen(
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
-//                        TextButton(
-//                            onClick = { /* TODO: Navigate tới màn hình toàn b thiết bị */ },
-//                            colors = ButtonDefaults.textButtonColors(
-//                                contentColor = Color.Blue
-//                            )
-//                        ) {
-//                            Text(text = "Xem thêm")
-//                        }
+                        TextButton(
+                            onClick = { /* TODO: Navigate tới màn hình toàn b thiết bị */ },
+                            colors = ButtonDefaults.textButtonColors(
+                                contentColor = Color.Blue
+                            )
+                        ) {
+                            Text(text = "")
+                        }
                     }
 
                     fun getType(typeId: Int): String {

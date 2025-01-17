@@ -320,7 +320,7 @@ interface ApiService {
 
     @POST("/api/users/confirm-email")
     suspend fun confirmEmail(
-        @Body request: EmailRequest,
+        @Body email:String,
         @Header("Authorization") token: String
     ): EmailResponse
 

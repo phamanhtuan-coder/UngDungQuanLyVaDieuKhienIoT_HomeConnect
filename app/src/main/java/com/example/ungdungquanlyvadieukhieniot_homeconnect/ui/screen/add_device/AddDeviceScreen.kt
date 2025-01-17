@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.add_device
 
 import android.app.Application
@@ -256,7 +258,7 @@ fun AddDeviceScreen(
                                                 },
                                                 placeholder = { Text("Chọn phòng") },
                                                 modifier = Modifier
-                                                    .menuAnchor(type, enabled) // Bắt buộc khi dùng ExposedDropdownMenuBox
+                                                    .menuAnchor() // Bắt buộc khi dùng ExposedDropdownMenuBox
                                                     .width(if (isTablet) 500.dp else 400.dp)
                                                     .height(if (isTablet) 80.dp else 70.dp),
                                                 trailingIcon = {
