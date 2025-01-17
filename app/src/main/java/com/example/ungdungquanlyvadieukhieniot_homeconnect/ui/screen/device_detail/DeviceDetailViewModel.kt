@@ -7,10 +7,14 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AttributeRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.PowerUsageData2
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SensorData
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.repository.DeviceRepository
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.repository.StatisticsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
@@ -42,8 +46,29 @@ sealed class UnlinkState {
     data class Error(val error: String) : UnlinkState()
 }
 
+sealed class CalculationState {
+    object Idle : CalculationState()
+    object Loading : CalculationState()
+
+    // Trả về SensorData (thay vì SensorData2)
+    data class AverageSensorSuccess(
+        val message: String,
+        val data: SensorData
+    ) : CalculationState()
+
+    // Trả về PowerUsageData (thay vì PowerUsageData2)
+    data class PowerUsageSuccess(
+        val message: String,
+        val data: PowerUsageData2
+    ) : CalculationState()
+
+    data class Error(val error: String) : CalculationState()
+}
+
+
 class DeviceDetailViewModel(application: Application, context: Context) : AndroidViewModel(application) {
     private val repository = DeviceRepository(context) // Repository để quản lý cả Spaces và Devices
+    private val repository2 = StatisticsRepository(context)
 
     private val _infoDeviceState = MutableStateFlow<getInfoDeviceState>(getInfoDeviceState.Idle)
     val infoDeviceState = _infoDeviceState.asStateFlow()
@@ -107,6 +132,42 @@ class DeviceDetailViewModel(application: Application, context: Context) : Androi
             } catch (e: Exception) {
                 Log.e("DeviceDetailViewModel", "Error fetching unlink: ${e.message}")
                 _unlinkState.value = UnlinkState.Error(e.message ?: "Load thất bại!")
+            }
+        }
+    }
+
+    // ---------------- Tính toán thống kê ---------------- //
+    private val _calculationState = MutableStateFlow<CalculationState>(CalculationState.Idle)
+    val calculationState: StateFlow<CalculationState> = _calculationState.asStateFlow()
+
+    fun calculateDailyAverageSensor(deviceId: Int, date: String) {
+        _calculationState.value = CalculationState.Loading
+        viewModelScope.launch {
+            try {
+                val response = repository2.calculateDailyAverageSensor(deviceId, date)
+                // response.data bây giờ là kiểu SensorData
+                _calculationState.value = CalculationState.AverageSensorSuccess(
+                    message = response.message,
+                    data = response.data
+                )
+            } catch (e: Exception) {
+                _calculationState.value = CalculationState.Error(e.message ?: "Đã xảy ra lỗi không xác định")
+            }
+        }
+    }
+
+    fun calculateDailyPowerUsage(deviceId: Int, date: String) {
+        _calculationState.value = CalculationState.Loading
+        viewModelScope.launch {
+            try {
+                val response = repository2.calculateDailyPowerUsage(deviceId, date)
+                // response.data bây giờ là kiểu PowerUsageData
+                _calculationState.value = CalculationState.PowerUsageSuccess(
+                    message = response.message,
+                    data = response.data
+                )
+            } catch (e: Exception) {
+                _calculationState.value = CalculationState.Error(e.message ?: "Đã xảy ra lỗi không xác định")
             }
         }
     }
