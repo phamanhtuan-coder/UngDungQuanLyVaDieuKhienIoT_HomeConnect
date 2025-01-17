@@ -6,8 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DailyAverageSensorResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DailyPowerUsageResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.repository.StatisticsRepository
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.CalculationState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -71,6 +73,41 @@ class DashboardViewModel(
                 // Xử lý lỗi và cập nhật trạng thái thất bại
                 Log.e("DEBUG", "Error fetching Power Usage: ${e.message}")
                 _statisticsState.value = StatisticsState.Error(e.message ?: "Unknown error")
+            }
+        }
+    }
+
+    private val _calculationState = MutableStateFlow<CalculationState>(CalculationState.Idle)
+    val calculationState: StateFlow<CalculationState> = _calculationState.asStateFlow()
+
+    fun calculateDailyAverageSensor(deviceId: Int, date: String) {
+        _calculationState.value = CalculationState.Loading
+        viewModelScope.launch {
+            try {
+                val response = repository.calculateDailyAverageSensor(deviceId, date)
+                // response.data bây giờ là kiểu SensorData
+                _calculationState.value = CalculationState.AverageSensorSuccess(
+                    message = response.message,
+                    data = response.data
+                )
+            } catch (e: Exception) {
+                _calculationState.value = CalculationState.Error(e.message ?: "Đã xảy ra lỗi không xác định")
+            }
+        }
+    }
+
+    fun calculateDailyPowerUsage(deviceId: Int, date: String) {
+        _calculationState.value = CalculationState.Loading
+        viewModelScope.launch {
+            try {
+                val response = repository.calculateDailyPowerUsage(deviceId, date)
+                // response.data bây giờ là kiểu PowerUsageData
+                _calculationState.value = CalculationState.PowerUsageSuccess(
+                    message = response.message,
+                    data = response.data
+                )
+            } catch (e: Exception) {
+                _calculationState.value = CalculationState.Error(e.message ?: "Đã xảy ra lỗi không xác định")
             }
         }
     }
