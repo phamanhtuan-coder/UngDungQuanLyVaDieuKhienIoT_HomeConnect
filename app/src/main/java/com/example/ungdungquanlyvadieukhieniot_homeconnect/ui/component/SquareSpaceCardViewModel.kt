@@ -1,7 +1,6 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component
 
 import android.app.Application
-import android.content.Context
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,9 +17,8 @@ sealed class SpaceState {
     data class Error(val error: String) : SpaceState()
 }
 
-class SquareSpaceCardViewModel(application: Application, context: Context) :
-    AndroidViewModel(application) {
-    private val repository = SpaceRepository(context) // Repository để quản lý
+class SquareSpaceCardViewModel(application: Application) : AndroidViewModel(application) {
+    private val repository = SpaceRepository(application.applicationContext)
 
     private val _spaceDetailState = MutableStateFlow<SpaceState>(SpaceState.Idle)
     val spaceDetailState = _spaceDetailState.asStateFlow()

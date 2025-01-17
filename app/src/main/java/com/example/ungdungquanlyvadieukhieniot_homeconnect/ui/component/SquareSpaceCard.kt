@@ -15,7 +15,6 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,65 +36,65 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
-
 /**
- * Giao diện Thẻ phòng
+ * Space Card UI Component
  * -----------------------------------------
- * - Người viết: Phạm Anh Tuấn
- * - Ngày viết: 29/11/2024
- * - Lần cập nhật cuối: 11/12/2024
+ * - Author: Phạm Anh Tuấn
+ * - Created: 29/11/2024
+ * - Last Updated: 11/12/2024
  * -----------------------------------------
- * @param temperature: Nhiệt độ phòng
- * @param icon: Hình ảnh biểu tượng phòng
- * @param spaceName: Tên phòng
- * @param deviceCount: Số lượng thiết bị kết nối
- * @return Card chứa thông tin phòng
+ * @param space: Space data to display
+ * @return Card containing space information
  * ---------------------------------------
- *
  */
 @Composable
 fun SpaceCard(
     space: SpaceResponse,
-    viewModel: SquareSpaceCardViewModel = viewModel()
-
 ) {
-    var temperature by remember { mutableStateOf(25) }
-    var icon by remember { mutableStateOf(Icons.Default.Home) }
-    var spaceName by remember { mutableStateOf(space.Name) }
-    var deviceCount by remember { mutableStateOf(0) }
+    // Obtain the ViewModel
+    val viewModel: SquareSpaceCardViewModel = viewModel()
 
-
+    // Trigger data fetching when the Composable is first composed or when space.SpaceID changes
     LaunchedEffect(key1 = space.SpaceID) {
         viewModel.getSpaceDetail(space.SpaceID)
     }
-    val spaceDetailState by viewModel.spaceDetailState.collectAsState()
-    var spaceDetail by remember { mutableStateOf<SpaceState>(SpaceState.Idle) }
 
-    when (spaceDetailState) {
+    // Collect the state from the ViewModel
+    val spaceDetailState by viewModel.spaceDetailState.collectAsState()
+
+    // Local state variables to manage UI data
+    var temperature by remember { mutableStateOf(randomInt(25, 40)) }
+    var icon by remember { mutableStateOf(Icons.Default.Home) }
+    var spaceName by remember { mutableStateOf(space.Name) }
+    var deviceCount by remember { mutableStateOf(randomInt(0, 10)) }
+
+    // Update local state based on ViewModel's state
+    when (val state = spaceDetailState) {
         is SpaceState.Success -> {
-            spaceDetail = (spaceDetailState as SpaceState.Success)
-            temperature = randomInt(25, 40) //Todo: Lấy dữ liệu sau này
-            icon = Icons.Default.Home //Todo: Lấy dữ liệu sau này
-            spaceName = (spaceDetailState as SpaceState.Success).space.Name
-            deviceCount = randomInt(0, 10) //Todo: Lấy dữ liệu sau này
+            temperature = randomInt(25, 40) // Replace with actual data
+            icon = Icons.Default.Home // Replace with dynamic icons if available
+            spaceName = state.space.Name
+            deviceCount = randomInt(0, 10) // Replace with actual data
         }
 
         is SpaceState.Error -> {
-            val error = (spaceDetailState as SpaceState.Error).error
+            val error = state.error
             Log.e("SpaceCard", "Error fetching space detail: $error")
+            // Optionally, show error UI
         }
 
         is SpaceState.Loading -> {
             Log.d("SpaceCard", "Loading space detail...")
+            // Optionally, show loading UI
         }
 
         is SpaceState.Idle -> {
+            // Initial state; already using default or passed-in values
         }
     }
 
-
+    // UI Rendering
     AppTheme {
-        val colorScheme = MaterialTheme.colorScheme
         Card(
             modifier = Modifier
                 .padding(8.dp)
@@ -114,27 +113,10 @@ fun SpaceCard(
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                color = if (temperature >= 30) Color(0xFFE91E63) else if (temperature <= 10) Color(
-                                    0xFF2196F3
-                                ) else Color(0xFF4CAF50),
-                                shape = RoundedCornerShape(16.dp)
-                            )
-                            .padding(horizontal = 12.dp, vertical = 4.dp)
-                    ) {
-                        Text(
-                            text = "$temperature °C",
-                            color = Color.White,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                    // Temperature Display
+                    TemperatureDisplay(temperature = temperature)
 
+                    // Icon Display
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
@@ -144,7 +126,7 @@ fun SpaceCard(
                             .padding(8.dp)
                     )
 
-
+                    // Space Name Display
                     Text(
                         text = spaceName,
                         color = Color.Black,
@@ -152,6 +134,8 @@ fun SpaceCard(
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     )
+
+                    // Device Count Display
                     Text(
                         text = "$deviceCount Devices Connected",
                         color = Color.Gray,
@@ -164,6 +148,40 @@ fun SpaceCard(
     }
 }
 
+/**
+ * Temperature Display Composable
+ * @param temperature: Current temperature to display
+ */
+@Composable
+fun TemperatureDisplay(temperature: Int) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = when {
+                    temperature >= 30 -> Color(0xFFE91E63) // Hot
+                    temperature <= 10 -> Color(0xFF2196F3) // Cold
+                    else -> Color(0xFF4CAF50) // Moderate
+                },
+                shape = RoundedCornerShape(16.dp)
+            )
+            .padding(horizontal = 12.dp, vertical = 4.dp)
+    ) {
+        Text(
+            text = "$temperature °C",
+            color = Color.White,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+/**
+ * Generates a random integer between [from] (inclusive) and [to] (exclusive).
+ * Used here for placeholder data.
+ */
 fun randomInt(from: Int, to: Int): Int {
     return (from until to).random()
 }
