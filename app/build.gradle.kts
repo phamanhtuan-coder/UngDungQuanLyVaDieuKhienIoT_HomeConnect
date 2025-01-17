@@ -42,7 +42,13 @@ android {
 
 
 dependencies {
+    implementation ("androidx.compose.ui:ui:1.5.0")
+    implementation ("androidx.compose.material3:material3:1.1.0")
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation ("com.google.code.gson:gson:2.10")
     implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.6.1") // Thay phiên bản nếu cần
+    implementation ("com.google.android.gms:play-services-location:21.0.1")
 
     //Google Firebase Messaging
     implementation(libs.firebase.messaging)
