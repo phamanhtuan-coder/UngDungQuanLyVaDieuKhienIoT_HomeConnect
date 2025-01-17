@@ -46,12 +46,15 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UserR
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UserResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.WeeklyAverageSensorResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.WeeklySensorRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.repository.WeatherApiService
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 interface ApiService {
     @POST("/api/auth/login")
@@ -229,3 +232,4 @@ interface ApiService {
         @Header("Authorization") token: String
     ): DailyPowerUsageResponse3
 }
+
