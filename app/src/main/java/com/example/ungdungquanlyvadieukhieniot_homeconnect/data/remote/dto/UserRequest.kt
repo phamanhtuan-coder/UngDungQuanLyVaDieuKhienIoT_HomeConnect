@@ -6,4 +6,5 @@ data class UserRequest(
     val Phone: String,
     val Address: String,
     val DateOfBirth: String,
+    val ProfileImage: String
 )
