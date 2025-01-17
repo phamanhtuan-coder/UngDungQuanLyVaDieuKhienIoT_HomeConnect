@@ -155,7 +155,15 @@ fun ActivityHistoryScreen(
                                                     }
                                                     2 -> { // Đèn
                                                         val lightDetails = log.details as? FormattedLightDetails
-                                                        "Trạng thái: ${if (lightDetails?.powerStatus == true) "Bật" else "Tắt"}"
+                                                        buildString {
+                                                            append("Trạng thái: ${if (lightDetails?.powerStatus == true) "Bật" else "Tắt"}")
+                                                            lightDetails?.brightness?.let {
+                                                                append(", Độ sáng: $it%")
+                                                            }
+                                                            lightDetails?.color?.let {
+                                                                append(", Màu sắc: $it")
+                                                            }
+                                                        }
                                                     }
                                                     else -> "Không có thông tin chi tiết"
                                                 }

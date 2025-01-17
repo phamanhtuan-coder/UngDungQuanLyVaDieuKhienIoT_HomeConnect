@@ -41,7 +41,13 @@ data class SensorDetails(
 
 data class LightDetails(
     val action: String,
-    val powerStatus: Boolean
+    val powerStatus: Boolean,
+    val attribute: String? = null
+)
+
+data class LightAttribute(
+    val brightness: Int,
+    val color: String
 )
 
 data class FormattedLog(
@@ -61,5 +67,8 @@ data class FormattedSensorDetails(
 
 data class FormattedLightDetails(
     val action: String,
-    val powerStatus: Boolean
+    val powerStatus: Boolean,
+    val brightness: Int? = null,
+    val color: String? = null
+
 )

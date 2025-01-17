@@ -10,13 +10,13 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Actio
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.FormattedLightDetails
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.FormattedLog
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.FormattedSensorDetails
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LightAttribute
 import kotlinx.coroutines.flow.MutableStateFlow
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LightDetails
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LogResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SensorDetails
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.repository.LogRepository
 import com.google.gson.Gson
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
@@ -28,7 +28,6 @@ class ActivityHistoryViewModel(application: Application, context: Context) : And
     val logsState = _logsState.asStateFlow()
 
     private val _selectedLogState = MutableStateFlow<SelectedLogState>(SelectedLogState.Idle)
-    val selectedLogState: StateFlow<SelectedLogState> = _selectedLogState
 
 
     fun getDeviceLogs(deviceId: Int) {
@@ -69,11 +68,23 @@ class ActivityHistoryViewModel(application: Application, context: Context) : And
             }
             2 -> { // Đèn
                 try {
-                    val details = gson.fromJson(log.Details, LightDetails::class.java)
-                    FormattedLightDetails(
-                        action = details.action,
-                        powerStatus = details.powerStatus
-                    )
+                        val details = gson.fromJson(log.Details, LightDetails::class.java)
+                        val attribute = if (!details.attribute.isNullOrEmpty()) {
+                            gson.fromJson(details.attribute, LightAttribute::class.java)
+                        } else {
+                            // Thử lấy từ Device.Attribute nếu có
+                            if (!log.Device.Attribute.isNullOrEmpty()) {
+                                gson.fromJson(log.Device.Attribute, LightAttribute::class.java)
+                            } else null
+                        }
+
+                        FormattedLightDetails(
+                            action = details.action,
+                            powerStatus = details.powerStatus,
+                            brightness = attribute?.brightness,
+                            color = attribute?.color
+                        )
+
                 } catch (e: Exception) {
                     null
                 }

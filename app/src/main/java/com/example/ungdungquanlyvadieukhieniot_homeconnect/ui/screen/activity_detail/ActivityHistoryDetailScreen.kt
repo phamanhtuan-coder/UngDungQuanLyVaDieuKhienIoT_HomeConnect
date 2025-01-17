@@ -40,6 +40,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBott
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import android.util.Log
 import androidx.compose.runtime.LaunchedEffect
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.FormattedLightDetails
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LogDetailNavArg
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.activity_history.formatDate
 import com.google.gson.Gson
@@ -109,12 +110,18 @@ fun ActivityHistoryScreenDetailScreen(
 
                 var time by remember { mutableStateOf(formatDate(logDetails.timestamp)) }
                 var content by remember { mutableStateOf(
-                    """
-                Thiết bị: ${logDetails.deviceName}
-                Loại: ${if (logDetails.deviceType == 1) "Cảm biến khói" else "Đèn LED"}
+                    """Thiết bị: ${logDetails.deviceName}
+Loại: ${if (logDetails.deviceType == 1) "Cảm biến khói" else "Đèn LED"}
                 
                 ${logDetails.details}
-                """.trimIndent()
+    ${if (logDetails.deviceType == 2) {
+                        val lightDetails = logDetails.details as? FormattedLightDetails
+                        """
+        Độ sáng: ${lightDetails?.brightness ?: "N/A"}%
+        Màu sắc: ${lightDetails?.color ?: "N/A"}
+        """.trimIndent()
+                    } else ""}
+    """.trimIndent()
                 ) }
 
         Scaffold(
