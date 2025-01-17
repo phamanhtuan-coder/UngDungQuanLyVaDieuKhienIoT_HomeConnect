@@ -744,6 +744,11 @@ fun ProfileScreen(
                             Icon(
                                 imageVector =if (isVerified.value) Icons.Default.CheckCircle else Icons.Default.Error,
                                 contentDescription = "Verified",
+                                modifier = Modifier.clickable(
+                                    onClick = {
+                                        navController.navigate(Screens.OTP.route)
+                                    }
+                                ),
                                 tint = if (isVerified.value) Color.Green else Color.Red
                             )
                         },
