@@ -143,7 +143,7 @@ fun DashboardDeviceScreen(
 
         // Kiểm tra “loại dữ liệu”
         when (selectedDataType.value) {
-            0 -> {
+            3 -> {
                 // Loại 0 => Sử dụng điện -> gọi getDailyPowerUsages
                 if (deviceId > 0 && start.isNotEmpty() && end.isNotEmpty()) {
                     viewModel3.getDailyPowerUsages(deviceId, start, end)
@@ -172,7 +172,7 @@ fun DashboardDeviceScreen(
         when (statisticsState) {
             is StatisticsState.DailyPowerUsageSuccess -> {
                 // Trường hợp “Sử dụng điện”
-                if (selectedDataType.value == 0) {
+                if (selectedDataType.value == 3) {
                     Log.e("Sử dụng điện 2" , "Đã vào")
                     val response = (statisticsState as StatisticsState.DailyPowerUsageSuccess).data
                     Log.d("DEBUG", "Updating chart for Power Usage: ${response.dailyPowerUsages}")
@@ -186,9 +186,9 @@ fun DashboardDeviceScreen(
 
                 chartData = data.map { dailyData ->
                     when (selectedDataType.value) {
-                        1 -> dailyData.averageTemperature
-                        2 -> dailyData.averageHumidity
-                        3 -> dailyData.averageGas
+                        0 -> dailyData.averageTemperature
+                        1 -> dailyData.averageHumidity
+                        2 -> dailyData.averageGas
                         else -> 0f
                     }
                 }
@@ -235,7 +235,7 @@ fun DashboardDeviceScreen(
                 verticalArrangement = Arrangement.Top
             ) {
                 // 1) TabRow “loại dữ liệu” (điện/ nhiệt/ ẩm/ ga)
-                val chartOptions = listOf("Sử dụng điện", "Nhiệt độ", "Độ ẩm", "Khí ga")
+                val chartOptions = listOf("Nhiệt độ", "Độ ẩm", "Khí ga", "Sử dụng điện")
                 TabRow(
                     selectedTabIndex = selectedDataType.value,
                     modifier = Modifier.fillMaxWidth()
@@ -259,10 +259,10 @@ fun DashboardDeviceScreen(
                 // 3) Hiển thị biểu đồ
                 MpAndroidChart(
                     title = when (selectedDataType.value) {
-                        0 -> "Sử dụng điện"
-                        1 -> "Nhiệt độ"
-                        2 -> "Độ ẩm"
-                        3 -> "Khí ga"
+                        3 -> "Sử dụng điện"
+                        0 -> "Nhiệt độ"
+                        1 -> "Độ ẩm"
+                        2 -> "Khí ga"
                         else -> ""
                     },
                     data = chartData,
