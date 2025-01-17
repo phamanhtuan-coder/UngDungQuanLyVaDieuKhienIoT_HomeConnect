@@ -46,14 +46,38 @@ class HouseDropDownViewModel(application: Application, context: Context) : Andro
 }
 
 class SharedViewModel : ViewModel() {
+
+    // Lưu trữ houseId
     private val _houseId = MutableStateFlow<Int?>(null)
     val houseId: StateFlow<Int?> get() = _houseId
 
+    // Lưu trữ userId
+    private val _userId = MutableStateFlow<Int?>(null)
+    val userId: StateFlow<Int?> get() = _userId
+
+    // Thiết lập houseId
     fun setHouseId(id: Int) {
         _houseId.value = id
     }
 
+    // Thiết lập userId
+    fun setUserId(id: Int) {
+        _userId.value = id
+    }
+
+    // Xóa houseId
     fun clearHouseId() {
         _houseId.value = null // Xóa giá trị khi không cần nữa
+    }
+
+    // Xóa userId
+    fun clearUserId() {
+        _userId.value = null // Xóa giá trị khi không cần nữa
+    }
+
+    // Xóa cả houseId và userId
+    fun clearAll() {
+        _houseId.value = null
+        _userId.value = null
     }
 }
