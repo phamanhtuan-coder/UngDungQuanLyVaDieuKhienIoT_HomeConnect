@@ -21,11 +21,14 @@ class LogRepository(private val context: Context) {
     }
 
     suspend fun getLatestSensor(DeviceID: Int): LogLastest {
-    suspend fun getDeviceLogs(deviceId: Int): List<LogResponse> {
         val sharedPrefs = context.getSharedPreferences("MY_APP_PREFS", Context.MODE_PRIVATE)
         val token = sharedPrefs.getString("JWT_TOKEN", "") ?: ""
         return apiService.getLatestSensor(DeviceID, token = "Bearer $token")
+    }
 
+    suspend fun getDeviceLogs(deviceId: Int): List<LogResponse> {
+        val sharedPrefs = context.getSharedPreferences("MY_APP_PREFS", Context.MODE_PRIVATE)
+        val token = sharedPrefs.getString("JWT_TOKEN", "") ?: ""
         return apiService.getDeviceLogs(deviceId=deviceId,token = "Bearer $token")
     }
 }
