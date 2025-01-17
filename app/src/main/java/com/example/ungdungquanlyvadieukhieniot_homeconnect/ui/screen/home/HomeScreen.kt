@@ -1,7 +1,6 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.home
 
 import android.app.Application
-import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,8 +36,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.auth0.jwt.JWT
-import com.auth0.jwt.interfaces.DecodedJWT
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SharedWithResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.DeviceCard
@@ -51,6 +48,8 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.WeatherI
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.DeviceViewModel
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.SpaceState
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.profile.InfoProfileState
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.profile.ProfileScreenViewModel
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 /** Giao diện màn hình Trang chủ (Home Screen)
@@ -108,12 +107,31 @@ fun HomeScreen(
             }
         }
     }
+    val viewModelProfile = remember {
+        ProfileScreenViewModel(application, context)
+    }
+    var userId by remember { mutableStateOf(0) }
+    val infoProfileState by viewModelProfile.infoProfileState.collectAsState()
+    LaunchedEffect(Unit) {
+        viewModelProfile.getInfoProfile()
+    }
+    when (infoProfileState) {
+        is InfoProfileState.Loading -> {
 
-    val sharedPrefs = context.getSharedPreferences("JWT", Context.MODE_PRIVATE)
-    val token = sharedPrefs.getString("JWT_TOKEN", "") ?: ""
-    val decodedJWT = decodeJWT(token)
-    val userId = decodedJWT.getClaim("UserID").asInt()
-    val email = decodedJWT.getClaim("Email").asString()
+        }
+
+        is InfoProfileState.Success -> {
+            userId = (infoProfileState as InfoProfileState.Success).user.UserID
+            Log.d("InfoProfileState", userId.toString())
+        }
+
+        is InfoProfileState.Error -> {
+            Log.d("InfoProfileState", (infoProfileState as InfoProfileState.Error).error)
+        }
+
+        else -> {}
+    }
+
 
     val viewModel = remember {
         SharedWithViewModel(application, context)
@@ -124,7 +142,6 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         viewModel.fetchSharedWith(userId)
     }
-
     when (state) {
         is SharedWithState.Loading -> {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -288,8 +305,4 @@ fun HomeScreen(
         }
     )
     }
-}
-
-fun decodeJWT(token: String): DecodedJWT {
-    return JWT.decode(token)
 }

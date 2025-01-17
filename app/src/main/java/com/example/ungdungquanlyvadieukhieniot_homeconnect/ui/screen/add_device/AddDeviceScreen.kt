@@ -24,13 +24,13 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Room
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -46,10 +46,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.SharedViewModel
@@ -258,7 +256,7 @@ fun AddDeviceScreen(
                                                 },
                                                 placeholder = { Text("Chọn phòng") },
                                                 modifier = Modifier
-                                                    .menuAnchor() // Bắt buộc khi dùng ExposedDropdownMenuBox
+                                                    .menuAnchor(type, enabled) // Bắt buộc khi dùng ExposedDropdownMenuBox
                                                     .width(if (isTablet) 500.dp else 400.dp)
                                                     .height(if (isTablet) 80.dp else 70.dp),
                                                 trailingIcon = {
@@ -267,7 +265,7 @@ fun AddDeviceScreen(
                                                         contentDescription = null
                                                     )
                                                 },
-                                                colors = TextFieldDefaults.outlinedTextFieldColors(
+                                                colors = OutlinedTextFieldDefaults.colors(
                                                     focusedTextColor = colorScheme.onBackground,
                                                     unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),
                                                 )
@@ -362,4 +360,3 @@ fun AddDeviceScreen(
         )
     }
 }
-
