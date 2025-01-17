@@ -1,5 +1,7 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.add_device
 
+import android.app.Application
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -7,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -21,6 +24,10 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Room
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -28,115 +35,154 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.SharedViewModel
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.DeviceViewModel
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.SpaceState
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.validation.ValidationUtils
+import kotlinx.coroutines.launch
 
-
-/** Giao diện màn hình Thêm thiết bị (AddDeviceScreen)
- * -----------------------------------------
- * Người viết: Nguyễn Thanh Sang
- * Ngày viết: 17/12/2024
- * Lần cập nhật cuối: 17/12/2024
- * -----------------------------------------
- * @param navController: Đối tượng điều khiển dẫn hướng trong Compose Navigation
- * @return Scaffold: Giao diện màn hình thêm thiết bị
- *
- * ---------------------------------------
- */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddDeviceScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    sharedViewModel: SharedViewModel // Chứa houseId
 ) {
-    // Biến trạng thái để lưu giá trị nhập
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+
+    // ViewModel quản lý Device & Spaces
+    val deviceViewModel = remember { DeviceViewModel(application, context) }
+
+    // Lấy houseId từ SharedViewModel
+    val houseId by sharedViewModel.houseId.collectAsState()
+
+    // Gọi hàm lấy danh sách Spaces khi houseId != null
+    LaunchedEffect(houseId) {
+        houseId?.let {
+            deviceViewModel.getSpacesByHomeId(it)
+        }
+    }
+
+    // Lắng nghe luồng State của danh sách space
+    val spacesState by deviceViewModel.spacesListState.collectAsState()
+
+    // ----------------------
+    // Đây là ViewModel cũ quản lý quá trình linkDevice
+    // (AddDeviceViewModel) để khi bấm nút "Liên kết" sẽ gọi linkDevice
+    // ----------------------
+    val addDeviceViewModel = remember { AddDeviceViewModel(application, context) }
+    val deviceLinkState by addDeviceViewModel.deviceState.collectAsState()
+
+    // Biến Compose
+    val coroutineScope = rememberCoroutineScope()
+
     var deviceId by remember { mutableStateOf("") }
     var deviceName by remember { mutableStateOf("") }
 
-    // Biến trạng thái để hiển thị thông báo lỗi
     var deviceIdError by remember { mutableStateOf("") }
     var deviceNameError by remember { mutableStateOf("") }
+
+    // Những biến cho dropdown:
+    var expanded by remember { mutableStateOf(false) }
+    var selectedSpaceName by remember { mutableStateOf("Chọn phòng") }
+    var selectedSpaceId by remember { mutableStateOf<Int?>(null) }
+
     val configuration = LocalConfiguration.current
     val isTablet = configuration.screenWidthDp >= 600
-    AppTheme {
 
+    // Lắng nghe DeviceLinkState để xử lý side-effect (nếu cần)
+    LaunchedEffect(deviceLinkState) {
+        when (deviceLinkState) {
+            is DeviceState.LinkSuccess -> {
+                // Xử lý thành công
+                val successMsg = (deviceLinkState as DeviceState.LinkSuccess).message
+                Log.d("AddDeviceScreen", "LinkSuccess: $successMsg")
+                // Có thể hiển thị Toast hoặc điều hướng màn khác
+            }
+            is DeviceState.Error -> {
+                // Xử lý lỗi
+                val errMsg = (deviceLinkState as DeviceState.Error).error
+                Log.e("AddDeviceScreen", "Error linkDevice: $errMsg")
+            }
+            else -> {
+                // Idle hoặc Loading, chưa cần gì thêm
+            }
+        }
+    }
+
+    AppTheme {
         val colorScheme = MaterialTheme.colorScheme
         Scaffold(
-            containerColor =colorScheme.background,
+            containerColor = colorScheme.background,
             topBar = {
-                /*
-            * Hiển thị Header
-             */
                 Header(navController, "Back", "Liên kết thiết bị")
             },
             bottomBar = {
-                /*
-            * Hiển thị Thanh Menu dưới cùng
-             */
                 MenuBottom(navController)
             },
             content = { innerPadding ->
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     Column(
                         modifier = Modifier
-                            .fillMaxSize() // Đảm bảo chiếm toàn bộ không gian
-                            .imePadding() // Tự động thêm khoảng trống khi bàn phím xuất hiện
-                            .verticalScroll(rememberScrollState()) // Cho phép cuộn
+                            .fillMaxSize()
+                            .imePadding()
+                            .verticalScroll(rememberScrollState())
                             .padding(innerPadding),
-                        verticalArrangement = Arrangement.Center, // Căn giữa theo chiều dọc
-                        horizontalAlignment = Alignment.CenterHorizontally // Căn giữa theo chiều ngang
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Row(
                             modifier = Modifier
-                                .fillMaxSize() // Chiếm toàn bộ kích thước màn hình
-                                .background(colorScheme.background) // Đặt màu nền tổng thể
-                                .padding(8.dp) // Khoảng cách viền xung quanh màn hình
+                                .fillMaxSize()
+                                .background(colorScheme.background)
+                                .padding(8.dp)
                         ) {
-                            // Màn hình "Chia sẻ thiết bị" (nằm bên phải)
                             Box(
                                 modifier = Modifier
-                                    .weight(1f) // Chiếm 50% chiều rộng của Row
+                                    .weight(1f)
                                     .background(
-                                        colorScheme.background, // Màu nền
+                                        colorScheme.background,
                                         shape = RoundedCornerShape(12.dp)
-                                    ) // Nền trắng với góc bo tròn 12dp
-                                    .padding(16.dp) // Khoảng cách bên trong Box
+                                    )
+                                    .padding(16.dp)
                             ) {
-                                // Nội dung của màn hình
                                 Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally, // Căn giữa theo chiều ngang
-                                    verticalArrangement = Arrangement.Center, // Căn giữa theo chiều dọc
-                                    modifier = Modifier.fillMaxSize() // Chiếm toàn bộ kích thước của Box
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center,
+                                    modifier = Modifier.fillMaxSize()
                                 ) {
-
-                                    // Cột chứa các ô nhập liệu và nút gửi yêu cầu
+                                    // Cột chứa các ô nhập liệu và nút "Liên kết"
                                     Column(
-                                        modifier = Modifier
-                                            .width(400.dp) // Đặt chiều rộng cố định cho cột
+                                        modifier = Modifier.width(400.dp)
                                     ) {
                                         // Ô nhập ID thiết bị
                                         OutlinedTextField(
-                                            value = deviceId, // Giá trị hiện tại của ID thiết bị
+                                            value = deviceId,
                                             onValueChange = {
                                                 deviceId = it
-                                                // Kiểm tra lỗi cho ID thiết bị ngay khi thay đổi giá trị
                                                 deviceIdError = ValidationUtils.validateDeviceId(it)
                                             },
-                                            leadingIcon = { // Biểu tượng ở bên trái ô nhập liệu
+                                            leadingIcon = {
                                                 Icon(
                                                     Icons.Filled.Person,
                                                     contentDescription = null
@@ -155,19 +201,19 @@ fun AddDeviceScreen(
                                                 unfocusedContainerColor = colorScheme.onPrimary,
                                                 focusedIndicatorColor = colorScheme.primary,
                                                 unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
-                                            )
+                                            ),
+                                            isError = deviceIdError.isNotBlank()
                                         )
-                                        Spacer(modifier = Modifier.height(8.dp)) // Khoảng cách dưới ô nhập ID
+                                        Spacer(modifier = Modifier.height(8.dp))
 
                                         // Ô nhập Tên thiết bị
                                         OutlinedTextField(
-                                            value = deviceName, // Giá trị hiện tại của Tên thiết bị
+                                            value = deviceName,
                                             onValueChange = {
                                                 deviceName = it
-                                                // Kiểm tra lỗi cho Tên thiết bị ngay khi thay đổi giá trị
                                                 deviceNameError = ValidationUtils.validateDeviceName(it)
                                             },
-                                            leadingIcon = { // Biểu tượng ở bên trái ô nhập liệu
+                                            leadingIcon = {
                                                 Icon(
                                                     Icons.Default.Devices,
                                                     contentDescription = null
@@ -186,58 +232,125 @@ fun AddDeviceScreen(
                                                 unfocusedContainerColor = colorScheme.onPrimary,
                                                 focusedIndicatorColor = colorScheme.primary,
                                                 unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
-                                            )
-                                        )
-
-                                        Spacer(modifier = Modifier.height(8.dp)) // Khoảng cách dưới ô nhập Email
-
-                                        OutlinedTextField(
-                                            value = "",
-                                            leadingIcon = { // Biểu tượng ở bên trái ô nhập liệu
-                                                Icon(
-                                                    Icons.Default.Room,
-                                                    contentDescription = null
-                                                )
-                                            },
-                                            singleLine = true,
-                                            shape = RoundedCornerShape(25),
-                                            onValueChange = { /* TODO: Xử lý thay đổi giá trị */ },
-                                            placeholder = { Text("Chon phòng") },
-                                            modifier = Modifier
-                                                .width(if (isTablet) 500.dp else 400.dp)
-                                                .height(if (isTablet) 80.dp else 70.dp),
-                                            colors = TextFieldDefaults.colors(
-                                                focusedTextColor = colorScheme.onBackground,  // Màu text khi TextField được focus
-                                                unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),  // Màu text khi TextField không được focus
-                                                focusedContainerColor = colorScheme.onPrimary,
-                                                unfocusedContainerColor = colorScheme.onPrimary,
-                                                focusedIndicatorColor = colorScheme.primary,
-                                                unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
                                             ),
-                                            trailingIcon = {
-                                                //Todo: Khi nhấn vào thì thành dropdown box
-                                                Icon(
-                                                    imageVector = Icons.Default.KeyboardArrowDown,
-                                                    contentDescription = null
-                                                )
-                                            }
+                                            isError = deviceNameError.isNotBlank()
                                         )
-                                        Spacer(modifier = Modifier.height(16.dp)) // Khoảng cách dưới ô nhập Email
+                                        Spacer(modifier = Modifier.height(8.dp))
 
-                                        // Nút gửi yêu cầu
+                                        // Dropdown Spaces
+                                        // Nếu bạn không muốn dùng ExposedDropdownMenuBox
+                                        // có thể tùy chỉnh DropdownMenuItem thủ công, nhưng dưới đây là ví dụ M3.
+                                       ExposedDropdownMenuBox(
+                                            expanded = expanded,
+                                            onExpandedChange = { expanded = !expanded }
+                                        ) {
+                                            OutlinedTextField(
+                                                value = selectedSpaceName,
+                                                onValueChange = {},
+                                                readOnly = true, // Chỉ chọn từ dropdown
+                                                singleLine = true,
+                                                shape = RoundedCornerShape(25),
+                                                leadingIcon = {
+                                                    Icon(
+                                                        Icons.Default.Room,
+                                                        contentDescription = null
+                                                    )
+                                                },
+                                                placeholder = { Text("Chọn phòng") },
+                                                modifier = Modifier
+                                                    .menuAnchor() // Bắt buộc khi dùng ExposedDropdownMenuBox
+                                                    .width(if (isTablet) 500.dp else 400.dp)
+                                                    .height(if (isTablet) 80.dp else 70.dp),
+                                                trailingIcon = {
+                                                    Icon(
+                                                        imageVector = Icons.Default.KeyboardArrowDown,
+                                                        contentDescription = null
+                                                    )
+                                                },
+                                                colors = TextFieldDefaults.outlinedTextFieldColors(
+                                                    focusedTextColor = colorScheme.onBackground,
+                                                    unfocusedTextColor = colorScheme.onBackground.copy(alpha = 0.7f),
+                                                )
+                                            )
+
+                                            ExposedDropdownMenu(
+                                                expanded = expanded,
+                                                onDismissRequest = { expanded = false },
+                                            ) {
+                                                when (spacesState) {
+                                                    is SpaceState.Loading -> {
+                                                        // Loading menu item
+                                                        Box(
+                                                            modifier = Modifier
+                                                                .padding(8.dp)
+                                                                .fillMaxSize()
+                                                        ) {
+                                                            Text("Đang tải danh sách phòng...")
+                                                        }
+                                                    }
+                                                    is SpaceState.Success -> {
+                                                        val spaces = (spacesState as SpaceState.Success).spacesList
+                                                        // Duyệt qua danh sách phòng và tạo item
+                                                        spaces.forEach { space ->
+                                                            DropdownMenuItem(
+                                                                text = { Text(space.Name) },
+                                                                onClick = {
+                                                                    selectedSpaceName = space.Name
+                                                                    selectedSpaceId = space.SpaceID
+                                                                    expanded = false
+                                                                }
+                                                            )
+                                                        }
+                                                    }
+                                                    is SpaceState.Error -> {
+                                                        val errorMsg = (spacesState as SpaceState.Error).error
+                                                        Box(
+                                                            modifier = Modifier
+                                                                .padding(8.dp)
+                                                                .fillMaxWidth()
+                                                        ) {
+                                                            Text(
+                                                                text = "Lỗi khi tải phòng: $errorMsg",
+                                                                color = MaterialTheme.colorScheme.error
+                                                            )
+                                                        }
+                                                    }
+                                                    else -> {}
+                                                }
+                                            }
+                                        }
+
+                                        Spacer(modifier = Modifier.height(16.dp))
+
+                                        // Nút liên kết
                                         Button(
-                                            onClick = { /* TODO: xử lý thêm thiết bị */ }, // Hàm xử lý khi nhấn nút (chưa triển khai)
+                                            onClick = {
+                                                // Validate lần cuối
+                                                deviceIdError = ValidationUtils.validateDeviceId(deviceId)
+                                                deviceNameError = ValidationUtils.validateDeviceName(deviceName)
+
+                                                // Nếu không có lỗi và đã chọn room
+                                                coroutineScope.launch {
+                                                    addDeviceViewModel.linkDevice(
+                                                        deviceId = deviceId,
+                                                        spaceId = selectedSpaceId.toString(),
+                                                        deviceName = deviceName
+                                                    )
+                                                }
+                                            },
                                             modifier = Modifier
-                                                .align(Alignment.CenterHorizontally) // Canh lề phải
+                                                .align(Alignment.CenterHorizontally)
                                                 .width(if (isTablet) 300.dp else 200.dp)
                                                 .height(if (isTablet) 56.dp else 48.dp),
-                                            colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary),
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = colorScheme.primary
+                                            ),
                                             shape = RoundedCornerShape(50)
                                         ) {
                                             Text(
                                                 "Liên kết",
                                                 color = colorScheme.onPrimary,
-                                            ) // Nội dung và màu chữ của nút
+                                            )
                                         }
                                     }
                                 }
@@ -250,8 +363,3 @@ fun AddDeviceScreen(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    AddDeviceScreen(navController = rememberNavController())
-}

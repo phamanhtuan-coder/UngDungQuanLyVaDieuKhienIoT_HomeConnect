@@ -1,5 +1,6 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.house_management
 
+import android.app.Application
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -40,6 +41,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,7 +50,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -56,12 +60,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.navigation.NavHostController
+import androidx.compose.runtime.getValue
+import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.setValue
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.CreateHouseRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.HousesListPesponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UpdateHouseRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
@@ -89,7 +100,78 @@ fun HouseManagementScreen(
 
     val isPopupVisible = remember { mutableStateOf(false) }
     val isEditing = remember { mutableStateOf(false) }
-    val editingData = remember { mutableStateOf(HouseData()) }
+    val editingData = remember { mutableStateOf(HousesListPesponse(
+        HouseID = 0,
+        Name = "",
+        Address = "",
+        IconName = "",
+        IconColor = "", // Giá trị mặc định là một mã màu hợp lệ
+        Spaces = emptyList()
+    )) }
+
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+
+    val viewModel = remember { HouseManagementViewModel(application, context) }
+
+    val state by viewModel.houseManagementState.collectAsState()
+
+    var houseManagementState by remember { mutableStateOf<List<HousesListPesponse>>(emptyList()) }
+
+    when (state) {
+        is HouseManagementState.Idle -> Text("Chờ tải dữ liệu...")
+        is HouseManagementState.Loading -> CircularProgressIndicator()
+        is HouseManagementState.Success -> {
+            houseManagementState = (state as HouseManagementState.Success).houses
+        }
+        is HouseManagementState.Error -> {
+            val error = (state as HouseManagementState.Error).error
+            Text("Error: $error")
+        }
+    }
+
+    val updateState by viewModel.updateHouseState.collectAsState()
+
+    when (updateState) {
+        is UpdateHouseState.Loading -> CircularProgressIndicator()
+        is UpdateHouseState.Success -> {
+            val successState = updateState as UpdateHouseState.Success
+            Text("Cập nhật thành công: ${successState.message}")
+            // Làm mới danh sách nhà nếu cần
+            LaunchedEffect(Unit) {
+                viewModel.fetchHouses()
+            }
+        }
+        is UpdateHouseState.Error -> {
+            val errorState = updateState as UpdateHouseState.Error
+            Text("Lỗi cập nhật: ${errorState.error}")
+        }
+        else -> {}
+    }
+
+    val createState by viewModel.createHouseState.collectAsState()
+
+    when (createState) {
+        is CreateHouseState.Loading -> CircularProgressIndicator()
+        is CreateHouseState.Success -> {
+            val successState = createState as CreateHouseState.Success
+            Text("Nhà tạo thành công: ${successState.message}")
+            // Làm mới danh sách nhà
+            LaunchedEffect(Unit) {
+                viewModel.fetchHouses()
+            }
+        }
+        is CreateHouseState.Error -> {
+            val errorState = createState as CreateHouseState.Error
+            Text("Lỗi tạo nhà: ${errorState.error}")
+        }
+        else -> {}
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchHouses()
+    }
+
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
         Scaffold(
@@ -128,9 +210,12 @@ fun HouseManagementScreen(
                         .height(3 * 100.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(5) { index ->
-                        CardHouse(isTablet) { name, address, icon ->
-                            editingData.value = HouseData(name, address, icon)
+                    items(houseManagementState) { house ->
+                        CardHouse(
+                            isTablet = isTablet,
+                            house = house
+                        ) { selectedHouse ->
+                            editingData.value = selectedHouse
                             isEditing.value = true
                             isPopupVisible.value = true
                         }
@@ -143,7 +228,7 @@ fun HouseManagementScreen(
                     Button(
                         onClick = {
                             isEditing.value = false
-                            editingData.value = HouseData()
+                            editingData.value
                             isPopupVisible.value = true
                         },
                         modifier = Modifier
@@ -162,6 +247,19 @@ fun HouseManagementScreen(
                     }
                 }
 
+                // Map tên màu -> Color
+                val colorNameMap = mapOf(
+                    "red" to Color.Red,
+                    "green" to Color.Green,
+                    "blue" to Color.Blue,
+                    "yellow" to Color.Yellow,
+                    "cyan" to Color.Cyan,
+                    "magenta" to Color.Magenta,
+                    "gray" to Color.Gray,
+                    "black" to Color.Black,
+                    "white" to Color.White,
+                    "customBlue" to Color(0xFF2196F3)
+                )
 
                 if (isPopupVisible.value) {
                     AddHousePopup(
@@ -169,6 +267,28 @@ fun HouseManagementScreen(
                         isEditing = isEditing.value,
                         onDismiss = { isPopupVisible.value = false },
                         onAddOrUpdateHouse = { name, address, icon, color ->
+
+                            if (isEditing.value) { // Sử dụng isEditing.value
+                                viewModel.updateHouse(
+                                    houseId = editingData.value.HouseID,
+                                    request = UpdateHouseRequest(
+                                        Name = name,
+                                        Address = address,
+                                        IconName = icon,
+                                        IconColor = colorNameMap.entries.firstOrNull { it.value == color }?.key ?: "transparent"
+                                    )
+                                )
+                            } else {
+                                // Thêm mới
+                                viewModel.createHouse(
+                                    CreateHouseRequest(
+                                        Name = name,
+                                        Address = address,
+                                        IconName = icon,
+                                        IconColor = colorNameMap.entries.firstOrNull { it.value == color }?.key ?: "transparent"
+                                    )
+                                )
+                            }
                             isPopupVisible.value = false
                         },
                         isTablet = isTablet
@@ -193,9 +313,52 @@ fun HouseManagementScreen(
  * @return Card chứa thông tin nhà
  */
 @Composable
-fun CardHouse(isTablet: Boolean, onEdit: (String, String, String) -> Unit) {
+fun CardHouse(
+    isTablet: Boolean,
+    house: HousesListPesponse,
+    onEdit: (HousesListPesponse) -> Unit
+) {
+    // Danh sách icon và tên
+    val icons = listOf(
+        Pair(Icons.Default.Home, "Nhà"),
+        Pair(Icons.Default.Work, "Cơ quan"),
+        Pair(Icons.Default.School, "Trường"),
+        Pair(Icons.Default.AccountBalance, "Ngân hàng"),
+        Pair(Icons.Default.Apartment, "Căn hộ"),
+        Pair(Icons.Default.Hotel, "Khách sạn"),
+        Pair(Icons.Default.Villa, "Biệt thự"),
+        Pair(Icons.Default.Cottage, "Nhà gỗ"),
+        Pair(Icons.Default.Castle, "Lâu đài"),
+        Pair(Icons.Default.LocalLibrary, "Thư viện")
+    )
+
+    // Map tên màu -> Color
+    val colorNameMap = mapOf(
+        "red" to Color.Red,
+        "green" to Color.Green,
+        "blue" to Color.Blue,
+        "yellow" to Color.Yellow,
+        "cyan" to Color.Cyan,
+        "magenta" to Color.Magenta,
+        "gray" to Color.Gray,
+        "black" to Color.Black,
+        "white" to Color.White,
+        "customBlue" to Color(0xFF2196F3)
+    )
+
+    // Lấy ImageVector tương ứng với IconName (nếu không tìm thấy, mặc định là Icons.Default.Home)
+    val matchedIcon = icons.firstOrNull { it.second == house.IconName }?.first ?: Icons.Default.Home
+
+    // Lấy Color cho icon từ IconColor (nếu không tìm thấy, mặc định là Color.Black hoặc colorScheme.primary, tuỳ bạn)
+    val matchedIconColor = run {
+        val colorKey = house.IconColor.lowercase()
+        colorNameMap[colorKey] ?: Color.Black  // Mặc định là đen nếu không map được
+    }
+
+    // Lấy colorScheme từ AppTheme hoặc MaterialTheme
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
+
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
@@ -205,6 +368,7 @@ fun CardHouse(isTablet: Boolean, onEdit: (String, String, String) -> Unit) {
                     .widthIn(max = if (isTablet) 600.dp else 400.dp)
                     .padding(8.dp),
                 shape = RoundedCornerShape(12.dp),
+                // Giữ nguyên màu card, ví dụ là màu primary
                 colors = CardDefaults.cardColors(
                     containerColor = colorScheme.primary,
                     contentColor = colorScheme.onPrimary
@@ -221,24 +385,35 @@ fun CardHouse(isTablet: Boolean, onEdit: (String, String, String) -> Unit) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Home,
+                            imageVector = matchedIcon,
                             contentDescription = null,
-                            tint = colorScheme.onPrimary,
+                            // Dùng matchedIconColor để chỉ đổi màu icon
+                            tint = matchedIconColor,
                             modifier = Modifier.padding(end = 16.dp)
                         )
-                        Text(
-                            text = "House 1",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = colorScheme.onPrimary
-                        )
+                        Column {
+                            Text(
+                                text = house.Name,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = colorScheme.onPrimary // Hoặc một màu khác
+                            )
+                            Text(
+                                text = house.Address,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Light,
+                                color = colorScheme.onPrimary
+                            )
+                        }
                     }
                     IconButton(
-                        onClick = { onEdit("House 1", "Address 1", "Home") }
+                        onClick = { onEdit(house) }
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                             contentDescription = null,
+                            // Nếu muốn nút mũi tên không bị đổi theo iconColor,
+                            // cứ để nó là colorScheme.onPrimary
                             tint = colorScheme.onPrimary
                         )
                     }
@@ -246,9 +421,7 @@ fun CardHouse(isTablet: Boolean, onEdit: (String, String, String) -> Unit) {
             }
         }
     }
-
 }
-
 
 /**
  * Hiển thị popup thêm hoặc chỉnh sửa nhà
@@ -268,17 +441,12 @@ fun CardHouse(isTablet: Boolean, onEdit: (String, String, String) -> Unit) {
  */
 @Composable
 fun AddHousePopup(
-    houseData: HouseData,
+    houseData: HousesListPesponse,
     isEditing: Boolean,
     onDismiss: () -> Unit,
     onAddOrUpdateHouse: (String, String, String, Color) -> Unit,
     isTablet: Boolean
 ) {
-    val houseName = remember { mutableStateOf(houseData.name) }
-    val houseAddress = remember { mutableStateOf(houseData.address) }
-    val selectedIcon = remember { mutableStateOf(houseData.icon) }
-    val selectedColor = remember { mutableStateOf(houseData.color ?: Color.Transparent) }
-
     val icons = listOf(
         Pair(Icons.Default.Home, "Nhà"),
         Pair(Icons.Default.Work, "Cơ quan"),
@@ -296,6 +464,30 @@ fun AddHousePopup(
         Color.Red, Color.Green, Color.Blue, Color.Yellow, Color.Cyan,
         Color.Magenta, Color.Gray, Color.Black, Color.White, Color(0xFF2196F3)
     )
+
+    val colorNameMap = mapOf(
+        "red" to Color.Red,
+        "green" to Color.Green,
+        "blue" to Color.Blue,
+        "yellow" to Color.Yellow,
+        "cyan" to Color.Cyan,
+        "magenta" to Color.Magenta,
+        "gray" to Color.Gray,
+        "black" to Color.Black,
+        "white" to Color.White,
+        "customBlue" to Color(0xFF2196F3) // Màu tùy chỉnh
+    )
+
+    val houseName = remember { mutableStateOf(houseData.Name) }
+    val houseAddress = remember { mutableStateOf(houseData.Address) }
+    val selectedIcon = remember { mutableStateOf(houseData.IconName) }
+
+    var selectedColor by remember {
+        mutableStateOf(
+            colorNameMap[houseData.IconColor.lowercase()] ?: Color.Transparent
+        )
+    }
+
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
         AlertDialog(
@@ -309,7 +501,7 @@ fun AddHousePopup(
                     houseName.value,
                     houseAddress.value,
                     selectedIcon.value,
-                    selectedColor.value
+                    selectedColor
                 )
             },
 
@@ -393,11 +585,11 @@ fun AddHousePopup(
                                     .size(40.dp)
                                     .background(color, CircleShape)
                                     .border(
-                                        width = if (selectedColor.value == color) 1.dp else 0.dp,
-                                        color = if (selectedColor.value == color) colorScheme.primary else Color.Transparent,
+                                        width = if (selectedColor == color) 1.dp else 0.dp,
+                                        color = if (selectedColor == color) colorScheme.primary else Color.Transparent,
                                         shape = CircleShape
                                     )
-                                    .clickable { selectedColor.value = color }
+                                    .clickable { selectedColor = color }
                             )
                         }
                     }
@@ -484,10 +676,10 @@ fun IconPicker(
 }
 
 
-//Todo: Tạm thời, sau này sẽ thay bằng viewmodel
-data class HouseData(
-    val name: String = "",
-    val address: String = "",
-    val icon: String = "",
-    val color: Color? = null
-)
+////Todo: Tạm thời, sau này sẽ thay bằng viewmodel
+//data class HouseData(
+//    val name: String = "",
+//    val address: String = "",
+//    val icon: String = "",
+//    val color: Color? = null
+//)

@@ -8,6 +8,9 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Attri
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AverageSensorResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ChangePasswordRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ChangePasswordResponce
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.CreateHouseRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.CreateSpaceRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.CreateSpaceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DailyAverageSensorResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DailyPowerUsageResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DailySensorRequest
@@ -18,6 +21,9 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Email
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.EmailResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.HouseResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LogLastest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.HousesListPesponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LinkDeviceRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LinkedDeviceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LoginRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LoginResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.NewPasswordRequest
@@ -28,9 +34,12 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Regis
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SharedUser
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SharedUserRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse2
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UnlinkResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UpdateHouseRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UpdateHouseResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.User
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UserRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UserResponse
@@ -190,6 +199,51 @@ interface ApiService {
         @Path("deviceId") deviceId: Int,
         @Header("Authorization") token: String
     ): WeeklyAverageSensorResponse
+
+    @GET("/api/houses")
+    suspend fun getHouses(
+        @Header("Authorization") token: String
+    ): List<HousesListPesponse>
+
+    @PUT("/api/houses/{houseId}")
+    suspend fun updateHouse(
+        @Path("houseId") houseId: Int,
+        @Body body: UpdateHouseRequest,
+        @Header("Authorization") token: String
+    ): UpdateHouseResponse
+
+    @POST("/api/houses")
+    suspend fun createHouse(
+        @Body request: CreateHouseRequest,
+        @Header("Authorization") token: String
+    ): CreateHouseResponse
+
+    @GET("/api/spaces/{houseId}")
+    suspend fun getSpaces(
+        @Path("houseId") houseId: Int,
+        @Header("Authorization") token: String
+    ): List<SpaceResponse2>
+
+    data class UpdateSpaceRequest(val Name: String)
+
+    @PUT("/api/spaces/{id}")
+    suspend fun updateSpace(
+        @Path("id") spaceId: Int,
+        @Body body: UpdateSpaceRequest,
+        @Header("Authorization") token: String
+    ): SpaceResponse3
+
+    @POST("/api/spaces")
+    suspend fun createSpace(
+        @Body body: CreateSpaceRequest,
+        @Header("Authorization") token: String
+    ): CreateSpaceResponse
+
+    @POST("/api/devices/link")
+    suspend fun linkDevice(
+        @Body body: LinkDeviceRequest,
+        @Header("Authorization") token: String
+    ): LinkedDeviceResponse
 
     @DELETE("/api/sharedpermissions/revoke/{permissionId}")
     suspend fun revokePermission(

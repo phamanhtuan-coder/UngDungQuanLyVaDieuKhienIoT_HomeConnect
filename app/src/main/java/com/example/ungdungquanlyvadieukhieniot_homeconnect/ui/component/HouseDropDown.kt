@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -32,6 +34,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.HouseResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.access_point_connection.isTablet
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.SpaceState
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_sharing_list.isTablet
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
@@ -74,7 +77,7 @@ fun HouseSelection(
             viewModel.getListHouse()
         }
         var selectedItem by remember {
-            mutableStateOf<HouseResponse>(houses.firstOrNull() ?: HouseResponse(HouseID = 0, Name = "Không có nhà"))
+            mutableStateOf(HouseResponse(HouseID = -1, Name = "Không có nhà"))
         }
 
         when(housesListState){
@@ -92,11 +95,8 @@ fun HouseSelection(
                 Log.d("List House", houses.toString())
 
                 // Kiểm tra nếu danh sách `houses` trống
-                if (houses.isEmpty()) {
-                    selectedItem = HouseResponse(HouseID = -1, Name = "Không có nhà")
-                    sharedViewModel.setHouseId(selectedItem.HouseID)
-                } else {
-                    selectedItem = houses.first()
+                if (houses.isNotEmpty() && selectedItem.HouseID == -1) {
+                    selectedItem = houses.first()  // Mặc định chọn item đầu tiên
                     onTabSelected(selectedItem.HouseID)
                     sharedViewModel.setHouseId(selectedItem.HouseID)
                 }
@@ -106,12 +106,13 @@ fun HouseSelection(
         var isDropdownExpanded by remember { mutableStateOf(false) }
         val colorScheme = MaterialTheme.colorScheme
         Column(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.wrapContentSize()
         ) {
+            Spacer(modifier = Modifier.height(16.dp))
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
+                    .wrapContentSize()
+                    .clip(RoundedCornerShape(6.dp))
                     .background(colorScheme.surface)
                     .clickable {
                         isDropdownExpanded = !isDropdownExpanded
@@ -128,6 +129,7 @@ fun HouseSelection(
                         color = colorScheme.onSurface,
                         fontSize = 18.sp
                     )
+                    Log.d("SelectedItem", "Name: ${selectedItem.Name}, ID: ${selectedItem.HouseID}")
                     Icon(
                         imageVector = if (isDropdownExpanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
                         contentDescription = null,
@@ -139,7 +141,7 @@ fun HouseSelection(
             if (isDropdownExpanded) {
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .wrapContentSize()
                         .clip(RoundedCornerShape(12.dp))
                         .background(colorScheme.surfaceVariant)
                         .padding(vertical = 4.dp)
@@ -150,10 +152,10 @@ fun HouseSelection(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
-                                    selectedItem = house
-                                    onTabSelected(house.HouseID)
-                                    sharedViewModel.setHouseId(selectedItem.HouseID)
-                                    isDropdownExpanded = false
+                                    selectedItem = house // Cập nhật `selectedItem`
+                                    onTabSelected(house.HouseID) // Gọi callback để xử lý
+                                    sharedViewModel.setHouseId(house.HouseID) // Lưu trạng thái
+                                    isDropdownExpanded = false // Đóng dropdown
                                 }
                                 .padding(horizontal = 16.dp, vertical = 12.dp),
                             fontSize = 16.sp,
@@ -185,7 +187,7 @@ fun HouseSelection(
                         }
                     }
                 }
-
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }

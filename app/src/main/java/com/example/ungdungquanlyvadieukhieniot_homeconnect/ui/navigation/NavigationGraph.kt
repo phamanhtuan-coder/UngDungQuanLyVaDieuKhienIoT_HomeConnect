@@ -33,6 +33,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.settings.Se
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.share_device.ShareDeviceScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.signup.SignUpScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.space.SpaceScreen
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.space.SpaceViewModel
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.update_password.UpdatePasswordScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.wifi_connection.WifiConnectionScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screens.DashboardScreen
@@ -146,7 +147,7 @@ fun NavigationGraph(
 
         //Add Device Screen
         composable(Screens.AddDevice.route) {
-            AddDeviceScreen(navController)
+            AddDeviceScreen(navController, sharedViewModel)
         }
 
         //All Notifications Screen
@@ -197,8 +198,12 @@ fun NavigationGraph(
 
         //Add Space Screen
         composable(Screens.AddSpace.route) {
-            AddSpaceScreen(navController)
+            AddSpaceScreen(
+                navController = navController,
+                sharedViewModel = sharedViewModel
+            )
         }
+
 
         composable(
             route = "${Screens.NewPassword.route}?email={email}",
