@@ -11,6 +11,8 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Creat
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.CreateSpaceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DailyAverageSensorResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DailyPowerUsageResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DailyPowerUsageResponse2
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DailySensorAveragesResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DailySensorRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceTokenRequest
@@ -194,4 +196,20 @@ interface ApiService {
         @Body body: LinkDeviceRequest,
         @Header("Authorization") token: String
     ): LinkedDeviceResponse
+
+    @GET("/api/statistics/daily-room-power-usage/{spaceId}/{startDate}/{endDate}")
+    suspend fun getDailyRoomPowerUsage(
+        @Path("spaceId") spaceId: Int,
+        @Path("startDate") startDate: String,
+        @Path("endDate") endDate: String,
+        @Header("Authorization") token: String
+    ): DailyPowerUsageResponse2
+
+    @GET("/api/statistics/daily-room-averages-sensor/{spaceId}/{startDate}/{endDate}")
+    suspend fun getDailyRoomAveragesSensor(
+        @Path("spaceId") spaceId: Int,
+        @Path("startDate") startDate: String,
+        @Path("endDate") endDate: String,
+        @Header("Authorization") token: String
+    ): DailySensorAveragesResponse
 }
