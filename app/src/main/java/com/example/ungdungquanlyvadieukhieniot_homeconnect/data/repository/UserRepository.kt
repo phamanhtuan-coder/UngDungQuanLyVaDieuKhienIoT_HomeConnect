@@ -8,6 +8,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Devic
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceTokenResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.NewPasswordRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.NewPasswordResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SharedWithResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UserRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UserResponse
 
@@ -49,5 +50,12 @@ class UserRepository(private val context: Context) {
         val token = sharedPrefs.getString("JWT_TOKEN", "") ?: ""
 
         return apiService.putChangePassword(userId, changePasswordRequest, token = "Bearer $token")
+    }
+
+    suspend fun getSharedWith(userId: Int): List<SharedWithResponse> {
+        val sharedPrefs = context.getSharedPreferences("MY_APP_PREFS", Context.MODE_PRIVATE)
+        val token = sharedPrefs.getString("JWT_TOKEN", "") ?: ""
+
+        return apiService.sharedWith(userId, token = "Bearer $token")
     }
 }
