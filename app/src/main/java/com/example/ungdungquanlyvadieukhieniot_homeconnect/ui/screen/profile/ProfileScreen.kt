@@ -144,6 +144,7 @@ fun ProfileScreen(
         var avatarUri by remember { mutableStateOf<Uri?>(null) }
         var errorMessage by remember { mutableStateOf("") }
         var profileImage by remember {mutableStateOf("")}
+        val displayedAvatarBitmap = remember { mutableStateOf<Bitmap?>(null) }
         val avatarBitmapState = remember { mutableStateOf<Bitmap?>(null) }
 
         val requiredPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -199,6 +200,9 @@ fun ProfileScreen(
                                 val base64Image = Base64.encodeToString(compressedImage, Base64.NO_WRAP)
                                 profileImage = base64Image
                                 Log.d("Base64", base64Image) // Log Base64 hoặc gửi lên API
+
+                                val bitmap = BitmapFactory.decodeByteArray(compressedImage, 0, compressedImage.size)
+                                displayedAvatarBitmap.value = bitmap
                             } else {
                                 // Ảnh vượt kích thước hoặc không thể nén đủ nhỏ
                                 errorMessage = "Ảnh quá lớn, không thể nén đủ nhỏ!"
@@ -294,6 +298,7 @@ fun ProfileScreen(
                     val bitmap = base64ToBitmap(it.ProfileImage) // Chuyển đổi Base64 thành Bitmap
                     if (bitmap != null) {
                         avatarBitmapState.value = bitmap // Cập nhật trạng thái Bitmap
+                        displayedAvatarBitmap.value = bitmap
                     }
                 }
             }
@@ -418,7 +423,7 @@ fun ProfileScreen(
                                 },
                             contentAlignment = Alignment.Center
                         ) {
-                            avatarBitmapState.value?.let { bitmap ->
+                            displayedAvatarBitmap.value?.let { bitmap ->
                                 Box(
                                     modifier = Modifier
                                         .size(if (isTablet) 120.dp else 70.dp)
@@ -851,12 +856,16 @@ fun ProfileScreen(
                                 val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                                 val formattedDate = outputFormat.format(inputFormat.parse(dateCreated.value) ?: Date())
 
+                                // Chuyển đổi ảnh hiện tại thành Base64
+                                val profileImageBase64 = displayedAvatarBitmap.value?.let { bitmapToBase64(it) } ?: ""
+
                                 val userRequest = UserRequest(
                                     Name = nameState.value.ifBlank { "Tên không được để trống" },
                                     Email = emailState.value.ifBlank { "example@gmail.com" },
                                     Phone = phoneState.value.ifBlank { "0123456789" },
                                     Address = locationState.value.ifBlank { "Chưa nhập địa chỉ" },
-                                    DateOfBirth = formattedDate
+                                    DateOfBirth = formattedDate,
+                                    ProfileImage = profileImage
                                 )
                                 Log.e("DateToServer", "Ngày gửi lên server: $formattedDate")
                                 viewModel.putInfoProfile(profile!!.UserID, userRequest)
@@ -918,6 +927,18 @@ fun uriToByteArray(context: Context, uri: Uri): ByteArray? {
         val byteArray = inputStream?.readBytes()
         inputStream?.close()
         byteArray
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+}
+
+fun bitmapToBase64(bitmap: Bitmap): String? {
+    return try {
+        val outputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream) // Nén ảnh với chất lượng 100%
+        val byteArray = outputStream.toByteArray()
+        Base64.encodeToString(byteArray, Base64.NO_WRAP) // Chuyển đổi sang Base64
     } catch (e: Exception) {
         e.printStackTrace()
         null
