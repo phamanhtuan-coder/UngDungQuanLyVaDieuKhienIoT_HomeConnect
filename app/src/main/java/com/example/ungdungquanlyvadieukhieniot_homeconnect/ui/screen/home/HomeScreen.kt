@@ -1,6 +1,7 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.home
 
 import android.app.Application
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,6 +46,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.auth0.jwt.JWT
+import com.auth0.jwt.interfaces.DecodedJWT
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SharedWithResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.DeviceCard
@@ -115,8 +118,11 @@ fun HomeScreen(
         }
     }
 
-
-
+    val sharedPrefs = context.getSharedPreferences("JWT", Context.MODE_PRIVATE)
+    val token = sharedPrefs.getString("JWT_TOKEN", "") ?: ""
+    val decodedJWT = decodeJWT(token)
+    val userId = decodedJWT.getClaim("UserID").asInt()
+    val email = decodedJWT.getClaim("Email").asString()
 
     val viewModel = remember {
         SharedWithViewModel(application, context)
@@ -125,7 +131,7 @@ fun HomeScreen(
     var sharedUsers by remember { mutableStateOf<List<SharedWithResponse>?>(emptyList()) }
 
     LaunchedEffect(Unit) {
-        viewModel.fetchSharedWith(22)
+        viewModel.fetchSharedWith(userId)
     }
 
     when (state) {
@@ -249,19 +255,19 @@ fun HomeScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Toàn bộ thiết bị",
+                            text = "Thiết bị được chia sẻ",
                             color = colorScheme.onBackground,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
-                        TextButton(
-                            onClick = { /* TODO: Navigate tới màn hình toàn b thiết bị */ },
-                            colors = ButtonDefaults.textButtonColors(
-                                contentColor = Color.Blue
-                            )
-                        ) {
-                            Text(text = "Xem thêm")
-                        }
+//                        TextButton(
+//                            onClick = { /* TODO: Navigate tới màn hình toàn b thiết bị */ },
+//                            colors = ButtonDefaults.textButtonColors(
+//                                contentColor = Color.Blue
+//                            )
+//                        ) {
+//                            Text(text = "Xem thêm")
+//                        }
                     }
 
                     fun getType(typeId: Int): String {
@@ -291,4 +297,8 @@ fun HomeScreen(
         }
     )
     }
+}
+
+fun decodeJWT(token: String): DecodedJWT {
+    return JWT.decode(token)
 }

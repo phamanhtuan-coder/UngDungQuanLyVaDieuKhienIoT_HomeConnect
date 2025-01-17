@@ -143,9 +143,11 @@ fun SignUpScreen(navController: NavHostController,
             CircularProgressIndicator()
         }
         is SignUpState.Success -> {
-            Text((signUpState as SignUpState.Success).message, color = Color.Red)
-            //navController.navigate(Screens.Login.route)
-            Log.d("List Device", (signUpState as SignUpState.Success).message)
+            LaunchedEffect(Unit) {
+                navController.navigate(Screens.Login.route) {
+                    popUpTo(Screens.Register.route) { inclusive = true }
+                }
+            }
         }
     }
 
@@ -166,12 +168,12 @@ fun SignUpScreen(navController: NavHostController,
         val datePickerState = rememberDatePickerState(initialSelectedDateMillis = initialDateMillis)
 
         var showDatePicker by remember { mutableStateOf(false) }
-        var name by remember { mutableStateOf("Sang Test") }
-        var email by remember { mutableStateOf("1234@gmail.com") }
-        var password by remember { mutableStateOf("afhj@A123") }
-        var confirmPassword by remember { mutableStateOf("afhj@A123") }
-        var phoneNumber by remember { mutableStateOf("0258963741") }
-        var address by remember { mutableStateOf("Ap 12132") }
+        var name by remember { mutableStateOf("") }
+        var email by remember { mutableStateOf("") }
+        var password by remember { mutableStateOf("") }
+        var confirmPassword by remember { mutableStateOf("") }
+        var phoneNumber by remember { mutableStateOf("") }
+        var address by remember { mutableStateOf("") }
         var avatarUri by remember { mutableStateOf<Uri?>(null) }
 
         var stage by remember { mutableStateOf(1) }
