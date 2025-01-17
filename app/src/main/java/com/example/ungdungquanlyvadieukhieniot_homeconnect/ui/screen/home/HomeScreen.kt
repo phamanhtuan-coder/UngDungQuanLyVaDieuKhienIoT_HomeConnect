@@ -117,8 +117,7 @@ fun HomeScreen(
 
 
 
-    val context = LocalContext.current
-    val application = context.applicationContext as Application
+
     val viewModel = remember {
         SharedWithViewModel(application, context)
     }

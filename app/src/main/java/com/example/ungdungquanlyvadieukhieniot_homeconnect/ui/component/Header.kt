@@ -74,7 +74,7 @@ fun Header(
     navController: NavHostController,
     type: String = "Home",
     title: String = "",
-    username: String = "Username",
+    username: String = "Chúc bạn có một ngày tốt lành!",
 ) {
     when (type) {
         "Home" -> HomeHeader(navController, username)
