@@ -43,6 +43,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Regis
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SharedUser
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SharedUserRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceDetailResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SharedWithResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse2
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleRequest
@@ -55,6 +56,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UserR
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.UserResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.WeeklyAverageSensorResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.WeeklySensorRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.repository.WeatherApiService
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -64,6 +66,8 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 interface ApiService {
     @POST("/api/auth/login")
@@ -288,6 +292,12 @@ interface ApiService {
         @Body body: DailyPowerUsageRequest,
         @Header("Authorization") token: String
     ): DailyPowerUsageResponse3
+
+    @GET("/api/users/{userId}/shared-with")
+    suspend fun sharedWith(
+        @Path("userId") userId: Int,
+        @Header("Authorization") token: String
+    ) : List<SharedWithResponse>
 
     @DELETE("/api/sharedpermissions/revoke/{permissionId}")
     suspend fun revokePermission(
