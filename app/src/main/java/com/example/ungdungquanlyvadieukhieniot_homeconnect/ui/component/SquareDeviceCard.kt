@@ -1,5 +1,6 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +30,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.DialogNavigator
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SharedWithResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 
 
 /**
@@ -48,20 +53,26 @@ import androidx.compose.ui.unit.sp
  * @return Card chứa thông tin thiết bị
  * ---------------------------------------
  */
-@Preview(showBackground = true)
 @Composable
 fun DeviceCard(
+    device: SharedWithResponse,
+    navigator: NavHostController,
     devicePicture: ImageVector = Icons.Filled.Devices,
     deviceName: String = "Tên thiết bị",
     deviceType: String = "Loại thiết bị",
-    deviceLocation: String = "Vị trí",
-    deviceStatus: Boolean = true
+//    deviceLocation: String = "Vị trí",
+//    deviceStatus: Boolean = true
 ) {
    return Card(
         modifier = Modifier
             .padding(8.dp)
             .size(160.dp)
             .clip(RoundedCornerShape(12.dp))
+            .clickable(
+                onClick = {
+                    navigator.navigate("device/${device.Device.TypeID}/${device.Device.DeviceID}")
+                }
+            )
             .shadow(4.dp, RoundedCornerShape(12.dp)),
         colors = CardDefaults.cardColors(
             containerColor = Color(0xFFF5F5F5),
@@ -102,42 +113,42 @@ fun DeviceCard(
                     textAlign = TextAlign.Center
                 )
 
-                // Spaces
-                Text(
-                    text = deviceLocation,
-                    color = Color.Gray,
-                    fontSize = 14.sp,
-                    textAlign = TextAlign.Center
-                )
+//                // Spaces
+//                Text(
+//                    text = deviceLocation,
+//                    color = Color.Gray,
+//                    fontSize = 14.sp,
+//                    textAlign = TextAlign.Center
+//                )
 
                 // Device Status Switch
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.End,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                ) {
-                    Text(
-                        text = if (deviceStatus) "Hoạt động" else "Tắt",
-                        color = if (deviceStatus) Color(0xFF4CAF50) else Color.Gray,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(end = 18.dp) // Add padding to position the text
-                    )
-                    Switch(
-                        checked = deviceStatus,
-                        onCheckedChange = { /* TODO: Implement toggle functionality */ },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = Color(0xFF4CAF50),
-                            uncheckedThumbColor = Color.Gray,
-                            checkedTrackColor = Color(0xFFC8E6C9),
-                            uncheckedTrackColor = Color(0xFFE0E0E0)
-                        ),
-                        modifier = Modifier.size(30.dp)
-                    )
-                }
+//                Row(
+//                    verticalAlignment = Alignment.CenterVertically,
+//                    horizontalArrangement = Arrangement.End,
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(horizontal = 16.dp)
+//                ) {
+////                    Text(
+////                        text = if (deviceStatus) "Hoạt động" else "Tắt",
+////                        color = if (deviceStatus) Color(0xFF4CAF50) else Color.Gray,
+////                        fontSize = 12.sp,
+////                        fontWeight = FontWeight.Medium,
+////                        textAlign = TextAlign.Center,
+////                        modifier = Modifier.padding(end = 18.dp) // Add padding to position the text
+////                    )
+////                    Switch(
+////                        checked = deviceStatus,
+////                        onCheckedChange = { /* TODO: Implement toggle functionality */ },
+////                        colors = SwitchDefaults.colors(
+////                            checkedThumbColor = Color(0xFF4CAF50),
+////                            uncheckedThumbColor = Color.Gray,
+////                            checkedTrackColor = Color(0xFFC8E6C9),
+////                            uncheckedTrackColor = Color(0xFFE0E0E0)
+////                        ),
+////                        modifier = Modifier.size(30.dp)
+////                    )
+//                }
 
             }
         }
