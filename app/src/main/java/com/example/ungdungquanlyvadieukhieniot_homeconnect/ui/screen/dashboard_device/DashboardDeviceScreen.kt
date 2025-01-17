@@ -27,10 +27,14 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.PowerUsageData
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.PowerUsageData2
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SensorData
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.DeviceState
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device.DeviceViewModel
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.device_detail.CalculationState
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screens.IconBox
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screens.LimitedWordsText
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
@@ -500,7 +504,57 @@ fun MpAndroidChart(title: String, data: List<Float>, labels: List<String>) {
 // 5) DeviceItem giữ nguyên
 // --------------------------------------
 @Composable
-fun DeviceItem(device: DeviceResponse, onDetailsClick: () -> Unit) {
+fun DeviceItem(
+    device: DeviceResponse,
+    onDetailsClick: () -> Unit,
+) {
+    val now = Calendar.getInstance()
+    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+
+    // 1) Tạo ViewModel
+    val viewModel = remember { DashboardViewModel(application, context) }
+
+    // 2) Lắng nghe calculationState từ ViewModel
+    val calcState = viewModel.calculationState.collectAsState()
+
+    // 3) Tạo biến cục bộ để lưu kết quả SensorData và PowerUsageData
+    val sensorData = remember { mutableStateOf<SensorData?>(null) }
+    val powerData = remember { mutableStateOf<PowerUsageData2?>(null) }
+
+    // 4) Gọi 2 hàm tính toán khi composable khởi tạo
+    LaunchedEffect(Unit) {
+        viewModel.calculateDailyAverageSensor(device.DeviceID, sdf.format(now.time))
+        viewModel.calculateDailyPowerUsage(device.DeviceID, sdf.format(now.time))
+    }
+
+    // 5) Dựa trên state, cập nhật biến cục bộ
+    when (val state = calcState.value) {
+        is CalculationState.Idle -> {
+            // Chưa tính toán hoặc chưa có gì
+        }
+        is CalculationState.Loading -> {
+            // Đang load, bạn có thể hiển thị ProgressIndicator nếu muốn
+        }
+        is CalculationState.AverageSensorSuccess -> {
+            // Lấy dữ liệu SensorData -> lưu vào sensorData
+            sensorData.value = state.data
+        }
+        is CalculationState.PowerUsageSuccess -> {
+            // Lấy dữ liệu PowerUsageData -> lưu vào powerData
+            powerData.value = state.data
+        }
+        is CalculationState.Error -> {
+            // Khi xảy ra lỗi -> tuỳ bạn hiển thị
+            // Text(text = "Lỗi: ${state.error}")
+            Log.e("CalculationState.Error", (state as CalculationState.Error).toString())
+        }
+    }
+
+    // ----------------------------------------------
+    // Tạo vài hàm tiện ích format hiển thị
+    // ----------------------------------------------
     fun getIconForType(typeId: Int): String {
         return when (typeId) {
             1 -> "\uD83D\uDD25" // Fire
@@ -513,17 +567,19 @@ fun DeviceItem(device: DeviceResponse, onDetailsClick: () -> Unit) {
         return when (typeId) {
             1 -> "Báo cháy" // Fire
             2 -> "Đèn led" // Light
-            else -> "Không xác định"         // Biểu tượng mặc định
+            else -> "Không xác định"
         }
     }
 
     fun getPower(power: Boolean): String {
-        return when (power) {
-            true -> "Bật" // Fire
-            false -> "Tắt" // Light
-            else -> "Không xác định"         // Biểu tượng mặc định
-        }
+        return if (power) "Bật" else "Tắt"
     }
+
+    // ----------------------------------------------
+    // Chuẩn bị giá trị hiển thị, nếu null => 0f
+    // ----------------------------------------------
+    val powerRatingValue = powerData.value?.powerRating ?: 0f
+    val avgTemperatureValue = sensorData.value?.averageTemperature ?: 0f
 
     AppTheme {
         val colorScheme = MaterialTheme.colorScheme
@@ -531,7 +587,7 @@ fun DeviceItem(device: DeviceResponse, onDetailsClick: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            colors = CardDefaults.cardColors(containerColor = colorScheme.surface)
         ) {
             Row(
                 modifier = Modifier
@@ -544,34 +600,35 @@ fun DeviceItem(device: DeviceResponse, onDetailsClick: () -> Unit) {
                     IconBox(getIconForType(device.TypeID), colorScheme.background)
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
-
                         LimitedWordsText(device.Name, 3)
 
                         Text(
                             text = "Loại: ${getType(device.TypeID)}",
                             fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                            color = colorScheme.onSurface.copy(alpha = 0.6f)
                         )
                         Text(
                             text = "Trạng thái: ${getPower(device.PowerStatus)}",
                             fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                            color = colorScheme.onSurface.copy(alpha = 0.6f)
                         )
-//                        Text(
-//                            text = "Sử dụng điện: ${device.powerUsage} W",
-//                            fontSize = 14.sp,
-//                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-//                        )
-//                        Text(
-//                            text = "Nhiệt độ: ${device.temperature}°C",
-//                            fontSize = 14.sp,
-//                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-//                        )
+                        // Lấy powerRatingValue, nếu null thì 0f
+                        Text(
+                            text = "Sử dụng điện: $powerRatingValue W",
+                            fontSize = 14.sp,
+                            color = colorScheme.onSurface.copy(alpha = 0.6f)
+                        )
+                        // Lấy avgTemperatureValue, nếu null thì 0f
+                        Text(
+                            text = "Nhiệt độ: $avgTemperatureValue °C",
+                            fontSize = 14.sp,
+                            color = colorScheme.onSurface.copy(alpha = 0.6f)
+                        )
                     }
                 }
                 Button(
                     onClick = onDetailsClick,
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    colors = ButtonDefaults.buttonColors(containerColor = colorScheme.primary)
                 ) {
                     Text(text = "Chi tiết", color = Color.White)
                 }
