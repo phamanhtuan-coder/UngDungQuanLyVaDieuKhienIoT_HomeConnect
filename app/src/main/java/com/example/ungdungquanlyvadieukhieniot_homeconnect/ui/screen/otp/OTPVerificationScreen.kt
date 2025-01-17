@@ -48,14 +48,38 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 fun OtpScreen(
     navController: NavHostController,
     email: String,
+    onVerificationSuccess: () -> Unit, // Thêm callback này
+    title: String = "Nhập mã OTP", // Cho phép tùy chỉnh tiêu đề
+    description: String = "Vui lòng nhập mã OTP vừa được gửi tới Email", // Cho phép tùy chỉnh mô tả
     viewModel: OTPViewModel = viewModel()
-
-) {
+){
     val sendOTPState by viewModel.sendOtpState.collectAsState()
     var sendSuccesful = ""
 
     LaunchedEffect(Unit) {
         viewModel.sendOTP(email)
+    }
+
+    val verifyEmailState by viewModel.verifyEmailState.collectAsState()
+    var verifyEmailMessage = ""
+    when (verifyEmailState) {
+        is VerifyEmailState.Success -> {
+            LaunchedEffect(Unit) {
+                onVerificationSuccess()
+            }
+        }
+
+        is VerifyEmailState.Error -> {
+            verifyEmailMessage = "Xác thực Email thất bại! Email không tồn tại."
+        }
+
+        is VerifyEmailState.Loading -> {
+            verifyEmailMessage = "Đang xác thực Email..."
+        }
+
+        else -> {
+           // Khong lam gi
+        }
     }
 
     when (sendOTPState) {
@@ -80,9 +104,18 @@ fun OtpScreen(
     var verifyOTPMessage = ""
     when (verifyOTPState) {
         is OTPState.Success -> {
-            LaunchedEffect(Unit) {
-                navController.navigate("${Screens.NewPassword.route}?email=$email")
+
+            when(title){
+                "Xác nhận Email" -> {
+                    viewModel.confirmEmail(email)
+                }
+                else -> {
+                    LaunchedEffect(Unit) {
+                        onVerificationSuccess()
+                    }
+                }
             }
+
         }
 
         is OTPState.Error -> {
@@ -120,7 +153,7 @@ fun OtpScreen(
             ) {
                 // Tiêu đề
                 Text(
-                    text = "Nhập mã OTP",
+                    text = title,
                     fontSize = if (isTablet) 28.sp else 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = colorScheme.primary
@@ -136,7 +169,7 @@ fun OtpScreen(
                     }
                 )
                 Text(
-                    text = "Vui lòng nhập mã OTP vừa được gửi tới Email",
+                    text =description,
                     fontSize = 14.sp,
                     color = colorScheme.onBackground.copy(alpha = 0.6f)
                 )
@@ -180,7 +213,18 @@ fun OtpScreen(
                                 unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
                             ),
                         )
+                        Text(
+                            text = verifyEmailMessage,
+                            fontSize = 24.sp,
+                            color = colorScheme.error
+                        )
+                        Text(
+                            text = verifyOTPMessage,
+                            fontSize = 24.sp,
+                            color = colorScheme.error
+                        )
                     }
+
 
                 }
                 TextButton(
@@ -247,5 +291,5 @@ fun OtpScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun OtpScreenPreview() {
-    OtpScreen(navController = rememberNavController(), email = "")
+    OtpScreen(navController = rememberNavController(), email = "", onVerificationSuccess = {})
 }

@@ -1,5 +1,7 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.api
 
+import CreateHouseResponse
+import SpaceResponse3
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Alert
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AlertDetail
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.AlertResponse
@@ -263,6 +265,13 @@ interface ApiService {
         @Body sharedWithUserEmail: SharedUserRequest,
         @Header("Authorization") token: String
     ): Response<Unit>
+
+    @POST("/api/users/confirm-email")
+    suspend fun confirmEmail(
+        @Body request: EmailRequest,
+        @Header("Authorization") token: String
+    ): EmailResponse
+
 
 
 }

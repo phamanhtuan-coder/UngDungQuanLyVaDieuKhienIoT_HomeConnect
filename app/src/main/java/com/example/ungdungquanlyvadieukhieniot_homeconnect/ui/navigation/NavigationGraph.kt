@@ -69,19 +69,49 @@ fun NavigationGraph(
 
         // OTP Screen
         composable(
-            route = "${Screens.OTP.route}?email={email}",
+            route = Screens.OTP.route,
             arguments = listOf(
+                navArgument("type") {
+                    type = NavType.StringType
+                },
                 navArgument("email") {
                     type = NavType.StringType
-                    defaultValue = ""
                 }
             )
         ) { backStackEntry ->
+            val type = backStackEntry.arguments?.getString("type") ?: "reset_password"
             val email = backStackEntry.arguments?.getString("email") ?: ""
-            Log.d("OTP", "Email: $email")
+
+            val onVerificationSuccess = {
+                when (type) {
+                    "reset_password" -> {
+                        navController.navigate("${Screens.NewPassword.route}?email=$email")
+                    }
+                    "email_verification" -> {
+                        navController.navigate(Screens.Profile.route)
+                    }
+//                    "transaction" -> {
+//                        navController.navigate(Screens.TransactionSuccess.route)
+//                    }
+                }
+            }
+
             OtpScreen(
                 navController = navController,
-                email = email
+                email = email,
+                title = when(type) {
+                    "reset_password" -> "Nhập mã OTP"
+                    "email_verification" -> "Xác thực Email"
+                    "transaction" -> "Xác thực giao dịch"
+                    else -> "Nhập mã OTP"
+                },
+                description = when(type) {
+                    "reset_password" -> "Vui lòng nhập mã OTP vừa được gửi tới Email"
+                    "email_verification" -> "Nhập mã xác thực được gửi tới email của bạn"
+                    "transaction" -> "Nhập mã OTP để xác nhận giao dịch"
+                    else -> "Vui lòng nhập mã OTP vừa được gửi tới Email"
+                },
+                onVerificationSuccess = onVerificationSuccess
             )
         }
         // HomeScreen

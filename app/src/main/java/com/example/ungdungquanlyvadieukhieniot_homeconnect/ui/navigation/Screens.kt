@@ -10,7 +10,9 @@ sealed class Screens(
     object RecoverPassword: Screens("recover_password")
     object UpdatePassword: Screens("update_password")
     object NewPassword: Screens("new_password")
-    object OTP: Screens("otp")
+    object OTP : Screens("otp/{type}/{email}") {
+        fun createRoute(type: String, email: String) = "otp/$type/$email"
+    }
     object PasswordAuth: Screens("password_auth")
     object Profile: Screens("profile")
     object AddDevice: Screens("add_device")

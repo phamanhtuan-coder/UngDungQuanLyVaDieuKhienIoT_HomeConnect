@@ -465,19 +465,26 @@ fun ProfileScreen(
                                     ),
                                 contentAlignment = Alignment.TopEnd
                             ) {
-                                Icon(
-                                    imageVector = if (isVerified.value) Icons.Default.CheckCircle else Icons.Default.Error,
-                                    contentDescription = "Verified",
-                                    tint =  if (isVerified.value) Color.Green else Color.Red,
-                                    modifier = Modifier
-                                        .size((if (isTablet) 70 else 40).dp)
-                                        .padding(
-                                            start = if (isTablet) 16.dp else 8.dp,
-                                            end = if (isTablet) 16.dp else 8.dp,
-                                            top = if (isTablet) 8.dp else 2.dp,
-                                            bottom = if (isTablet) 8.dp else 2.dp
-                                        )
-                                )
+                                IconButton (
+                                    onClick = {
+                                        navController.navigate(Screens.OTP.createRoute("email_verification", emailState.value))
+                                    },
+                                    enabled = !isVerified.value,
+                                ){
+                                    Icon(
+                                        imageVector = if (isVerified.value) Icons.Default.CheckCircle else Icons.Default.Error,
+                                        contentDescription = "Verified",
+                                        tint =  if (isVerified.value) Color.Green else Color.Red,
+                                        modifier = Modifier
+                                            .size((if (isTablet) 70 else 40).dp)
+                                            .padding(
+                                                start = if (isTablet) 16.dp else 8.dp,
+                                                end = if (isTablet) 16.dp else 8.dp,
+                                                top = if (isTablet) 8.dp else 2.dp,
+                                                bottom = if (isTablet) 8.dp else 2.dp
+                                            )
+                                    )
+                                }
                             }
                         }
 
