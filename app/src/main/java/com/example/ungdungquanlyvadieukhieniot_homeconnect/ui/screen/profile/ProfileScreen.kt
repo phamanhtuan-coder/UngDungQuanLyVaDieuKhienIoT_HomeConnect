@@ -465,16 +465,21 @@ fun ProfileScreen(
                                     ),
                                 contentAlignment = Alignment.TopEnd
                             ) {
-                                IconButton (
+                                IconButton(
                                     onClick = {
-                                        navController.navigate(Screens.OTP.createRoute("email_verification", emailState.value))
+                                        navController.navigate(
+                                            Screens.OTP.createRoute(
+                                                "email_verification",
+                                                emailState.value
+                                            )
+                                        )
                                     },
                                     enabled = !isVerified.value,
-                                ){
+                                ) {
                                     Icon(
                                         imageVector = if (isVerified.value) Icons.Default.CheckCircle else Icons.Default.Error,
                                         contentDescription = "Verified",
-                                        tint =  if (isVerified.value) Color.Green else Color.Red,
+                                        tint = if (isVerified.value) Color.Green else Color.Red,
                                         modifier = Modifier
                                             .size((if (isTablet) 70 else 40).dp)
                                             .padding(

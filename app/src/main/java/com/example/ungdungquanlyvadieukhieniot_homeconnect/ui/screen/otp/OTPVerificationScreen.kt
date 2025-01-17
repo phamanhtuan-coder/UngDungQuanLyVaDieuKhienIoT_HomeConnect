@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 @Composable
@@ -52,7 +51,7 @@ fun OtpScreen(
     title: String = "Nhập mã OTP", // Cho phép tùy chỉnh tiêu đề
     description: String = "Vui lòng nhập mã OTP vừa được gửi tới Email", // Cho phép tùy chỉnh mô tả
     viewModel: OTPViewModel = viewModel()
-){
+) {
     val sendOTPState by viewModel.sendOtpState.collectAsState()
     var sendSuccesful = ""
 
@@ -78,7 +77,7 @@ fun OtpScreen(
         }
 
         else -> {
-           // Khong lam gi
+            // Khong lam gi
         }
     }
 
@@ -105,10 +104,11 @@ fun OtpScreen(
     when (verifyOTPState) {
         is OTPState.Success -> {
 
-            when(title){
+            when (title) {
                 "Xác nhận Email" -> {
                     viewModel.confirmEmail(email)
                 }
+
                 else -> {
                     LaunchedEffect(Unit) {
                         onVerificationSuccess()
@@ -169,7 +169,7 @@ fun OtpScreen(
                     }
                 )
                 Text(
-                    text =description,
+                    text = description,
                     fontSize = 14.sp,
                     color = colorScheme.onBackground.copy(alpha = 0.6f)
                 )

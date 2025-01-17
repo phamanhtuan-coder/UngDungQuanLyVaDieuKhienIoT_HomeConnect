@@ -1,6 +1,6 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.data.repository
 
-import android.app.Application
+import SpaceResponse3
 import android.content.Context
 import android.util.Log
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.api.ApiService.UpdateSpaceRequest
@@ -8,6 +8,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.api.Retro
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.CreateSpaceRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.CreateSpaceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceDetailResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse2
 
@@ -60,5 +61,11 @@ class SpaceRepository(private val context: Context) {
         ).also {
             Log.d("CreateSpaceRepository", "API Response: ${it.message}, Space: ${it.space}")
         }
+    }
+
+    suspend fun getSpaceDetail(spaceId: Int): SpaceDetailResponse {
+        val sharedPrefs = context.getSharedPreferences("MY_APP_PREFS", Context.MODE_PRIVATE)
+        val token = sharedPrefs.getString("JWT_TOKEN", "") ?: ""
+        return apiService.getSpaceDetail(spaceId, "Bearer $token")
     }
 }

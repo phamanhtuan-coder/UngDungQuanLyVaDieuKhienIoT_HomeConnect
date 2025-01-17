@@ -86,7 +86,8 @@ class OTPViewModel(application: Application) : AndroidViewModel(application) {
             } catch (e: Exception) {
                 // Bắt lỗi (VD: 401, Network error, v.v.)
                 Log.e("OTPViewModel", "OTP send error: ${e.message}")
-                _verifyEmailState.value = VerifyEmailState.Error(e.message ?: "Xác thực email thất bại!")
+                _verifyEmailState.value =
+                    VerifyEmailState.Error(e.message ?: "Xác thực email thất bại!")
             }
         }
     }

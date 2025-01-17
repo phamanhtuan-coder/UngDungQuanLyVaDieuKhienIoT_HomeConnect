@@ -1,7 +1,6 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation
 
 import DashboardDeviceScreen
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -33,7 +32,6 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.settings.Se
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.share_device.ShareDeviceScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.signup.SignUpScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.space.SpaceScreen
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.space.SpaceViewModel
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.update_password.UpdatePasswordScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.wifi_connection.WifiConnectionScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screens.DashboardScreen
@@ -87,6 +85,7 @@ fun NavigationGraph(
                     "reset_password" -> {
                         navController.navigate("${Screens.NewPassword.route}?email=$email")
                     }
+
                     "email_verification" -> {
                         navController.navigate(Screens.Profile.route)
                     }
@@ -99,13 +98,13 @@ fun NavigationGraph(
             OtpScreen(
                 navController = navController,
                 email = email,
-                title = when(type) {
+                title = when (type) {
                     "reset_password" -> "Nhập mã OTP"
                     "email_verification" -> "Xác thực Email"
                     "transaction" -> "Xác thực giao dịch"
                     else -> "Nhập mã OTP"
                 },
-                description = when(type) {
+                description = when (type) {
                     "reset_password" -> "Vui lòng nhập mã OTP vừa được gửi tới Email"
                     "email_verification" -> "Nhập mã xác thực được gửi tới email của bạn"
                     "transaction" -> "Nhập mã OTP để xác nhận giao dịch"

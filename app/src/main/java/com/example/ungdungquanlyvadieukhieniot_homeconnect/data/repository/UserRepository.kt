@@ -58,7 +58,7 @@ class UserRepository(private val context: Context) {
         )
         val sharedPrefs = context.getSharedPreferences("MY_APP_PREFS", Context.MODE_PRIVATE)
         val token = sharedPrefs.getString("JWT_TOKEN", "") ?: ""
-        return apiService.confirmEmail(request, token= "Bearer $token")
+        return apiService.confirmEmail(request, token = "Bearer $token")
     }
 
 

@@ -99,7 +99,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 @Composable
 fun DeviceScreen(
     navController: NavHostController,
-    sharedViewModel: SharedViewModel
+    sharedViewModel: SharedViewModel,
 ) {
     var selectedTabIndex by remember { mutableStateOf(0) }
 

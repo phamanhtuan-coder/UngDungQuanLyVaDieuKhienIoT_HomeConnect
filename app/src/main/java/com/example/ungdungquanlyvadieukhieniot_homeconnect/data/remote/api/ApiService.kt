@@ -22,10 +22,10 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Devic
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.EmailRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.EmailResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.HouseResponse
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LogLastest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.HousesListPesponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LinkDeviceRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LinkedDeviceResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LogLastest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LoginRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LoginResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.NewPasswordRequest
@@ -35,6 +35,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Regis
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RegisterResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SharedUser
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SharedUserRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceDetailResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse2
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleRequest
@@ -272,6 +273,11 @@ interface ApiService {
         @Header("Authorization") token: String
     ): EmailResponse
 
+    @GET("/api/spaces/{spaceId}/detail")
+    fun getSpaceDetail(
+        @Path("spaceId") spaceId: Int,
+        @Header("Authorization") token: String
+    ): SpaceDetailResponse
 
 
 }

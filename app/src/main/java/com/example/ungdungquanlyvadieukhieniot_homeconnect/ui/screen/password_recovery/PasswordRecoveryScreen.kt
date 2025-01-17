@@ -166,7 +166,12 @@ fun PasswordRecoveryScreen(
                 when (checkEmailState) {
                     is CheckEmailState.Success -> {
                         LaunchedEffect(Unit) {
-                            navController.navigate(Screens.OTP.createRoute("reset_password", emailState.value))
+                            navController.navigate(
+                                Screens.OTP.createRoute(
+                                    "reset_password",
+                                    emailState.value
+                                )
+                            )
                         }
 
                     }
