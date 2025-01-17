@@ -34,6 +34,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.NewPa
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RangeSensorRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RegisterRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RegisterResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SharedWithResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse2
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ToggleRequest
@@ -231,5 +232,11 @@ interface ApiService {
         @Body body: DailyPowerUsageRequest,
         @Header("Authorization") token: String
     ): DailyPowerUsageResponse3
+
+    @GET("/api/users/{userId}/shared-with")
+    suspend fun sharedWith(
+        @Path("userId") userId: Int,
+        @Header("Authorization") token: String
+    ) : List<SharedWithResponse>
 }
 
