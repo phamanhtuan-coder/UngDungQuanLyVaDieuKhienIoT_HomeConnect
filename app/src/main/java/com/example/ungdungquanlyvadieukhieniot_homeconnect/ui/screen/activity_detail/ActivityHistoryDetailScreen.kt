@@ -18,12 +18,8 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -36,19 +32,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.Header
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component.MenuBottom
-import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.activity_history.ActivityHistoryScreen
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
+import android.util.Log
+import androidx.compose.runtime.LaunchedEffect
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.FormattedLightDetails
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LogDetailNavArg
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.screen.activity_history.formatDate
+import com.google.gson.Gson
 
 
 /** Giao diện màn hình Cập nhật Mật Khẩu (Update PassWord Screen)
@@ -64,14 +59,13 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
 @Composable
 fun ActivityHistoryScreenDetailScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    logDetailsJson: String
 ) {
     AppTheme {
         val title by remember { mutableStateOf("Chi tiết lịch sử hoạt động") }
 
         val colorScheme = MaterialTheme.colorScheme
-        var time by remember { mutableStateOf("") }
-        var content by remember { mutableStateOf("") }
 
         val configuration = LocalConfiguration.current
         val screenWidthDp = configuration.screenWidthDp.dp
@@ -85,6 +79,50 @@ fun ActivityHistoryScreenDetailScreen(
             screenWidthDp < 600.dp -> 16.dp
             else -> 32.dp
         }
+
+        val viewModel = remember { ActivityHistoryDetailViewModel() }
+        val logDetails = remember {
+            try {
+                Gson().fromJson(logDetailsJson, LogDetailNavArg::class.java)
+            } catch (e: Exception) {
+                Log.e("ActivityHistoryDetail", "Error parsing log details", e)
+                null
+            }
+        }
+
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            if (logDetails == null) {
+                // Error state
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Không thể tải thông tin chi tiết")
+                }
+            } else {
+                // Success state - UI hiện tại của bạn
+                LaunchedEffect(logDetails) {
+                    viewModel.setLogDetail(logDetails)
+                }
+
+
+                var time by remember { mutableStateOf(formatDate(logDetails.timestamp)) }
+                var content by remember { mutableStateOf(
+                    """Thiết bị: ${logDetails.deviceName}
+Loại: ${if (logDetails.deviceType == 1) "Cảm biến khói" else "Đèn LED"}
+                
+                ${logDetails.details}
+    ${if (logDetails.deviceType == 2) {
+                        val lightDetails = logDetails.details as? FormattedLightDetails
+                        """
+        Độ sáng: ${lightDetails?.brightness ?: "N/A"}%
+        Màu sắc: ${lightDetails?.color ?: "N/A"}
+        """.trimIndent()
+                    } else ""}
+    """.trimIndent()
+                ) }
 
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -131,7 +169,7 @@ fun ActivityHistoryScreenDetailScreen(
                                     focusedLabelColor = colorScheme.secondary,
                                 ),
                                 onValueChange = { time = it },
-                                label = {Text("Thời gian") },
+                                label = { Text("Thời gian") },
                                 modifier = Modifier.fillMaxWidth()
                             )
 
@@ -147,7 +185,7 @@ fun ActivityHistoryScreenDetailScreen(
                                     focusedContainerColor = colorScheme.secondary,
                                     focusedTextColor = colorScheme.onSecondary
                                 ),
-                                label = {Text("Nội dung hoạt động") },
+                                label = { Text("Nội dung hoạt động") },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(200.dp),
@@ -192,9 +230,11 @@ fun ActivityHistoryScreenDetailScreen(
         )
     }
 }
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun ActivityHistoryScreenDetailScreenPreview() {
-    ActivityHistoryScreenDetailScreen(navController = rememberNavController())
+    }
 }
+
+//@Preview(showBackground = true, showSystemUi = true)
+//@Composable
+//fun ActivityHistoryScreenDetailScreenPreview() {
+//    ActivityHistoryScreenDetailScreen(navController = rememberNavController())
+//}

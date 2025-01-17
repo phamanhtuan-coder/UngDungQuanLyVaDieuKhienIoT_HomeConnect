@@ -22,8 +22,16 @@ sealed class Screens(
     object AllNotifications : Screens("all_notifications")
     object NotificationDetail : Screens("notification_detail")
     object HouseManagement : Screens("house_management")
-    object ActivityHistory : Screens("activity_history")
-    object ActivityHistoryDetail : Screens("activity_history_detail")
+    object ActivityHistory : Screens("activity_history?deviceId={deviceId}") {
+        fun createRoute(deviceId: Int): String {
+            return "activity_history?deviceId=$deviceId"
+        }
+    }
+    object ActivityHistoryDetail : Screens("activity_history_detail/{logDetails}") {
+        fun createRoute(logDetails: String): String {
+            return "activity_history_detail/$logDetails"
+        }
+    }
     object WifiConnection: Screens("wifi_connection")
     object Spaces : Screens("spaces")
     object AddSpace : Screens("add_space")

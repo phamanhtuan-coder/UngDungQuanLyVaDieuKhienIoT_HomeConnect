@@ -928,7 +928,7 @@ fun DeviceDetailPhoneScreen(
                                 Button(
                                     onClick = {
                                         //Todo: Xử lý khi nhấn nút Lịch sử
-                                        navController.navigate(Screens.ActivityHistory.route)
+                                        navController.navigate(Screens.ActivityHistory.createRoute(safeDevice.DeviceID))
                                     },
                                     modifier = Modifier
                                         .weight(1f) // Chia đều không gian
