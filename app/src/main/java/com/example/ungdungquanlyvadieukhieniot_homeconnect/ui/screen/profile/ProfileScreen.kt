@@ -746,7 +746,12 @@ fun ProfileScreen(
                                 contentDescription = "Verified",
                                 modifier = Modifier.clickable(
                                     onClick = {
-                                        navController.navigate(Screens.OTP.route)
+                                        navController.navigate(
+                                            Screens.OTP.createRoute(
+                                                "email_verification",
+                                                emailState.value
+                                            )
+                                        )
                                     }
                                 ),
                                 tint = if (isVerified.value) Color.Green else Color.Red
