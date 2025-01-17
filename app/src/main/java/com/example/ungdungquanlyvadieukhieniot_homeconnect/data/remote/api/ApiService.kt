@@ -19,6 +19,8 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Email
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.EmailResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.HouseResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.HousesListPesponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LinkDeviceRequest
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LinkedDeviceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LoginRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.LoginResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.NewPasswordRequest
@@ -186,4 +188,10 @@ interface ApiService {
         @Body body: CreateSpaceRequest,
         @Header("Authorization") token: String
     ): CreateSpaceResponse
+
+    @POST("/api/devices/link")
+    suspend fun linkDevice(
+        @Body body: LinkDeviceRequest,
+        @Header("Authorization") token: String
+    ): LinkedDeviceResponse
 }
