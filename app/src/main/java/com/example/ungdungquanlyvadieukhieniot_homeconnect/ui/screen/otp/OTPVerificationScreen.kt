@@ -13,6 +13,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -123,11 +124,10 @@ fun OtpScreen(
         }
 
         is OTPState.Loading -> {
-            verifyOTPMessage = "Đang xác thực mã OTP..."
+            CircularProgressIndicator()
         }
 
         else -> {
-            verifyOTPMessage = "Mã OTP có hiệu lực trong 5 phút."
         }
     }
 
@@ -213,20 +213,13 @@ fun OtpScreen(
                                 unfocusedIndicatorColor = colorScheme.onBackground.copy(alpha = 0.5f)
                             ),
                         )
-                        Text(
-                            text = verifyEmailMessage,
-                            fontSize = 24.sp,
-                            color = colorScheme.error
-                        )
-                        Text(
-                            text = verifyOTPMessage,
-                            fontSize = 24.sp,
-                            color = colorScheme.error
-                        )
+
                     }
 
 
                 }
+
+
                 TextButton(
                     modifier = Modifier
                         .align(Alignment.End)
@@ -253,16 +246,30 @@ fun OtpScreen(
                     focusRequesters[0].requestFocus()
                 }
 
-                Text(
-                    text = verifyOTPMessage,
-                    fontSize = 14.sp,
-                    color =
-                    when (verifyOTPState) {
-                        is OTPState.Idle -> Color.Green
-                        is OTPState.Loading -> Color.Yellow
-                        else -> colorScheme.error
-                    }
-                )
+
+                if (title == "Xác nhận Email") {
+                    Text(
+                        text = verifyEmailMessage,
+                        fontSize = 14.sp,
+                        color = when (verifyEmailState) {
+                            is VerifyEmailState.Idle -> Color.Green
+                            is VerifyEmailState.Loading -> Color.Yellow
+                            else -> colorScheme.error
+                        }
+                    )
+                } else {
+                    Text(
+                        text = verifyOTPMessage,
+                        fontSize = 14.sp,
+                        color =
+                        when (verifyOTPState) {
+                            is OTPState.Idle -> Color.Green
+                            is OTPState.Loading -> Color.Yellow
+                            else -> colorScheme.error
+                        }
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Button(
