@@ -1,6 +1,5 @@
 package com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.component
 
-import android.app.Application
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -30,11 +29,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.SpaceResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
 
@@ -56,29 +55,28 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
  */
 @Composable
 fun SpaceCard(
-    space: SpaceResponse
+    space: SpaceResponse,
+    viewModel: SquareSpaceCardViewModel = viewModel()
+
 ) {
     var temperature by remember { mutableStateOf(25) }
     var icon by remember { mutableStateOf(Icons.Default.Home) }
-    var spaceName by remember { mutableStateOf("Living Room") }
+    var spaceName by remember { mutableStateOf(space.Name) }
     var deviceCount by remember { mutableStateOf(0) }
 
-    val context = LocalContext.current
-    val application = context.applicationContext as Application
-    val viewModel = remember {
-        SquareSpaceCardViewModel(application, context)
-    }
 
     LaunchedEffect(key1 = space.SpaceID) {
         viewModel.getSpaceDetail(space.SpaceID)
     }
     val spaceDetailState by viewModel.spaceDetailState.collectAsState()
+    var spaceDetail by remember { mutableStateOf<SpaceState>(SpaceState.Idle) }
+
     when (spaceDetailState) {
         is SpaceState.Success -> {
-            val spaceDetail = (spaceDetailState as SpaceState.Success).space
+            spaceDetail = (spaceDetailState as SpaceState.Success)
             temperature = randomInt(25, 40) //Todo: Lấy dữ liệu sau này
             icon = Icons.Default.Home //Todo: Lấy dữ liệu sau này
-            spaceName = spaceDetail.Name
+            spaceName = (spaceDetailState as SpaceState.Success).space.Name
             deviceCount = randomInt(0, 10) //Todo: Lấy dữ liệu sau này
         }
 

@@ -19,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -90,12 +91,17 @@ fun HomeScreen(
 
         is SpaceState.Success -> {
             spaces = (spacesListState as SpaceState.Success).spacesList
-            Log.d("List Device", (spacesListState as SpaceState.Success).spacesList.toString())
-            if (selectedTabIndex == 0) {
-                viewModelDevice.loadDevices(spaces.first().SpaceID)
+            Log.d("List Device", spaces.toString())
+
+            // Sử dụng LaunchedEffect để gọi loadDevices một lần khi spaces thay đổi
+            if (selectedTabIndex == 0 && spaces.isNotEmpty()) {
+                LaunchedEffect(spaces.first().SpaceID) {
+                    viewModelDevice.loadDevices(spaces.first().SpaceID)
+                }
             }
         }
     }
+
 
 
     AppTheme {
