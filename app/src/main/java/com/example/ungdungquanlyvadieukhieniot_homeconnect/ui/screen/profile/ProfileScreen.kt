@@ -279,7 +279,7 @@ fun ProfileScreen(
                         val outputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
                             timeZone = TimeZone.getDefault() // Múi giờ hiển thị trên client
                         }
-                        dateCreated.value = outputFormat.format(parsedDate)
+                        dateCreated.value = outputFormat.format(parsedDate!!)
                         Log.e("FormattedDate", dateCreated.value) // Kiểm tra kết quả
                     } catch (e: Exception) {
                         Log.e("DateError", "Lỗi chuyển đổi ngày: ${e.message}")
@@ -338,7 +338,7 @@ fun ProfileScreen(
 
                         val outputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.US)
                         outputFormat.timeZone = TimeZone.getDefault() // Hoặc múi giờ bạn muốn
-                        dateCreated.value = outputFormat.format(parsedDate)
+                        dateCreated.value = outputFormat.format(parsedDate!!)
 
                         Log.e("dateCreated.value 4", dateCreated.value.toString())
                     }
