@@ -139,7 +139,7 @@ fun HomeScreen(
     val state by viewModel.sharedWithState.collectAsState()
     var sharedUsers by remember { mutableStateOf<List<SharedWithResponse>?>(emptyList()) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(userId) {
         viewModel.fetchSharedWith(userId)
     }
     when (state) {
@@ -285,7 +285,7 @@ fun HomeScreen(
                             else -> "Không xác định"
                         }
                     }
-
+                    Log.d("SharedUsers", sharedUsers.toString())
                     sharedUsers?.let { response ->
                         LazyRow(
                             modifier = Modifier.fillMaxWidth()

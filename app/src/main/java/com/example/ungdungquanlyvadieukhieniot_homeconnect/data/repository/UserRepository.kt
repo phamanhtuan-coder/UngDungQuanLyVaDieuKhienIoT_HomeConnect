@@ -6,6 +6,7 @@ import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.Chang
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.ChangePasswordResponce
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceTokenRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.DeviceTokenResponse
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.EmailRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.EmailResponse
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.NewPasswordRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.NewPasswordResponse
@@ -60,12 +61,12 @@ class UserRepository(private val context: Context) {
         return apiService.sharedWith(userId, token = "Bearer $token")
     }
     suspend fun confirmEmail(email: String): EmailResponse {
-//        val request = EmailRequest(
-//            email = email
-//        )
+        val request = EmailRequest(
+            email = email
+        )
         val sharedPrefs = context.getSharedPreferences("MY_APP_PREFS", Context.MODE_PRIVATE)
         val token = sharedPrefs.getString("JWT_TOKEN", "") ?: ""
-        return apiService.confirmEmail(email, token = "Bearer $token")
+        return apiService.confirmEmail(request, token = "Bearer $token")
     }
 
 

@@ -66,7 +66,9 @@ fun OtpScreen(
     when (verifyEmailState) {
         is VerifyEmailState.Success -> {
             verifyEmailMessage = "Xác thực Email thành công!"
+            Log.d("OtpScreen", "Calling confirmEmail")
             onVerificationSuccess()
+            Log.d("OtpScreen", "Calling onVerificationSuccess")
         }
 
         is VerifyEmailState.Error -> {
