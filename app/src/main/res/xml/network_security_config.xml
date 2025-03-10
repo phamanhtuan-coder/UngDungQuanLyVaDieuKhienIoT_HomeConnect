@@ -2,6 +2,7 @@
 <network-security-config>
     <domain-config cleartextTrafficPermitted="true">
         <!-- Thay "10.0.2.2" bằng IP/Domain server của bạn -->
-        <domain includeSubdomains="true">homeconnect-api-ws-3a22df0bbfef.herokuapp.com</domain>
+        <!--        <domain includeSubdomains="true">homeconnect-api-ws-3a22df0buapp.combfef.herok</domain>-->
+        <domain includeSubdomains="true">10.0.2.2</domain>
     </domain-config>
 </network-security-config>
