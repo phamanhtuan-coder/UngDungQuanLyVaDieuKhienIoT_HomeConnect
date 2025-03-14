@@ -66,6 +66,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -90,6 +91,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.ungdungquanlyvadieukhieniot_homeconnect.R
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.RegisterRequest
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.navigation.Screens
 import com.example.ungdungquanlyvadieukhieniot_homeconnect.ui.theme.AppTheme
@@ -106,22 +108,17 @@ import java.util.Locale
 @Composable
 fun SignUpScreen(navController: NavHostController,
 ) {
+    // Họ tên
+    var nameError by remember { mutableStateOf("") }
 
-//    // Họ tên
-//    var name by remember { mutableStateOf("") }
-      var nameError by remember { mutableStateOf("") }
-//
-//    // Email
-//    var email by remember { mutableStateOf("") }
-      var emailError by remember { mutableStateOf("") }
-//
-//    // Số điện thoại
-//    var phoneNumber by remember { mutableStateOf("") }
-      var phoneError by remember { mutableStateOf("") }
-//
-//    // Địa chỉ
-//    var address by remember { mutableStateOf("") }
-      var addressError by remember { mutableStateOf("") }
+    // Email
+    var emailError by remember { mutableStateOf("") }
+
+    // Số điện thoại
+    var phoneError by remember { mutableStateOf("") }
+
+    // Địa chỉ
+    var addressError by remember { mutableStateOf("") }
 
     val context = LocalContext.current
     val application = context.applicationContext as Application
@@ -174,41 +171,36 @@ fun SignUpScreen(navController: NavHostController,
         var confirmPassword by remember { mutableStateOf("") }
         var phoneNumber by remember { mutableStateOf("") }
         var address by remember { mutableStateOf("") }
-        var avatarUri by remember { mutableStateOf<Uri?>(null) }
+        var avatarUri by remember { mutableStateOf(getDefaultAvatarUri(context)) }
+        var profileImage by remember { mutableStateOf(getDefaultAvatarBase64(context)) }
 
-        var stage by remember { mutableStateOf(1) }
+        var stage by remember { mutableIntStateOf(1) }
         var errorMessage by remember { mutableStateOf("") }
-
-        var profileImage by remember {mutableStateOf("")}
 
         val imagePickerLauncher =
             rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
                 uri?.let {
                     val mimeType = context.contentResolver.getType(it)
                     if (mimeType == "image/jpeg" || mimeType == "image/png") {
-                        avatarUri = it // Lưu URI của ảnh
+                        avatarUri = it
                         errorMessage = ""
 
-                        val maxSizeInKB = 25 // Giới hạn kích thước ảnh 92KB
-
-                        // Chuyển URI thành ByteArray
+                        val maxSizeInKB = 25
                         val inputImage = uriToByteArray(context, it)
 
                         if (inputImage != null) {
                             // Nén ảnh
                             val compressedImage =
                                 compressImage(
-                                    inputImage = inputImage, // Ảnh gốc dạng ByteArray
-                                    quality = 90, // Chất lượng khởi đầu (90%)
-                                    maxFileSizeKB = 25 // Kích thước mong muốn (25 KB)
+                                    inputImage = inputImage,
+                                    quality = 90,
+                                    maxFileSizeKB = maxSizeInKB
                                 )
                             if (compressedImage != null && compressedImage.size / 1024 <= maxSizeInKB) {
                                 // Chuyển đổi ảnh đã nén sang Base64
                                 val base64Image = Base64.encodeToString(compressedImage, Base64.NO_WRAP)
                                 profileImage = base64Image
-                                Log.d("Base64", base64Image) // Log Base64 hoặc gửi lên API
                             } else {
-                                // Ảnh vượt kích thước hoặc không thể nén đủ nhỏ
                                 errorMessage = "Ảnh quá lớn, không thể nén đủ nhỏ!"
                                 Log.e("ImagePicker", "Không thể nén ảnh")
                             }
@@ -217,7 +209,6 @@ fun SignUpScreen(navController: NavHostController,
                             Log.e("ImagePicker", "Không thể chuyển URI thành ByteArray")
                         }
                     } else {
-                        // MIME type không hợp lệ
                         errorMessage = "Chỉ chấp nhận định dạng JPEG hoặc PNG."
                         Log.e("ImagePicker", "Định dạng file không hợp lệ: $mimeType")
                     }
@@ -243,7 +234,9 @@ fun SignUpScreen(navController: NavHostController,
                     "Mật khẩu cần ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt."
 
                 confirmPassword != password -> errorMessage = "Mật khẩu nhập lại không khớp."
-                avatarUri == null -> errorMessage = "Vui lòng chọn ảnh đại diện."
+            }
+            if (profileImage.isBlank()) {
+                errorMessage = "Vui lòng chọn ảnh đại diện."
             }
             return errorMessage.isEmpty()
         }
@@ -456,33 +449,16 @@ fun SignUpScreen(navController: NavHostController,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
 
-                        avatarUri?.let {
-                            Image(
-                                painter = rememberAsyncImagePainter(it),
-                                contentDescription = "Avatar Preview",
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .size(120.dp)
-                                    .clip(CircleShape)
-                                    .border(2.dp, colorScheme.primary, CircleShape)
-                                    .background(colorScheme.onSurface.copy(alpha = 0.1f))
-                            )
-                        } ?: Box( // Hiển thị placeholder khi chưa chọn ảnh
-                            contentAlignment = Alignment.Center,
+                        Image(
+                            painter = rememberAsyncImagePainter(avatarUri),
+                            contentDescription = "Avatar",
+                            contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .size(120.dp)
                                 .clip(CircleShape)
-                                .border(2.dp, colorScheme.primary.copy(alpha = 0.5f), CircleShape)
-                                .background(colorScheme.onSurface.copy(alpha = 0.05f))
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = "Default Avatar",
-                                tint = colorScheme.onBackground.copy(alpha = 0.5f),
-                                modifier = Modifier.size(64.dp)
-                            )
-                        }
-
+                                .border(2.dp, colorScheme.primary, CircleShape)
+                                .background(colorScheme.onSurface.copy(alpha = 0.1f))
+                        )
                     }
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -731,46 +707,6 @@ fun SignUpScreen(navController: NavHostController,
     }
 }
 
-//private fun compressImage(context: Context, uri: Uri, maxSizeInKB: Int): ByteArray? {
-//    return try {
-//        val inputStream = context.contentResolver.openInputStream(uri)
-//        val bitmap = android.graphics.BitmapFactory.decodeStream(inputStream)
-//        inputStream?.close()
-//
-//        val outputStream = java.io.ByteArrayOutputStream()
-//        var quality = 100
-//
-//        // Xác định định dạng gốc
-//        val mimeType = context.contentResolver.getType(uri)
-//        val compressFormat = when (mimeType) {
-//            "image/png" -> android.graphics.Bitmap.CompressFormat.PNG
-//            "image/jpeg" -> android.graphics.Bitmap.CompressFormat.JPEG
-//            else -> return null // Không hỗ trợ định dạng khác
-//        }
-//
-//        // Nén ảnh giữ nguyên định dạng
-//        bitmap.compress(compressFormat, quality, outputStream)
-//
-//        // Nếu định dạng là JPEG, giảm chất lượng nếu vượt kích thước
-//        if (compressFormat == android.graphics.Bitmap.CompressFormat.JPEG) {
-//            while (outputStream.toByteArray().size / 1024 > maxSizeInKB && quality > 10) {
-//                quality -= 10
-//                outputStream.reset()
-//                bitmap.compress(compressFormat, quality, outputStream)
-//            }
-//        }
-//
-//        if (outputStream.toByteArray().size / 1024 <= maxSizeInKB) {
-//            outputStream.toByteArray()
-//        } else {
-//            null // Không thể nén ảnh đủ nhỏ
-//        }
-//    } catch (e: Exception) {
-//        e.printStackTrace()
-//        null
-//    }
-//}
-
 fun compressImage(inputImage: ByteArray, quality: Int, maxFileSizeKB: Int): ByteArray? {
     // Decode ảnh từ byte array
     var bitmap = BitmapFactory.decodeByteArray(inputImage, 0, inputImage.size)
@@ -779,17 +715,15 @@ fun compressImage(inputImage: ByteArray, quality: Int, maxFileSizeKB: Int): Byte
     var currentQuality = quality
 
     do {
-        outputStream.reset() // Xóa dữ liệu cũ trong bộ nhớ
+        outputStream.reset()
 
-        // Nén ảnh với chất lượng hiện tại
         bitmap.compress(Bitmap.CompressFormat.JPEG, currentQuality, outputStream)
 
-        // Nếu kích thước vẫn lớn hơn maxFileSizeKB, giảm độ phân giải
         if (outputStream.size() / 1024 > maxFileSizeKB) {
-            bitmap = resizeBitmap(bitmap, bitmap.width / 2, bitmap.height / 2) // Thu nhỏ ảnh
+            bitmap = resizeBitmap(bitmap, bitmap.width / 2, bitmap.height / 2)
         }
 
-        currentQuality -= 10 // Giảm chất lượng ảnh
+        currentQuality -= 10
     } while (outputStream.size() / 1024 > maxFileSizeKB && currentQuality > 10)
 
     return outputStream.toByteArray()
@@ -812,6 +746,21 @@ fun uriToByteArray(context: Context, uri: Uri): ByteArray? {
     }
 }
 
+fun getDefaultAvatarUri(context: Context): Uri {
+    return try {
+        Uri.parse("android.resource://${context.packageName}/drawable/user")
+    } catch (e: Exception) {
+        Log.e("Avatar", "Không tìm thấy ảnh mặc định, sử dụng ảnh trống", e)
+        Uri.EMPTY
+    }
+}
+
+fun getDefaultAvatarBase64(context: Context): String {
+    val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.user)
+    val outputStream = ByteArrayOutputStream()
+    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+    return Base64.encodeToString(outputStream.toByteArray(), Base64.NO_WRAP)
+}
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable

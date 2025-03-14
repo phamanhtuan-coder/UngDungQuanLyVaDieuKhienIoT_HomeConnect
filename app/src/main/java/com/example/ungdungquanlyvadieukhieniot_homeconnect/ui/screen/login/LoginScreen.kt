@@ -295,7 +295,6 @@ fun LoginScreen(
                         )
                     }
                 }
-
             }
         }
     }
