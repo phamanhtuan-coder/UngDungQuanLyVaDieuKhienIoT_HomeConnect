@@ -1,4 +1,4 @@
-package com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto
+package com.example.ungdungquanlyvadieukhieniot_homeconnect.data.remote.dto.device
 
 data class LinkDeviceRequest(
     val deviceId: String,
